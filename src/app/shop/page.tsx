@@ -56,9 +56,12 @@ export default function ShopPage() {
             </h1>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/" className="awwwards-btn flex items-center gap-2">
-               Home
-            </Link>
+            <button 
+              onClick={() => router.back()}
+              className="awwwards-btn flex items-center gap-2"
+            >
+               Back
+            </button>
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted hidden md:block">{products.length} pieces</p>
             <button 
               onClick={() => setIsFilterOpen(true)}

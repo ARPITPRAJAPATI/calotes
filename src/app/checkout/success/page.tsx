@@ -43,11 +43,14 @@ function SuccessContent() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <button 
+            onClick={() => router.back()}
+            className="awwwards-btn inline-flex items-center gap-2"
+          >
+            Back
+          </button>
           <Link href="/shop" className="awwwards-btn inline-flex items-center gap-2">
             Continue Shopping <ArrowRight size={14} />
-          </Link>
-          <Link href="/profile" className="awwwards-btn inline-flex items-center gap-2">
-            View Orders
           </Link>
         </div>
       </motion.div>

@@ -74,7 +74,7 @@ export default function Home() {
         <div className="max-w-[1800px] mx-auto px-6 md:px-10 py-4 flex items-center justify-between">
           {/* Left Nav */}
           <div className="hidden lg:flex items-center gap-8 text-[10px] uppercase tracking-[0.2em] font-bold">
-            {[{name:"New In", href:"/shop"}, {name:"Mens", href:"/shop?category=mens"}, {name:"Womens", href:"/shop?category=womens"}, {name:"Archive", href:"/shop"}].map(l => (
+            {[{ name: "New In", href: "/shop" }, { name: "Mens", href: "/shop?category=mens" }, { name: "Womens", href: "/shop?category=womens" }, { name: "Archive", href: "/shop" }].map(l => (
               <Link key={l.name} href={l.href}
                 onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)}
                 className="underline-hover hover:text-accent transition-colors"
@@ -135,10 +135,10 @@ export default function Home() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-0 z-[200] bg-bg-dark text-card flex flex-col p-8"
           >
-          <div className="flex justify-between items-center pb-10 border-b border-white/10">
-            <span className="font-display font-black text-2xl uppercase tracking-tighter text-card">Calotes</span>
-            <button onClick={() => setIsMobileMenuOpen(false)}><X size={24} strokeWidth={1.5} className="text-card" /></button>
-          </div>
+            <div className="flex justify-between items-center pb-10 border-b border-white/10">
+              <span className="font-display font-black text-2xl uppercase tracking-tighter text-card">Calotes</span>
+              <button onClick={() => setIsMobileMenuOpen(false)}><X size={24} strokeWidth={1.5} className="text-card" /></button>
+            </div>
             <nav className="flex-1 flex flex-col justify-center gap-2">
               {["New In", "Mens", "Womens", "Archive", "Sale"].map((item, i) => (
                 <motion.div key={item} initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.07 + 0.2 }}>
@@ -175,39 +175,12 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/90 z-10" />
           </motion.div>
 
-          {/* Massive Modern Branding Overlay */}
-          <motion.div 
-            style={{ 
-              y: useTransform(scrollY, [0, 400], [0, 150]),
-              opacity: useTransform(scrollY, [0, 300], [1, 0])
-            }}
-            className="absolute top-20 left-0 w-full z-20 flex justify-center pointer-events-auto"
-          >
-            <Link href="/" 
-              onMouseEnter={() => setHovering(true)} 
-              onMouseLeave={() => setHovering(false)}
-              className="relative group"
-            >
-              <motion.h1 
-                className="font-display font-black text-[14vw] leading-none uppercase tracking-[-0.08em] text-white mix-blend-difference"
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-              >
-                CALOTES
-              </motion.h1>
-              <motion.div 
-                className="absolute -bottom-2 left-0 w-0 h-1 bg-accent group-hover:w-full transition-all duration-700"
-              />
-            </Link>
-          </motion.div>
-
           {/* Hero Text */}
           <motion.div style={{ opacity: heroOpacity, y: textY }} className="absolute inset-0 z-20 flex flex-col justify-end pb-12 sm:pb-24 px-6 sm:px-12 md:px-20">
             <div className="max-w-[1800px] mx-auto w-full flex flex-col md:flex-row justify-between items-end gap-10 sm:gap-12">
               <div className="flex flex-col items-start w-full relative">
                 {/* Background "CALOTES" Watermark - Dynamic */}
-                <motion.div 
+                <motion.div
                   style={{ x: useTransform(scrollYProgress, [0, 0.2], [0, 100]) }}
                   className="absolute -top-20 -left-10 select-none pointer-events-none opacity-[0.03]"
                 >
@@ -238,11 +211,11 @@ export default function Home() {
                       ADAPT<span className="text-accent text-[4vw]">.</span>
                     </motion.h2>
                   </div>
-                  
+
                   <div className="flex items-center gap-4 mt-2">
-                    <motion.div 
+                    <motion.div
                       initial={{ width: 0 }} animate={{ width: "40px" }} transition={{ delay: 1, duration: 1 }}
-                      className="h-px bg-accent/50 hidden sm:block" 
+                      className="h-px bg-accent/50 hidden sm:block"
                     />
                     <motion.h2
                       variants={{
@@ -284,7 +257,7 @@ export default function Home() {
                     Globally sourced vintage. Authenticated & curated for those who dare to lead.
                   </p>
                 </div>
-                
+
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -314,7 +287,7 @@ export default function Home() {
             className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-4"
           >
             <div className="relative w-px h-16 bg-card/20 overflow-hidden">
-              <motion.div 
+              <motion.div
                 animate={{ y: ["-100%", "100%"] }}
                 transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
                 className="absolute inset-0 w-full h-full bg-accent"
@@ -419,7 +392,7 @@ export default function Home() {
             </video>
             <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
           </div>
-          
+
           <div className="relative z-10 text-center text-card px-6">
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -436,7 +409,7 @@ export default function Home() {
               transition={{ duration: 1 }}
               className="font-display font-black text-5xl sm:text-7xl md:text-9xl uppercase tracking-tighter leading-none mb-12"
             >
-              Beyond <br/> <span className="text-outline" style={{ WebkitTextStroke: '1px white' }}>Vintage.</span>
+              Beyond <br /> <span className="text-outline" style={{ WebkitTextStroke: '1px white' }}>Vintage.</span>
             </motion.h2>
             <Link href="/shop" className="awwwards-btn text-white border-white/40 hover:text-black hover:border-white w-full sm:w-auto justify-center">
               Explore The Vault
@@ -507,7 +480,7 @@ export default function Home() {
         {/* ── ADAPT STAND OUT SECTION ── */}
         <section className="relative py-32 sm:py-64 px-6 text-center bg-black text-card overflow-hidden flex flex-col items-center justify-center min-h-[80vh]">
           {/* Brand Motion Video Background with dynamic scale */}
-          <motion.div 
+          <motion.div
             style={{ scale }}
             className="absolute inset-0 z-0"
           >
@@ -542,7 +515,7 @@ export default function Home() {
 
             {/* Dynamic Brand Reel */}
             <div className="mt-12 mb-16 overflow-hidden w-full">
-              <motion.div 
+              <motion.div
                 animate={{ x: [0, -1000] }}
                 transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
                 className="flex whitespace-nowrap gap-12 sm:gap-24 opacity-30"
@@ -551,17 +524,17 @@ export default function Home() {
                   <span key={brand} className="font-display font-black text-4xl sm:text-6xl uppercase tracking-tighter">{brand}</span>
                 ))}
                 {["LEVI'S", "CARHARTT", "RALPH LAUREN", "GUCCI", "PRADA", "DIOR", "NIKE", "ADIDAS", "YSL"].map(brand => (
-                  <span key={brand+"_copy"} className="font-display font-black text-4xl sm:text-6xl uppercase tracking-tighter">{brand}</span>
+                  <span key={brand + "_copy"} className="font-display font-black text-4xl sm:text-6xl uppercase tracking-tighter">{brand}</span>
                 ))}
               </motion.div>
             </div>
 
             <div className="flex flex-col items-center gap-8">
               <p className="text-card/50 text-[10px] font-bold uppercase tracking-[0.4em] max-w-sm mx-auto leading-loose">
-                Globally sourced. Hand picked. <br/> Curated for the modern icon.
+                Globally sourced. Hand picked. <br /> Curated for the modern icon.
               </p>
               <Link href="/shop" className="awwwards-btn-accent inline-flex items-center gap-3 w-full sm:w-auto justify-center group">
-                Enter The Archive 
+                Enter The Archive
                 <motion.span animate={{ x: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>
                   <ArrowRight size={16} />
                 </motion.span>
