@@ -3,8 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { Search, ShoppingBag, User, Menu, X, ArrowRight, Heart } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
 
 export default function Home() {
+  const { data: session } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { scrollY } = useScroll();
@@ -82,7 +85,19 @@ export default function Home() {
 
           {/* Right Icons */}
           <div className="flex-1 flex items-center justify-end gap-4 lg:gap-6">
-            <a href="#" className="hidden lg:block text-xs font-bold tracking-[0.1em] uppercase hover:opacity-50 transition-opacity">Log In</a>
+            {session ? (
+              <div className="hidden lg:flex items-center gap-4">
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted">Hi, {session.user?.name?.split(' ')[0]}</span>
+                <button 
+                  onClick={() => signOut()}
+                  className="text-xs font-bold tracking-[0.1em] uppercase hover:text-accent-red transition-colors"
+                >
+                  Log Out
+                </button>
+              </div>
+            ) : (
+              <Link href="/login" className="hidden lg:block text-xs font-bold tracking-[0.1em] uppercase hover:opacity-50 transition-opacity">Log In</Link>
+            )}
             <button className="hidden lg:block hover:opacity-50 transition-opacity"><Heart size={20} strokeWidth={2}/></button>
             <button className="hover:opacity-50 transition-opacity relative flex items-center gap-2">
               <ShoppingBag size={20} strokeWidth={2}/>
