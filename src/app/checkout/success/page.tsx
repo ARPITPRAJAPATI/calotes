@@ -7,6 +7,7 @@ import { Suspense, useEffect } from "react";
 import { motion } from "framer-motion";
 
 function SuccessContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order");
 
