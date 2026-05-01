@@ -33,7 +33,7 @@ export default function Home() {
 
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } }
   };
 
   return (
@@ -111,7 +111,7 @@ export default function Home() {
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
-            transition={{ type: "tween", duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ type: "tween", duration: 0.4, ease: "easeOut" as const }}
             className="fixed inset-0 z-[100] bg-white flex flex-col"
           >
             <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-white">
