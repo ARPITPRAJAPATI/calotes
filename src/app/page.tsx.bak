@@ -1,0 +1,277 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { ShoppingBag, Search, Menu, X, ArrowRight } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
+import { useCart } from "@/context/CartContext";
+
+export default function Home() {
+  const { data: session } = useSession();
+  const { setIsCartOpen, cartCount } = useCart();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  const { scrollYProgress } = useScroll();
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, 300]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, -300]);
+  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 1.1]);
+
+  useEffect(() => {
+    const updateMousePosition = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener("mousemove", updateMousePosition);
+    return () => window.removeEventListener("mousemove", updateMousePosition);
+  }, []);
+
+  return (
+    <div className="bg-bg text-text font-sans selection:bg-text selection:text-bg overflow-hidden relative">
+      
+      {/* Custom Cursor */}
+      <motion.div 
+        className="fixed top-0 left-0 w-4 h-4 bg-accent-pink rounded-full pointer-events-none z-[100] mix-blend-difference hidden lg:block"
+        animate={{ 
+          x: mousePosition.x - 8, 
+          y: mousePosition.y - 8,
+          scale: isHovering ? 3 : 1
+        }}
+        transition={{ type: "tween", ease: "backOut", duration: 0.15 }}
+      />
+
+      {/* HEADER: Ultra-minimal, borderless */}
+      <header className="fixed top-0 w-full z-50 px-6 py-8 mix-blend-difference text-white">
+        <div className="flex items-center justify-between">
+          <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2"><Menu size={24} /></button>
+          
+          <div className="hidden lg:flex gap-8 text-[10px] uppercase tracking-[0.2em] font-bold">
+            <Link href="/shop" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)} className="hover:opacity-50 transition-opacity">Archive</Link>
+            <Link href="/shop" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)} className="hover:opacity-50 transition-opacity">Collections</Link>
+          </div>
+
+          <Link href="/" className="font-display font-black text-4xl uppercase tracking-tighter" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+            Calotes
+          </Link>
+
+          <div className="flex gap-6 items-center text-[10px] uppercase tracking-[0.2em] font-bold">
+            {session ? (
+              <Link href="/profile" className="hidden lg:block hover:opacity-50">Profile</Link>
+            ) : (
+              <Link href="/login" className="hidden lg:block hover:opacity-50">Login</Link>
+            )}
+            <button 
+              onClick={() => setIsCartOpen(true)} 
+              onMouseEnter={() => setIsHovering(true)} 
+              onMouseLeave={() => setIsHovering(false)}
+              className="flex items-center gap-2 hover:opacity-50 transition-opacity"
+            >
+              Cart <span className="hidden lg:inline">[{cartCount}]</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* MOBILE MENU */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ y: "-100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "-100%" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-[100] bg-bg text-text flex flex-col p-6"
+          >
+            <div className="flex justify-between items-center pb-8 border-b border-border">
+              <span className="font-display font-black text-2xl uppercase">Calotes</span>
+              <button onClick={() => setIsMobileMenuOpen(false)}><X size={28} /></button>
+            </div>
+            <div className="flex-1 flex flex-col justify-center gap-8 text-5xl font-display font-black uppercase tracking-tighter">
+              <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-accent-pink transition-colors">Archive</Link>
+              <Link href="/shop?category=mens" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-accent-pink transition-colors">Mens</Link>
+              <Link href="/shop?category=womens" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-accent-pink transition-colors">Womens</Link>
+              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-xl mt-8">Account</Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <main>
+        {/* 1. HERO VIDEO */}
+        <section className="relative h-screen w-full overflow-hidden bg-bg-dark">
+          <motion.div style={{ scale }} className="absolute inset-0 w-full h-full">
+            {/* Using a placeholder high-quality video or an image fallback that looks like a video still */}
+            <div className="absolute inset-0 bg-black/40 z-10" />
+            <img 
+              src="https://images.unsplash.com/photo-1492288991661-058aa541ff43?q=80&w=2160&auto=format&fit=crop" 
+              alt="Hero Fashion" 
+              className="w-full h-full object-cover object-center"
+            />
+          </motion.div>
+          
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-white mix-blend-difference pointer-events-none px-4">
+            <motion.h1 
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+              className="font-display font-black text-[12vw] leading-[0.8] uppercase tracking-tighter text-center"
+            >
+              The Global <br/> Archive
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1 }}
+              className="mt-8 text-[10px] md:text-xs font-bold uppercase tracking-[0.3em]"
+            >
+              Curated Vintage. Est 2026.
+            </motion.p>
+          </div>
+
+          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-30">
+            <Link 
+              href="/shop" 
+              onMouseEnter={() => setIsHovering(true)} 
+              onMouseLeave={() => setIsHovering(false)}
+              className="awwwards-btn text-white border-white/30 hover:border-white hover:text-black"
+            >
+              Enter Collection
+            </Link>
+          </div>
+        </section>
+
+        {/* 2. INFINITE MARQUEE */}
+        <div className="py-8 border-y border-border overflow-hidden bg-bg">
+          <motion.div 
+            animate={{ x: [0, -2000] }}
+            transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
+            className="flex whitespace-nowrap font-display font-black text-6xl uppercase tracking-tighter opacity-10"
+          >
+            {[...Array(6)].map((_, i) => (
+              <span key={i} className="mx-8 text-outline">
+                AUTHENTIC VINTAGE • WORLDWIDE SHIPPING • ARCHIVAL PIECES • 
+              </span>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* 3. ASYMMETRICAL EDITORIAL GRID */}
+        <section className="py-32 px-6 md:px-12 max-w-[1800px] mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-24">
+            <h2 className="font-display font-black text-5xl md:text-7xl uppercase tracking-tighter leading-[0.9] max-w-2xl">
+              Curating <br/> <span className="text-muted italic font-serif tracking-normal">the</span> Future <br/> from the Past.
+            </h2>
+            <p className="text-xs uppercase tracking-widest font-bold max-w-xs mt-8 md:mt-0 text-muted">
+              We source the rarest garments globally, restoring them to their original glory for the modern aesthetic.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-6">
+            {/* Large Image Left */}
+            <motion.div 
+              style={{ y: y1 }}
+              className="md:col-span-7 aspect-[4/5] overflow-hidden relative group"
+            >
+              <img src="https://images.unsplash.com/photo-1550614000-4b95d4ebfa24?q=80&w=1200&auto=format&fit=crop" className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-105" alt="Mens Collection" />
+              <div className="absolute inset-0 bg-black/20" />
+              <div className="absolute bottom-8 left-8">
+                <Link href="/shop?category=mens" className="awwwards-btn text-white border-white/50" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+                  Explore Mens
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* Small Image Right, shifted down */}
+            <motion.div 
+              style={{ y: y2 }}
+              className="md:col-span-4 md:col-start-9 aspect-[3/4] overflow-hidden relative group mt-12 md:mt-48"
+            >
+              <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1200&auto=format&fit=crop" className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-105" alt="Womens Collection" />
+              <div className="absolute inset-0 bg-black/20" />
+              <div className="absolute bottom-8 left-8">
+                <Link href="/shop?category=womens" className="awwwards-btn text-white border-white/50" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+                  Explore Womens
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* 4. HORIZONTAL SCROLL OR CAROUSEL FOR NEW ARRIVALS */}
+        <section className="py-32 bg-bg-dark text-white">
+          <div className="px-6 md:px-12 mb-16 flex justify-between items-end">
+            <h2 className="font-display font-black text-5xl uppercase tracking-tighter">Latest Arrivals</h2>
+            <Link href="/shop" className="text-[10px] uppercase tracking-widest font-bold hover:text-accent-pink transition-colors">View Directory</Link>
+          </div>
+          
+          <div className="flex overflow-x-auto hide-scrollbar pl-6 md:pl-12 gap-8 pb-12 snap-x">
+            {[
+              { id: 1, name: "Vintage Leather", price: "₹8,999", img: "https://images.unsplash.com/photo-1559551409-dadc959f76b8?q=80&w=800&auto=format&fit=crop" },
+              { id: 2, name: "Archive Denim", price: "₹4,299", img: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop" },
+              { id: 3, name: "Graphic Knit", price: "₹3,499", img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop" },
+              { id: 4, name: "Utility Vest", price: "₹5,999", img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=800&auto=format&fit=crop" }
+            ].map((item) => (
+              <div key={item.id} className="min-w-[80vw] md:min-w-[400px] snap-center group cursor-pointer" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+                <div className="aspect-[3/4] overflow-hidden mb-6 relative">
+                  <img src={item.img} className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105" alt={item.name} />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+                     <span className="awwwards-btn text-white border-white">Quick View</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center border-b border-white/20 pb-4">
+                  <h3 className="font-bold text-xs uppercase tracking-widest">{item.name}</h3>
+                  <span className="font-bold text-xs">{item.price}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+      </main>
+
+      {/* 5. MINIMAL EDITORIAL FOOTER */}
+      <footer className="pt-32 pb-12 px-6 md:px-12 bg-bg border-t border-border">
+        <div className="max-w-[1800px] mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-16 mb-32">
+            <div className="md:col-span-6">
+              <h1 className="font-display font-black text-6xl md:text-9xl uppercase tracking-tighter leading-[0.8] mb-8 text-outline">
+                Calotes
+              </h1>
+              <p className="text-xs font-bold uppercase tracking-widest text-muted max-w-sm">
+                Redefining the archive. Authentic vintage garments, curated for the modern wardrobe.
+              </p>
+            </div>
+            
+            <div className="md:col-span-2 md:col-start-9">
+               <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-6 text-muted">Navigation</h4>
+               <ul className="space-y-4 text-xs font-bold uppercase tracking-widest">
+                 <li><Link href="/shop" className="hover:text-accent-pink transition-colors">Archive</Link></li>
+                 <li><Link href="/shop?category=mens" className="hover:text-accent-pink transition-colors">Mens</Link></li>
+                 <li><Link href="/shop?category=womens" className="hover:text-accent-pink transition-colors">Womens</Link></li>
+                 <li><Link href="/shop?sale=true" className="hover:text-accent-pink transition-colors">Sale</Link></li>
+               </ul>
+            </div>
+
+            <div className="md:col-span-2">
+               <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-6 text-muted">Social</h4>
+               <ul className="space-y-4 text-xs font-bold uppercase tracking-widest">
+                 <li><a href="#" className="hover:text-accent-pink transition-colors">Instagram</a></li>
+                 <li><a href="#" className="hover:text-accent-pink transition-colors">Twitter</a></li>
+                 <li><a href="#" className="hover:text-accent-pink transition-colors">Pinterest</a></li>
+               </ul>
+            </div>
+          </div>
+          
+          <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-border text-[10px] font-bold uppercase tracking-[0.2em] text-muted gap-4">
+            <p>&copy; {new Date().getFullYear()} Calotes Studio.</p>
+            <div className="flex gap-8">
+              <span>Privacy</span>
+              <span>Terms</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

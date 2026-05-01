@@ -1,22 +1,67 @@
 @import "tailwindcss";
 
 @theme {
-  /* Colors */
-  --color-bg: #F2EDE6;
-  --color-bg-dark: #111010;
-  --color-text: #111010;
-  --color-muted: #6B6560;
-  --color-accent: #D4FF00;
-  --color-accent-red: #E8001D;
-  --color-border: #D5CFC8;
-  --color-card: #EDEAE4;
+  /* Calotes Brand Palette — Derived from Logo */
+  --color-bg: #F5F0E8;      /* Warm Cream — logo background */
+  --color-bg-dark: #1A120B; /* Deep Espresso Brown */
+  --color-text: #1A120B;    /* Deep Ink Brown */
+  --color-muted: #8C7B6B;   /* Warm Taupe */
+  --color-accent: #C84B2F;  /* Terracotta — logo's orange-red */
+  --color-accent-2: #3D5A2A;/* Forest Olive — logo's green */
+  --color-border: rgba(26, 18, 11, 0.1);
+  --color-card: #FDFAF5;    /* Near-White Cream */
 
   /* Typography */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-barlow), sans-serif;
+  --font-serif: var(--font-playfair), serif;
   
   /* Custom Utilities */
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer utilities {
+  .awwwards-btn {
+    @apply relative z-0 overflow-hidden bg-transparent text-text border border-text/20 px-8 py-4 uppercase tracking-[0.2em] text-[10px] font-bold transition-colors duration-500 hover:text-card hover:border-text;
+  }
+  .awwwards-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--color-text);
+    transform: translateY(100%);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: -1;
+  }
+  .awwwards-btn:hover::before {
+    transform: translateY(0);
+  }
+  .awwwards-btn-accent {
+    @apply relative z-0 overflow-hidden bg-accent text-card border border-accent px-8 py-4 uppercase tracking-[0.2em] text-[10px] font-bold transition-colors duration-500 hover:text-accent;
+  }
+  .awwwards-btn-accent::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--color-card);
+    transform: translateY(100%);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: -1;
+  }
+  .awwwards-btn-accent:hover::before {
+    transform: translateY(0);
+  }
+  .text-outline {
+    -webkit-text-stroke: 1px var(--color-text);
+    color: transparent;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 /* Base Styles */
