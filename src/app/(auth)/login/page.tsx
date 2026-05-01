@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Github, Chrome, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
