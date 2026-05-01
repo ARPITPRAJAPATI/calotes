@@ -55,7 +55,10 @@ export default function ShopPage() {
               <span className="italic font-serif font-normal text-muted tracking-normal">the</span> Collection
             </h1>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="awwwards-btn flex items-center gap-2">
+               Home
+            </Link>
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted hidden md:block">{products.length} pieces</p>
             <button 
               onClick={() => setIsFilterOpen(true)}

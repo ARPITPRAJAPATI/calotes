@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
@@ -58,10 +58,18 @@ function LoginForm() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-sm"
         >
-          {/* Logo */}
-          <Link href="/" className="block mb-16">
-            <span className="font-display font-black text-3xl uppercase tracking-tighter">Calotes</span>
-          </Link>
+          {/* Top Navigation */}
+          <div className="flex justify-between items-center mb-16">
+            <Link href="/" className="block">
+              <span className="font-display font-black text-3xl uppercase tracking-tighter">Calotes</span>
+            </Link>
+            <button 
+              onClick={() => router.back()}
+              className="text-[10px] font-black uppercase tracking-[0.2em] text-muted hover:text-text transition-colors flex items-center gap-2"
+            >
+              <ArrowLeft size={12} /> Back
+            </button>
+          </div>
 
           <div className="mb-10">
             <h1 className="font-display font-black text-4xl uppercase tracking-tighter mb-2">Welcome Back</h1>

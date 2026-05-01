@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 
 export default function RegisterPage() {
@@ -63,15 +63,23 @@ export default function RegisterPage() {
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="w-full max-w-md"
       >
-        <div className="mb-12 text-center">
-          <Link href="/" className="inline-block">
-            <h1 className="text-4xl font-display font-black tracking-tighter uppercase italic">
-              Calotes<span className="text-accent">.</span>
-            </h1>
-          </Link>
-          <p className="text-muted mt-4 font-medium uppercase tracking-widest text-xs">
-            Join the community of vintage collectors
-          </p>
+        <div className="mb-12 flex justify-between items-end">
+          <div>
+            <Link href="/" className="inline-block">
+              <h1 className="text-4xl font-display font-black tracking-tighter uppercase italic">
+                Calotes<span className="text-accent">.</span>
+              </h1>
+            </Link>
+            <p className="text-muted mt-4 font-medium uppercase tracking-widest text-[10px]">
+              Join the community
+            </p>
+          </div>
+          <button 
+            onClick={() => router.back()}
+            className="text-[10px] font-black uppercase tracking-[0.2em] text-muted hover:text-text transition-colors flex items-center gap-2 mb-1"
+          >
+            <ArrowLeft size={12} /> Back
+          </button>
         </div>
 
         <div className="bg-card border border-border p-8 relative overflow-hidden group">

@@ -28,8 +28,9 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-bg text-text">
-      <div className="pt-28 pb-4 px-6 md:px-12 border-b border-border">
+      <div className="pt-28 pb-4 px-6 md:px-12 border-b border-border flex justify-between items-center">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">Calotes — Account</p>
+        <Link href="/" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted hover:text-text transition-colors">Home</Link>
       </div>
 
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-20">
