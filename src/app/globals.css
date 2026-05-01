@@ -1,57 +1,64 @@
 @import "tailwindcss";
 
-:root {
-  --bg: #F2EDE6;
-  --bg-dark: #111010;
-  --text: #111010;
-  --text-muted: #6B6560;
-  --accent: #D4FF00;
-  --accent-red: #E8001D;
-  --border: #D5CFC8;
-  --card-bg: #EDEAE4;
+@theme {
+  /* Colors */
+  --color-bg: #F2EDE6;
+  --color-bg-dark: #111010;
+  --color-text: #111010;
+  --color-muted: #6B6560;
+  --color-accent: #D4FF00;
+  --color-accent-red: #E8001D;
+  --color-border: #D5CFC8;
+  --color-card: #EDEAE4;
+
+  /* Typography */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-barlow), sans-serif;
+  
+  /* Custom Utilities */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@theme inline {
-  --color-bg: var(--bg);
-  --color-bg-dark: var(--bg-dark);
-  --color-text: var(--text);
-  --color-muted: var(--text-muted);
-  --color-accent: var(--accent);
-  --color-accent-red: var(--accent-red);
-  --color-border: var(--border);
-  --color-card: var(--card-bg);
-  --font-sans: var(--font-inter);
-  --font-display: var(--font-barlow);
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
+/* Base Styles */
 body {
-  background-color: var(--bg);
-  color: var(--text);
-  font-family: var(--font-sans), sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Announcement bar styles */
-.announcement-bar {
-  background-color: var(--accent);
-  color: var(--text);
+/* Brutalist Form Resets */
+input, button, select, textarea {
+  font-family: inherit;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--text); border-radius: 2px; }
+button {
+  cursor: pointer;
+}
 
-/* Image hover zoom */
+input:focus {
+  outline: none;
+}
+
+/* Interactive Elements */
+a, button, input {
+  transition: var(--transition-smooth);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { 
+  width: 5px; 
+}
+::-webkit-scrollbar-track { 
+  background: var(--color-bg); 
+}
+::-webkit-scrollbar-thumb { 
+  background: var(--color-text); 
+  border-radius: 10px; 
+}
+
+/* Editorial Utilities */
 .img-zoom img {
   transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
@@ -59,7 +66,6 @@ body {
   transform: scale(1.06);
 }
 
-/* Product card underline animation */
 .underline-hover {
   position: relative;
 }
@@ -77,7 +83,6 @@ body {
   width: 100%;
 }
 
-/* Marquee animation */
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
