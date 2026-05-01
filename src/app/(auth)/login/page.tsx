@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Loader2 } from "lucide-react";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
@@ -69,7 +69,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <p className="text-accent-pink text-[10px] font-bold uppercase tracking-widest mb-6 border-l-2 border-accent-pink pl-3">{error}</p>
+            <p className="text-accent text-[10px] font-bold uppercase tracking-widest mb-6 border-l-2 border-accent pl-3">{error}</p>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -129,5 +129,13 @@ export default function LoginPage() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-bg flex items-center justify-center text-[10px] font-black uppercase tracking-[0.3em] text-muted">Verifying Archive Access...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
