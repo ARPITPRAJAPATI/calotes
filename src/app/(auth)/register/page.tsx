@@ -42,8 +42,10 @@ export default function RegisterPage() {
           await signIn("credentials", {
             email: formData.email,
             password: formData.password,
+            redirect: false,
             callbackUrl: "/",
           });
+          window.location.href = "/";
         }, 1500);
       }
     } catch (err) {

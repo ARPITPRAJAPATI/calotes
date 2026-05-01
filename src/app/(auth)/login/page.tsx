@@ -27,7 +27,7 @@ function LoginForm() {
         callbackUrl,
       });
       if (res?.error) { setError("Invalid credentials."); }
-      else { router.push(callbackUrl); router.refresh(); }
+      else { window.location.href = callbackUrl; }
     } catch { setError("An unexpected error occurred."); }
     finally { setLoading(false); }
   };
