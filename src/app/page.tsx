@@ -175,6 +175,33 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/90 z-10" />
           </motion.div>
 
+          {/* Massive Modern Branding Overlay */}
+          <motion.div 
+            style={{ 
+              y: useTransform(scrollY, [0, 400], [0, 150]),
+              opacity: useTransform(scrollY, [0, 300], [1, 0])
+            }}
+            className="absolute top-20 left-0 w-full z-20 flex justify-center pointer-events-auto"
+          >
+            <Link href="/" 
+              onMouseEnter={() => setHovering(true)} 
+              onMouseLeave={() => setHovering(false)}
+              className="relative group"
+            >
+              <motion.h1 
+                className="font-display font-black text-[14vw] leading-none uppercase tracking-[-0.08em] text-white mix-blend-difference"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+              >
+                CALOTES
+              </motion.h1>
+              <motion.div 
+                className="absolute -bottom-2 left-0 w-0 h-1 bg-accent group-hover:w-full transition-all duration-700"
+              />
+            </Link>
+          </motion.div>
+
           {/* Hero Text */}
           <motion.div style={{ opacity: heroOpacity, y: textY }} className="absolute inset-0 z-20 flex flex-col justify-end pb-12 sm:pb-24 px-6 sm:px-12 md:px-20">
             <div className="max-w-[1800px] mx-auto w-full flex flex-col md:flex-row justify-between items-end gap-10 sm:gap-12">
