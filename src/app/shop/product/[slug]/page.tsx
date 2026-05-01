@@ -133,7 +133,7 @@ export default function ProductDetailsPage() {
                 {product.compareAtPrice && (
                   <span className="text-muted line-through text-lg">₹{product.compareAtPrice}</span>
                 )}
-                <span className={`text-2xl font-black ${product.compareAtPrice ? 'text-accent-pink' : ''}`}>
+                <span className={`text-2xl font-black ${product.compareAtPrice ? 'text-accent' : ''}`}>
                   ₹{product.price}
                 </span>
               </div>
@@ -143,7 +143,7 @@ export default function ProductDetailsPage() {
             <div className="flex items-center gap-3 border-y border-border py-4">
               <ShieldCheck size={16} className="text-muted" />
               <span className="text-[10px] font-black uppercase tracking-[0.2em]">Condition: </span>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-accent-pink">{product.condition}</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-accent">{product.condition}</span>
             </div>
 
             {/* Size Selection */}

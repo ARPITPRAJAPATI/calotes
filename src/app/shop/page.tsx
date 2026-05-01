@@ -114,7 +114,7 @@ export default function ShopPage() {
                   <Link href={`/shop/product/${product.slug}`} className="block">
                     <div className="relative overflow-hidden aspect-[3/4] mb-6 bg-card">
                       {product.compareAtPrice && (
-                        <div className="absolute top-4 left-4 z-10 bg-accent-pink text-white px-3 py-1 text-[10px] font-black uppercase tracking-widest">
+                        <div className="absolute top-4 left-4 z-10 bg-accent text-white px-3 py-1 text-[10px] font-black uppercase tracking-widest">
                           Sale
                         </div>
                       )}
@@ -134,7 +134,7 @@ export default function ShopPage() {
                         {product.compareAtPrice && (
                           <p className="text-[10px] text-muted line-through">₹{product.compareAtPrice}</p>
                         )}
-                        <p className={`text-xs font-bold ${product.compareAtPrice ? 'text-accent-pink' : 'text-text'}`}>₹{product.price}</p>
+                        <p className={`text-xs font-bold ${product.compareAtPrice ? 'text-accent' : 'text-text'}`}>₹{product.price}</p>
                       </div>
                     </div>
                   </Link>

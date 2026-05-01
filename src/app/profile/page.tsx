@@ -44,12 +44,12 @@ export default function ProfilePage() {
             </div>
             <nav className="space-y-4 border-t border-border pt-8">
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted mb-4">Account</p>
-              <Link href="/shop" className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest hover:text-accent-pink transition-colors group">
+              <Link href="/shop" className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest hover:text-accent transition-colors group">
                 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" /> Continue Shopping
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: '/' })}
-                className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-muted hover:text-accent-pink transition-colors"
+                className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-muted hover:text-accent transition-colors"
               >
                 <LogOut size={14} /> Sign Out
               </button>
