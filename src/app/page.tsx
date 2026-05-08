@@ -59,11 +59,12 @@ export default function Home() {
         </motion.div>
 
         {/* Hero content */}
-        <div className="relative z-10 flex flex-col justify-end h-full px-6 md:px-12 pb-16 md:pb-24 max-w-[1800px] w-full mx-auto">
+        <div className="relative z-10 flex flex-col justify-center items-center text-center h-full px-6 md:px-12 max-w-[1800px] w-full mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center"
           >
             {/* Eye-brow */}
             <p className="section-label mb-6">Premium Pre-Owned · Est. India</p>
@@ -103,19 +104,14 @@ export default function Home() {
             </h1>
 
             {/* Sub-text + CTA row */}
-            <div className="flex flex-col sm:flex-row sm:items-end gap-6 sm:gap-12">
-              <p className="text-muted text-[11px] font-medium uppercase tracking-[0.2em] leading-relaxed max-w-xs">
+            <div className="flex flex-col items-center gap-8">
+              <p className="text-muted text-[11px] font-medium uppercase tracking-[0.2em] leading-relaxed max-w-sm">
                 Hand-picked vintage & streetwear.<br />
                 For the Indian modern icon.
               </p>
-              <div className="flex gap-4 flex-wrap">
-                <Link href="/shop" className="btn-primary">
-                  Shop
-                </Link>
-                <Link href="/lookbook" className="btn-outline">
-                  Lookbook
-                </Link>
-              </div>
+              <Link href="/shop" className="btn-outline px-12 py-5 text-sm tracking-[0.3em]">
+                Shop
+              </Link>
             </div>
           </motion.div>
         </div>
@@ -136,7 +132,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           3 · LATEST ARRIVALS (Aged Arc horizontal scroll)
       ══════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-32 overflow-hidden">
+      <section className="py-12 md:py-20 overflow-hidden">
         {/* Section header */}
         <div className="max-w-[1800px] mx-auto px-6 md:px-12 flex items-end justify-between mb-10 md:mb-14">
           <div>

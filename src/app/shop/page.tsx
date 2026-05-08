@@ -55,18 +55,18 @@ function ShopContent() {
   return (
     <>
       {/* ── Page header ─────────────────────────────── */}
-      <div className="px-6 md:px-12 max-w-[1800px] mx-auto mb-10">
-        <div className="border-b border-border pb-10 mb-10">
+      <div className="px-6 md:px-12 max-w-[1800px] mx-auto mt-[-20px] mb-4">
+        <div className="border-b border-border pb-4 mb-4">
           <motion.p
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-            className="section-label mb-3"
+            className="section-label mb-1"
           >
             The Vault
           </motion.p>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <motion.h1
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
-              className="font-display font-bold text-6xl md:text-8xl lg:text-[9vw] uppercase tracking-tight leading-[0.82] text-text"
+              className="font-display font-bold text-4xl md:text-6xl lg:text-[6vw] uppercase tracking-tight leading-[0.82] text-text"
             >
               Items
             </motion.h1>
@@ -74,7 +74,7 @@ function ShopContent() {
               <p className="section-label hidden md:block">{products.length} pieces</p>
               <button
                 onClick={() => setIsFilterOpen(true)}
-                className="flex items-center gap-2 btn-primary px-6 py-3"
+                className="flex items-center gap-2 btn-primary px-4 py-2 text-[10px]"
               >
                 <SlidersHorizontal size={14} />
                 Filters
