@@ -39,7 +39,7 @@ export default function ProfilePage() {
       </div>
 
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
           {/* Sidebar */}
           <aside className="lg:col-span-3 space-y-12">
             <div>
@@ -75,9 +75,9 @@ export default function ProfilePage() {
                 <Package size={48} strokeWidth={0.8} className="text-muted" />
                 <div>
                   <p className="text-xs font-bold uppercase tracking-widest mb-2">No orders yet.</p>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Your archive is waiting to be curated.</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Your pieces are waiting to be curated.</p>
                 </div>
-                <Link href="/shop" className="awwwards-btn-accent mt-4 inline-flex items-center gap-2">
+                <Link href="/shop" className="btn-primary mt-4 inline-flex items-center gap-2">
                   Start Collecting <ArrowUpRight size={14} />
                 </Link>
               </div>

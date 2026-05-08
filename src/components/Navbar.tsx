@@ -8,69 +8,73 @@ import { useCart } from "@/context/CartContext";
 import { ShoppingBag, Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+const CATEGORIES = [
+  { name: "All Items",  href: "/shop" },
+  { name: "Denim",        href: "/shop?category=denim" },
+  { name: "Outerwear",    href: "/shop?category=outerwear" },
+  { name: "Oversized",    href: "/shop?category=oversized" },
+  { name: "Plus Size",    href: "/shop?category=plus-size" },
+  { name: "Accessories",  href: "/shop?category=accessories" },
+];
+
 export default function Navbar() {
   const { data: session } = useSession();
   const { setIsCartOpen, cartCount } = useCart();
   const pathname = usePathname();
-  
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const [scrolled,        setScrolled]        = useState(false);
+  const [mobileMenuOpen,  setMobileMenuOpen]  = useState(false);
+  const [dropdownOpen,    setDropdownOpen]    = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const categories = [
-    { name: "All Archive", href: "/shop" },
-    { name: "Denim", href: "/shop/denim" },
-    { name: "Outerwear", href: "/shop/outerwear" },
-    { name: "Oversized", href: "/shop/oversized" },
-    { name: "Plus Size", href: "/shop/plus-size" },
-  ];
+  // Close menu on navigation
+  useEffect(() => { setMobileMenuOpen(false); }, [pathname]);
 
   return (
     <>
       <header
-        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          scrolled ? "bg-white/90 backdrop-blur-md border-b border-border py-4" : "bg-transparent py-8"
+        className={`sticky top-0 w-full z-50 transition-all duration-700 ${
+          scrolled
+            ? "bg-bg/95 backdrop-blur-md border-b border-border py-3"
+            : "bg-transparent py-6 md:py-8"
         }`}
       >
-        <div className="max-w-[1800px] mx-auto px-6 md:px-12 flex items-center justify-between">
-          {/* Left - Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-8">
-            <Link href="/shop" className="text-[9px] font-black uppercase tracking-[0.3em] hover:opacity-50 transition-opacity underline-hover">
-              Shop
-            </Link>
-            
-            <div 
+        <div className="max-w-[1800px] mx-auto px-5 md:px-10 flex items-center justify-between">
+
+          {/* ── Left nav (desktop) ── */}
+          <nav className="hidden lg:flex items-center gap-8 xl:gap-10">
+            <Link href="/shop" className="section-label underline-hover">Shop</Link>
+
+            {/* Categories dropdown */}
+            <div
               className="relative"
               onMouseEnter={() => setDropdownOpen(true)}
               onMouseLeave={() => setDropdownOpen(false)}
             >
-              <button className="flex items-center gap-1 text-[9px] font-black uppercase tracking-[0.3em] hover:opacity-50 transition-opacity underline-hover pb-1">
-                Categories <ChevronDown size={10} />
+              <button className="section-label underline-hover flex items-center gap-1 pb-0.5">
+                Categories <ChevronDown size={10} className="mt-0.5" />
               </button>
-              
+
               <AnimatePresence>
                 {dropdownOpen && (
                   <motion.div
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
+                    exit={{ opacity: 0, y: 8 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full left-0 mt-2 w-48 bg-bg-dark border border-border shadow-xl p-4 flex flex-col gap-3"
+                    className="absolute top-full left-0 mt-3 w-44 bg-bg-warm border border-border-warm shadow-2xl p-4 flex flex-col gap-3"
                   >
-                    {categories.map((cat) => (
-                      <Link 
-                        key={cat.href} 
+                    {CATEGORIES.map(cat => (
+                      <Link
+                        key={cat.href}
                         href={cat.href}
-                        className="text-xs font-bold uppercase tracking-widest text-muted hover:text-text transition-colors"
                         onClick={() => setDropdownOpen(false)}
+                        className="text-[9px] font-bold uppercase tracking-[0.3em] text-muted hover:text-text transition-colors"
                       >
                         {cat.name}
                       </Link>
@@ -80,129 +84,136 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
 
-            <Link href="/lookbook" className="text-[9px] font-black uppercase tracking-[0.3em] hover:opacity-50 transition-opacity underline-hover">
-              Lookbook
-            </Link>
-            <Link href="/about" className="text-[9px] font-black uppercase tracking-[0.3em] hover:opacity-50 transition-opacity underline-hover">
-              About
-            </Link>
+            <Link href="/lookbook" className="section-label underline-hover">Lookbook</Link>
+            <Link href="/about"    className="section-label underline-hover">About</Link>
           </nav>
 
-          {/* Center - Logo */}
-          <Link href="/" className="lg:absolute lg:left-1/2 lg:-translate-x-1/2">
-            <span className="font-display font-black text-3xl md:text-4xl uppercase tracking-tighter hover:text-accent transition-colors duration-500">
+          {/* ── Center logo ── */}
+          <Link
+            href="/"
+            className="lg:absolute lg:left-1/2 lg:-translate-x-1/2 flex flex-col items-start lg:items-center leading-none z-10"
+          >
+            <span className="font-display font-black text-2xl md:text-3xl uppercase tracking-tight text-text hover:text-terracotta transition-colors duration-500">
               Calotes
+            </span>
+            <span className="text-[7px] font-bold uppercase tracking-[0.5em] text-muted mt-0.5">
+              Vintage
             </span>
           </Link>
 
-          {/* Right - Actions */}
-          <div className="flex items-center gap-6">
-            <Link 
-              href={session ? "/profile" : "/login"} 
-              className="hidden lg:block text-[9px] font-black uppercase tracking-[0.3em] hover:opacity-50 transition-opacity underline-hover"
+          {/* ── Right actions ── */}
+          <div className="flex items-center gap-5 md:gap-7">
+            <Link
+              href={session ? "/profile" : "/login"}
+              className="hidden lg:block section-label underline-hover"
             >
               {session ? "Profile" : "Login"}
             </Link>
 
+            {/* Cart button */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] hover:opacity-50 transition-opacity relative group"
+              className="relative flex items-center gap-2 section-label hover:text-terracotta transition-colors"
+              aria-label="Open cart"
             >
-              <ShoppingBag size={16} strokeWidth={1.5} />
-              <span className="hidden sm:inline">Bag</span>
+              <ShoppingBag size={18} strokeWidth={1.5} />
+              <span className="hidden sm:block">Bag</span>
               {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 w-4 h-4 bg-accent-2 text-bg text-[8px] font-black rounded-full flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 w-4 h-4 bg-terracotta text-bg text-[8px] font-black rounded-full flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
             </button>
 
-            <button onClick={() => setMobileMenuOpen(true)} className="lg:hidden text-text hover:text-accent transition-colors">
-              <Menu size={24} strokeWidth={1.5} />
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="lg:hidden text-text hover:text-terracotta transition-colors"
+              aria-label="Open menu"
+            >
+              <Menu size={22} strokeWidth={1.5} />
             </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile Menu */}
+      {/* ────────────────────────────────────────────────────
+          Mobile Full-Screen Menu
+      ─────────────────────────────────────────────────── */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-bg flex flex-col"
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[100] bg-bg flex flex-col overflow-hidden"
           >
-            <div className="flex justify-between items-center p-6 border-b border-border">
-              <span className="font-display font-black text-2xl uppercase tracking-tighter">Calotes</span>
-              <button onClick={() => setMobileMenuOpen(false)}>
-                <X size={28} strokeWidth={1} className="text-text" />
+            {/* Header */}
+            <div className="flex justify-between items-center px-6 py-5 border-b border-border">
+              <Link href="/" className="font-display font-black text-2xl uppercase tracking-tight text-text">
+                Calotes
+              </Link>
+              <button onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
+                <X size={24} strokeWidth={1} className="text-muted hover:text-text transition-colors" />
               </button>
             </div>
-            
-            <nav className="flex-1 overflow-y-auto px-6 py-12 flex flex-col">
-              <div className="space-y-10">
-                <motion.div 
-                  initial={{ x: 20, opacity: 0 }} 
-                  animate={{ x: 0, opacity: 1 }} 
-                  transition={{ delay: 0.1 }}
+
+            {/* Navigation links */}
+            <nav className="flex-1 overflow-y-auto px-6 py-10 flex flex-col gap-2">
+              {[
+                { label: "Items",  href: "/shop" },
+                { label: "Lookbook", href: "/lookbook" },
+                { label: "About",    href: "/about" },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.href}
+                  initial={{ x: 30, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.05 * i, duration: 0.5, ease: [0.16,1,0.3,1] }}
                 >
-                  <Link href="/shop" onClick={() => setMobileMenuOpen(false)} className="text-5xl font-display font-black uppercase tracking-tighter block leading-none">
-                    Archive
+                  <Link
+                    href={item.href}
+                    className="block font-display font-black text-5xl uppercase tracking-tighter text-text hover:text-terracotta transition-colors leading-tight py-3"
+                  >
+                    {item.label}
                   </Link>
                 </motion.div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  {categories.slice(1, 5).map((cat, i) => (
-                    <motion.div
+              ))}
+
+              {/* Category pills */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25, duration: 0.5 }}
+                className="mt-6 pt-6 border-t border-border"
+              >
+                <p className="section-label mb-5">Categories</p>
+                <div className="flex flex-wrap gap-2">
+                  {CATEGORIES.map(cat => (
+                    <Link
                       key={cat.href}
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.2 + i * 0.1 }}
+                      href={cat.href}
+                      className="text-[9px] font-bold uppercase tracking-[0.3em] px-4 py-2 border border-border text-muted hover:border-terracotta hover:text-terracotta transition-all"
                     >
-                      <Link 
-                        href={cat.href}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="group block space-y-3"
-                      >
-                        <div className="aspect-[4/5] bg-bg-dark rounded-xl overflow-hidden relative">
-                          <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
-                          <div className="absolute inset-0 flex items-center justify-center p-2">
-                             <span className="text-[10px] font-black uppercase tracking-widest text-center">{cat.name}</span>
-                          </div>
-                        </div>
-                      </Link>
-                    </motion.div>
+                      {cat.name}
+                    </Link>
                   ))}
                 </div>
-
-                <motion.div 
-                  initial={{ x: 20, opacity: 0 }} 
-                  animate={{ x: 0, opacity: 1 }} 
-                  transition={{ delay: 0.6 }}
-                  className="space-y-8 pt-8 border-t border-border"
-                >
-                  <Link href="/lookbook" onClick={() => setMobileMenuOpen(false)} className="text-4xl font-display font-black uppercase tracking-tighter block leading-none">
-                    Lookbook
-                  </Link>
-                  <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="text-4xl font-display font-black uppercase tracking-tighter block leading-none">
-                    About
-                  </Link>
-                </motion.div>
-              </div>
+              </motion.div>
             </nav>
 
-            <div className="p-6 border-t border-border bg-bg-dark/50">
-              <Link 
-                href={session ? "/profile" : "/login"} 
-                onClick={() => setMobileMenuOpen(false)}
-                className="awwwards-btn-accent w-full flex items-center justify-center py-5"
+            {/* Footer actions */}
+            <div className="px-6 py-6 border-t border-border bg-bg-warm space-y-3">
+              <Link
+                href={session ? "/profile" : "/login"}
+                className="btn-primary w-full flex items-center justify-center py-4"
               >
-                {session ? "My Archive" : "Login / Sign Up"}
+                {session ? "My Archive" : "Sign In / Register"}
               </Link>
-              <div className="flex justify-center gap-8 mt-8 text-[10px] font-black uppercase tracking-[0.3em] text-muted">
-                <a href="#" className="hover:text-text">Instagram</a>
-                <a href="#" className="hover:text-text">WhatsApp</a>
+              <div className="flex justify-center gap-6 text-[9px] font-bold uppercase tracking-[0.3em] text-muted pt-2">
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-terracotta transition-colors">Instagram</a>
+                <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="hover:text-terracotta transition-colors">WhatsApp</a>
               </div>
             </div>
           </motion.div>

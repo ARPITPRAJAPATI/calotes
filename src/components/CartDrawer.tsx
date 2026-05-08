@@ -26,7 +26,7 @@ export default function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 220 }}
-            className="fixed right-0 top-0 h-full w-full max-w-md bg-bg z-[101] flex flex-col"
+            className="fixed right-0 top-0 h-full w-full max-w-md bg-bg-warm border-l border-border-warm z-[101] flex flex-col"
           >
             {/* Header */}
             <div className="p-8 border-b border-border flex justify-between items-center">
@@ -43,7 +43,7 @@ export default function CartDrawer() {
               {items.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center gap-6 text-center">
                   <p className="text-muted text-xs uppercase tracking-[0.2em] font-bold">Your archive is empty.</p>
-                  <button onClick={() => setIsCartOpen(false)} className="awwwards-btn">
+                  <button onClick={() => setIsCartOpen(false)} className="btn-outline">
                     Browse Collection
                   </button>
                 </div>
@@ -87,7 +87,7 @@ export default function CartDrawer() {
                 <div className="flex justify-center pt-4">
                   <button
                     onClick={() => { setIsCartOpen(false); router.push("/checkout"); }}
-                    className="awwwards-btn-accent px-10 py-5 flex items-center justify-center gap-3"
+                    className="btn-primary w-full justify-center py-4 flex items-center gap-3"
                   >
                     Checkout <ArrowRight size={14} />
                   </button>

@@ -14,162 +14,175 @@ interface Product {
   compareAtPrice?: number;
   images: string[];
   brand: string;
-  category: { name: string; slug: string; };
+  category: { name: string; slug: string };
   sizes: string[];
+  condition?: string;
 }
 
+const CATEGORIES = [
+  { name: "All Items", slug: "all" },
+  { name: "Denim",       slug: "denim" },
+  { name: "Outerwear",   slug: "outerwear" },
+  { name: "Oversized",   slug: "oversized" },
+  { name: "Plus Size",   slug: "plus-size" },
+  { name: "Accessories", slug: "accessories" },
+];
+
 function ShopContent() {
-  const searchParams = useSearchParams();
-  const initialCategory = searchParams.get('category') || "all";
-  
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(initialCategory);
+  const searchParams   = useSearchParams();
+  const initialCat     = searchParams.get("category") || "all";
+
+  const [products,      setProducts]      = useState<Product[]>([]);
+  const [loading,       setLoading]       = useState(true);
+  const [isFilterOpen,  setIsFilterOpen]  = useState(false);
+  const [activeCategory, setActiveCategory] = useState(initialCat);
 
   useEffect(() => { fetchProducts(); }, [activeCategory]);
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const url = activeCategory === "all" ? "/api/products" : `/api/products?category=${activeCategory}`;
-      const res = await fetch(url);
+      const url = activeCategory === "all"
+        ? "/api/products"
+        : `/api/products?category=${activeCategory}`;
+      const res  = await fetch(url);
       const data = await res.json();
       setProducts(data);
     } catch (e) { console.error(e); }
-    finally { setLoading(false); }
+    finally     { setLoading(false); }
   };
-
-  const categories = [
-    { name: "All Archive", slug: "all" },
-    { name: "Mens", slug: "mens" },
-    { name: "Womens", slug: "womens" },
-    { name: "Denim", slug: "denim" },
-    { name: "Outerwear", slug: "outerwear" },
-    { name: "Oversized", slug: "oversized" },
-    { name: "Plus Size", slug: "plus-size" },
-    { name: "Accessories", slug: "accessories" },
-  ];
 
   return (
     <>
-      {/* Page Header & Visual Categories */}
-      <div className="px-6 md:px-12 max-w-[1800px] mx-auto mb-16">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-16 border-b border-border pb-12">
-          <div>
-            <motion.p 
-              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-              className="text-[10px] uppercase tracking-[0.4em] font-black text-accent mb-4"
+      {/* ── Page header ─────────────────────────────── */}
+      <div className="px-6 md:px-12 max-w-[1800px] mx-auto mb-10">
+        <div className="border-b border-border pb-10 mb-10">
+          <motion.p
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            className="section-label mb-3"
+          >
+            The Vault
+          </motion.p>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
+              className="font-display font-bold text-6xl md:text-8xl lg:text-[9vw] uppercase tracking-tight leading-[0.82] text-text"
             >
-              The Vault
-            </motion.p>
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-              className="font-display font-black text-6xl md:text-9xl lg:text-[10vw] uppercase tracking-tighter leading-[0.8]"
-            >
-              Archive
+              Items
             </motion.h1>
-          </div>
-          <div className="flex items-center gap-6">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted hidden md:block">
-              {products.length} pieces curated
-            </p>
-            <button 
-              onClick={() => setIsFilterOpen(true)}
-              className="flex items-center gap-3 awwwards-btn-accent px-6 py-4"
-            >
-              <SlidersHorizontal size={16} /> Filters
-            </button>
+            <div className="flex items-center gap-5">
+              <p className="section-label hidden md:block">{products.length} pieces</p>
+              <button
+                onClick={() => setIsFilterOpen(true)}
+                className="flex items-center gap-2 btn-primary px-6 py-3"
+              >
+                <SlidersHorizontal size={14} />
+                Filters
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Aged Arc Style Category Selection */}
-        <div className="flex gap-4 overflow-x-auto pb-6 no-scrollbar snap-x">
-          {categories.filter(c => c.slug !== "all").map((cat) => (
+        {/* ── Category tabs ────────────────────────── */}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+          {CATEGORIES.map(cat => (
             <button
               key={cat.slug}
               onClick={() => setActiveCategory(cat.slug)}
-              className={`relative min-w-[120px] md:min-w-[180px] aspect-square rounded-2xl overflow-hidden snap-start shrink-0 group border-2 transition-all ${activeCategory === cat.slug ? 'border-text ring-2 ring-text/10' : 'border-transparent'}`}
+              className={`shrink-0 text-[8px] md:text-[9px] font-bold uppercase tracking-[0.3em] px-4 py-2 border transition-all duration-300 ${
+                activeCategory === cat.slug
+                  ? "border-terracotta text-terracotta bg-terracotta/5"
+                  : "border-border text-muted hover:border-border-warm hover:text-text"
+              }`}
             >
-              <img 
-                src={`https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=400&auto=format&fit=crop`} 
-                alt={cat.name} 
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
-              <div className="absolute inset-0 flex items-center justify-center p-4">
-                <span className="text-[9px] md:text-[11px] font-black text-white uppercase tracking-widest text-center">{cat.name}</span>
-              </div>
+              {cat.name}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="max-w-[1800px] mx-auto px-4 md:px-24 flex gap-8 lg:gap-16">
-        {/* Desktop Sidebar Filters */}
-        <aside className="hidden lg:block w-48 shrink-0 sticky top-32 h-max">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] mb-8 text-muted border-b border-border pb-4">
-            Curations
-          </h3>
+      {/* ── Main layout: sidebar + grid ─────────────── */}
+      <div className="max-w-[1800px] mx-auto px-6 md:px-12 flex gap-10 lg:gap-14">
+
+        {/* Desktop sidebar */}
+        <aside className="hidden lg:block w-44 shrink-0 sticky top-28 h-max">
+          <h3 className="section-label mb-6 border-b border-border pb-4">Curations</h3>
           <ul className="space-y-4">
-            {categories.map((cat) => (
+            {CATEGORIES.map(cat => (
               <li key={cat.slug}>
                 <button
                   onClick={() => setActiveCategory(cat.slug)}
-                  className={`text-[9px] uppercase tracking-[0.3em] font-black transition-all flex items-center gap-4 group w-full text-left ${activeCategory === cat.slug ? 'text-text' : 'text-muted/50 hover:text-text'}`}
+                  className={`flex items-center gap-3 text-[9px] uppercase tracking-[0.3em] font-bold w-full text-left transition-all group ${
+                    activeCategory === cat.slug ? "text-terracotta" : "text-muted hover:text-text"
+                  }`}
                 >
-                  <span className={`h-[1px] transition-all duration-700 ${activeCategory === cat.slug ? 'w-8 bg-text' : 'w-0 bg-muted group-hover:w-3'}`}></span>
-                  <span>{cat.name}</span>
+                  <span className={`h-px transition-all duration-700 ${
+                    activeCategory === cat.slug ? "w-8 bg-terracotta" : "w-0 group-hover:w-3 bg-muted"
+                  }`} />
+                  {cat.name}
                 </button>
               </li>
             ))}
           </ul>
         </aside>
 
-        {/* Product Grid */}
-        <div className="flex-1">
+        {/* Product grid */}
+        <div className="flex-1 pb-24">
           {loading ? (
             <div className="h-[50vh] flex flex-col items-center justify-center gap-4">
-              <Loader2 className="w-8 h-8 animate-spin text-accent" />
-              <p className="text-[10px] uppercase tracking-widest font-bold text-muted">Curating archive...</p>
+              <Loader2 className="w-6 h-6 animate-spin text-terracotta" />
+              <p className="section-label">Curating items…</p>
             </div>
           ) : products.length === 0 ? (
-            <div className="h-[50vh] flex flex-col items-center justify-center space-y-6 bg-card border border-border">
-              <p className="text-muted uppercase tracking-widest font-bold text-xs">No pieces found in this archive.</p>
-              <button onClick={() => setActiveCategory("all")} className="awwwards-btn">View All Pieces</button>
+            <div className="h-[50vh] flex flex-col items-center justify-center gap-6 border border-border">
+              <p className="section-label">No pieces in this category.</p>
+              <button onClick={() => setActiveCategory("all")} className="btn-outline">
+                View All
+              </button>
             </div>
           ) : (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-x-2 md:gap-x-4 gap-y-10"
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 md:gap-x-5 gap-y-10 md:gap-y-14"
             >
               {products.map((product, idx) => (
                 <motion.div
                   key={product._id}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                  className="group"
+                  transition={{ delay: idx * 0.05, ease: [0.16,1,0.3,1] }}
+                  className="product-card group"
                 >
-                  <Link href={`/shop/product/${product.slug}`} className="block">
-                    <div className="relative aspect-[3/4] mb-4 overflow-hidden border border-border/10 bg-bg-dark">
+                  <Link href={`/shop/product/${product.slug}`}>
+                    {/* Image */}
+                    <div className="relative aspect-[3/4] overflow-hidden bg-bg-warm">
                       {product.compareAtPrice && (
-                        <div className="absolute top-3 left-3 z-10 bg-black text-white px-2 py-1 text-[8px] font-black uppercase tracking-widest">
+                        <span className="absolute top-2 left-2 z-10 text-[7px] font-bold uppercase tracking-widest bg-terracotta/90 text-bg px-2 py-0.5">
                           Sale
-                        </div>
+                        </span>
                       )}
+                      <span className="absolute top-2 right-2 z-10 text-[7px] font-bold uppercase tracking-widest bg-bg/80 text-muted px-2 py-0.5">
+                        {product.condition || "Pre-Loved"}
+                      </span>
                       <img
                         src={product.images[0]}
                         alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                        className="product-card-img w-full h-full object-cover"
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <h3 className="text-[9px] md:text-[10px] font-black uppercase tracking-wider leading-tight line-clamp-2">{product.name}</h3>
+                    {/* Info */}
+                    <div className="mt-3 space-y-1">
+                      <h3 className="text-[9px] md:text-[10px] font-black uppercase tracking-wide leading-tight line-clamp-2">
+                        {product.name}
+                      </h3>
                       <div className="flex justify-between items-center">
-                        <p className="text-[8px] md:text-[9px] text-muted font-bold uppercase tracking-[0.2em]">{product.brand}</p>
-                        <p className="text-[9px] md:text-[10px] font-black">₹{product.price}</p>
+                        <p className="text-[7px] md:text-[8px] text-muted font-medium uppercase tracking-widest">
+                          {product.brand}
+                        </p>
+                        <p className="text-[9px] md:text-[10px] font-black text-terracotta">
+                          ₹{product.price.toLocaleString("en-IN")}
+                        </p>
                       </div>
                     </div>
                   </Link>
@@ -180,59 +193,84 @@ function ShopContent() {
         </div>
       </div>
 
-      {/* Mobile Filter Drawer */}
+      {/* ── Mobile floating filter btn ───────────────── */}
+      <div className="fixed bottom-8 right-5 z-40 lg:hidden">
+        <button
+          onClick={() => setIsFilterOpen(true)}
+          className="w-12 h-12 bg-terracotta text-bg rounded-full shadow-2xl flex items-center justify-center"
+        >
+          <SlidersHorizontal size={16} />
+        </button>
+      </div>
+
+      {/* ── Filter drawer ────────────────────────────── */}
       <AnimatePresence>
         {isFilterOpen && (
           <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setIsFilterOpen(false)} className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]" />
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-bg/70 backdrop-blur-sm z-[100]"
+              onClick={() => setIsFilterOpen(false)}
+            />
             <motion.div
               initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 30, stiffness: 220 }}
-              className="fixed right-0 top-0 h-full w-full max-w-md bg-bg-dark border-l border-border z-[101] p-8 flex flex-col"
+              transition={{ type: "spring", damping: 28, stiffness: 200 }}
+              className="fixed right-0 top-0 h-full w-full max-w-sm bg-bg-warm border-l border-border-warm z-[101] flex flex-col"
             >
-              <div className="flex justify-between items-center mb-12 border-b border-border pb-6">
-                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-card">Filters</h2>
-                <button onClick={() => setIsFilterOpen(false)} className="text-card hover:text-accent"><X size={24} /></button>
+              <div className="flex justify-between items-center px-8 py-6 border-b border-border">
+                <h2 className="section-label">Filters</h2>
+                <button onClick={() => setIsFilterOpen(false)}>
+                  <X size={20} className="text-muted hover:text-text transition-colors" />
+                </button>
               </div>
-              <div className="space-y-4 flex-1 overflow-y-auto pr-4">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] mb-6 text-muted">Categories</h3>
-                {categories.map((cat) => (
-                  <button
-                    key={cat.slug}
-                    onClick={() => { setActiveCategory(cat.slug); setIsFilterOpen(false); }}
-                    className={`block w-full text-left text-sm uppercase tracking-widest font-bold transition-colors py-3 border-b border-border/30 ${activeCategory === cat.slug ? 'text-accent' : 'text-card/70 hover:text-card'}`}
-                  >
-                    {cat.name}
-                  </button>
-                ))}
+
+              <div className="flex-1 overflow-y-auto px-8 py-8 space-y-8">
+                <div>
+                  <h3 className="section-label mb-5">Categories</h3>
+                  <div className="space-y-3">
+                    {CATEGORIES.map(cat => (
+                      <button
+                        key={cat.slug}
+                        onClick={() => { setActiveCategory(cat.slug); setIsFilterOpen(false); }}
+                        className={`flex items-center gap-3 text-[9px] uppercase tracking-[0.3em] font-bold w-full text-left py-2 border-b border-border/30 transition-colors ${
+                          activeCategory === cat.slug ? "text-terracotta border-terracotta/20" : "text-muted hover:text-text"
+                        }`}
+                      >
+                        {activeCategory === cat.slug && <span className="w-2 h-2 bg-terracotta rounded-full" />}
+                        {cat.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <div className="pt-8 border-t border-border mt-auto">
-                <button onClick={() => setIsFilterOpen(false)} className="awwwards-btn-accent w-full text-center">Show Results</button>
+
+              <div className="px-8 py-6 border-t border-border">
+                <button
+                  onClick={() => setIsFilterOpen(false)}
+                  className="btn-primary w-full justify-center py-4"
+                >
+                  Show Results
+                </button>
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
-      {/* Mobile Floating Filter Button */}
-      <div className="fixed bottom-8 right-6 z-40 lg:hidden">
-        <motion.button
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          onClick={() => setIsFilterOpen(true)}
-          className="w-14 h-14 bg-text text-bg rounded-full shadow-2xl flex items-center justify-center border border-border"
-        >
-          <SlidersHorizontal size={20} />
-        </motion.button>
-      </div>
     </>
   );
 }
 
 export default function ShopPage() {
   return (
-    <div className="w-full pt-32 pb-24 flex-1">
-      <Suspense fallback={<div className="h-[50vh] flex flex-col items-center justify-center gap-4"><Loader2 className="w-8 h-8 animate-spin text-accent" /><p className="text-[10px] uppercase tracking-widest font-bold text-muted">Curating archive...</p></div>}>
+    <div className="w-full pt-28 md:pt-36 pb-24">
+      <Suspense
+        fallback={
+          <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
+            <Loader2 className="w-6 h-6 animate-spin text-terracotta" />
+            <p className="section-label">Loading items…</p>
+          </div>
+        }
+      >
         <ShopContent />
       </Suspense>
     </div>

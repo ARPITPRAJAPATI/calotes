@@ -78,13 +78,13 @@ export default function ProductDetailsPage() {
 
   if (loading) return (
     <div className="h-screen flex flex-col items-center justify-center bg-bg gap-4">
-      <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      <p className="text-[10px] font-black uppercase tracking-widest text-muted">Accessing Archive...</p>
+      <Loader2 className="w-8 h-8 animate-spin text-terracotta" />
+      <p className="section-label">Accessing Items…</p>
     </div>
   );
   if (!product) return (
     <div className="h-screen bg-bg flex flex-col items-center justify-center gap-6">
-      <p className="text-muted uppercase tracking-widest font-bold text-xs">This piece is no longer in the archive.</p>
+      <p className="text-muted uppercase tracking-widest font-bold text-xs">This piece is no longer in the items list.</p>
       <Link href="/shop" className="awwwards-btn">Return to Shop</Link>
     </div>
   );
@@ -96,10 +96,10 @@ export default function ProductDetailsPage() {
         <div className="max-w-[1800px] mx-auto flex items-center justify-between">
           <Link href="/shop" className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-muted hover:text-text transition-all duration-300">
             <div className="w-8 h-px bg-muted group-hover:w-12 group-hover:bg-text transition-all duration-500" />
-            <span>Back to Archive</span>
+            <span>Back to Items</span>
           </Link>
           <div className="hidden sm:flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.2em] text-muted/40">
-            <span>Archive</span>
+            <span>Items</span>
             <div className="w-1 h-1 rounded-full bg-border" />
             <span className="text-muted">{product.category.name}</span>
           </div>
@@ -131,31 +131,31 @@ export default function ProductDetailsPage() {
           </div>
 
           {/* Right: Product Info (Sticky) */}
-          <div className="lg:col-span-6 lg:sticky lg:top-32 lg:h-max space-y-12 py-12">
+          <div className="lg:col-span-6 lg:sticky lg:top-32 lg:h-max space-y-10 py-8">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-accent mb-4 flex items-center gap-2">
-                <Sparkles size={12} /> Pre-Loved Authentic
+              <p className="section-label mb-4 flex items-center gap-2">
+                <Sparkles size={10} /> Pre-Loved · Authenticated
               </p>
-              <h1 className="font-display font-black text-4xl md:text-6xl uppercase tracking-tighter leading-[0.9] mb-6">
+              <h1 className="font-display font-black text-4xl md:text-5xl uppercase tracking-tighter leading-[0.9] mb-4">
                 {product.name}
               </h1>
-              <p className="text-xs font-bold uppercase tracking-widest text-muted mb-8">{product.brand}</p>
+              <p className="section-label mb-8">{product.brand}</p>
               
               <div className="flex items-end gap-4">
-                <span className={`text-3xl font-black ${product.compareAtPrice ? 'text-accent' : 'text-text'}`}>
-                  ₹{product.price}
+                <span className="text-3xl font-black text-terracotta">
+                  ₹{product.price.toLocaleString("en-IN")}
                 </span>
                 {product.compareAtPrice && (
-                  <span className="text-muted line-through text-lg mb-1">₹{product.compareAtPrice}</span>
+                  <span className="text-muted line-through text-lg mb-1">₹{product.compareAtPrice.toLocaleString("en-IN")}</span>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center gap-3 border-y border-border py-5 bg-card/30 px-4">
-              <ShieldCheck size={18} className="text-accent" />
+            <div className="flex items-center gap-3 border-y border-border py-5 bg-bg-warm px-4">
+              <ShieldCheck size={16} className="text-terracotta" />
               <div className="flex flex-col">
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-text">Condition: {product.condition}</span>
-                <span className="text-[9px] font-bold uppercase tracking-widest text-muted mt-1">Professionally authenticated and cleaned.</span>
+                <span className="section-label mt-1">Professionally authenticated and cleaned.</span>
               </div>
             </div>
 
@@ -166,23 +166,23 @@ export default function ProductDetailsPage() {
                   <p className="text-[10px] font-black uppercase tracking-[0.2em]">Select Size</p>
                   <button className="text-[9px] font-bold uppercase tracking-widest text-muted underline-hover">Size Guide</button>
                 </div>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-2">
                   {product.sizes.map((size) => {
                     const isPlus = size === "XXL" || size === "XXXL" || size === "4XL";
                     return (
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
-                        className={`relative px-6 py-4 text-[10px] font-black uppercase tracking-widest border transition-all duration-300 ${
+                        className={`relative px-5 py-3 text-[9px] font-black uppercase tracking-widest border transition-all duration-300 ${
                           selectedSize === size
-                            ? 'bg-text text-bg border-text'
+                            ? 'bg-terracotta text-bg border-terracotta'
                             : isPlus 
                               ? 'bg-accent/10 border-accent/30 text-text hover:border-accent' 
-                              : 'bg-transparent border-border hover:border-text/50'
+                              : 'bg-transparent border-border hover:border-border-warm'
                         }`}
                       >
                         {size}
-                        {isPlus && <span className="absolute -top-2 -right-2 bg-accent text-bg text-[8px] px-1.5 py-0.5">PLUS</span>}
+                        {isPlus && <span className="absolute -top-2 -right-2 bg-accent text-bg text-[7px] px-1 py-0.5">PLUS</span>}
                       </button>
                     )
                   })}
@@ -191,18 +191,18 @@ export default function ProductDetailsPage() {
             )}
 
             {/* Actions */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               <button
                 onClick={handleAddToCart}
-                className="awwwards-btn-accent w-full py-6"
+                className="btn-primary w-full py-5"
               >
                 {added ? "✓ Added to Bag" : "Add to Bag"}
               </button>
               <button
                 onClick={handleWhatsApp}
-                className="w-full py-5 bg-transparent border border-[#25D366] text-[#25D366] text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#25D366] hover:text-white transition-colors duration-300 flex items-center justify-center gap-3"
+                className="w-full py-5 bg-transparent border border-[#25D366]/60 text-[#25D366] text-[9px] font-bold uppercase tracking-[0.3em] hover:bg-[#25D366] hover:text-white transition-colors duration-300 flex items-center justify-center gap-3"
               >
-                <MessageCircle size={16} /> Buy on WhatsApp
+                <MessageCircle size={14} /> Buy on WhatsApp
               </button>
             </div>
 
@@ -214,12 +214,12 @@ export default function ProductDetailsPage() {
               </div>
 
               {product.measurements && (
-                <div className="space-y-4 bg-card p-6 border border-border/50">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2"><Ruler size={14} /> Measurements</p>
-                  <div className="grid grid-cols-1 gap-2 text-[10px] font-bold uppercase tracking-widest text-muted">
-                    {product.measurements.pitToPit && <div className="flex justify-between border-b border-border/50 py-2"><span>Pit to Pit</span><span className="text-text">{product.measurements.pitToPit}</span></div>}
-                    {product.measurements.length && <div className="flex justify-between border-b border-border/50 py-2"><span>Length</span><span className="text-text">{product.measurements.length}</span></div>}
-                    {product.measurements.waist && <div className="flex justify-between border-b border-border/50 py-2"><span>Waist</span><span className="text-text">{product.measurements.waist}</span></div>}
+                <div className="space-y-4 bg-bg-warm p-6 border border-border">
+                  <p className="section-label flex items-center gap-2"><Ruler size={12} /> Measurements</p>
+                  <div className="grid grid-cols-1 gap-0 text-[9px] font-bold uppercase tracking-widest text-muted">
+                    {product.measurements.pitToPit && <div className="flex justify-between border-b border-border py-2.5"><span>Pit to Pit</span><span className="text-text">{product.measurements.pitToPit}</span></div>}
+                    {product.measurements.length && <div className="flex justify-between border-b border-border py-2.5"><span>Length</span><span className="text-text">{product.measurements.length}</span></div>}
+                    {product.measurements.waist && <div className="flex justify-between border-b border-border py-2.5"><span>Waist</span><span className="text-text">{product.measurements.waist}</span></div>}
                   </div>
                 </div>
               )}
@@ -233,12 +233,12 @@ export default function ProductDetailsPage() {
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div>
               <h2 className="font-display font-black text-4xl uppercase tracking-tighter mb-4">Community Reviews</h2>
-              <div className="flex items-center gap-2 text-accent">
-                {[1,2,3,4,5].map(i => <Star key={i} size={16} fill="currentColor" />)}
-                <span className="text-text text-xs font-bold ml-2">4.9 / 5.0 (24 Reviews)</span>
+              <div className="flex items-center gap-1.5 text-terracotta">
+                {[1,2,3,4,5].map(i => <Star key={i} size={14} fill="currentColor" />)}
+                <span className="text-text text-[9px] font-bold ml-2 uppercase tracking-widest">4.9 / 5.0 · 24 Reviews</span>
               </div>
             </div>
-            <button className="awwwards-btn">Write a Review</button>
+            <button className="btn-outline">Write a Review</button>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -247,13 +247,13 @@ export default function ProductDetailsPage() {
               { name: "Karan M.", text: "The condition is actually better than I expected for a vintage item. Will buy again.", date: "1 week ago" },
               { name: "Priya T.", text: "Finally found my holy grail jacket here. Amazing curation.", date: "2 weeks ago" },
             ].map((rev, i) => (
-              <div key={i} className="bg-card p-8 border border-border/50">
-                <div className="flex text-accent mb-4">
-                  {[1,2,3,4,5].map(star => <Star key={star} size={12} fill="currentColor" />)}
+              <div key={i} className="bg-bg-warm p-6 border border-border">
+                <div className="flex text-terracotta mb-4">
+                  {[1,2,3,4,5].map(star => <Star key={star} size={11} fill="currentColor" />)}
                 </div>
-                <p className="text-sm font-medium leading-relaxed mb-6">"{rev.text}"</p>
-                <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-muted border-t border-border/30 pt-4">
-                  <span>{rev.name} <span className="text-accent ml-2">✓ Verified</span></span>
+                <p className="text-[11px] text-muted leading-relaxed mb-5">"{rev.text}"</p>
+                <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest text-muted border-t border-border pt-3">
+                  <span>{rev.name} <span className="text-terracotta ml-2">✓ Verified</span></span>
                   <span>{rev.date}</span>
                 </div>
               </div>

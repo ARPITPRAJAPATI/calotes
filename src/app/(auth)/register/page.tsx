@@ -109,7 +109,7 @@ export default function RegisterPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="bg-accent-red/10 text-accent-red text-sm p-4 border border-accent-red/20 font-medium">
+                <div className="bg-terracotta/10 text-terracotta text-sm p-4 border border-terracotta/20 font-medium">
                   {error}
                 </div>
               )}
@@ -159,7 +159,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-text text-bg py-4 font-display font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-bg-dark transition-all active:scale-[0.98] disabled:opacity-70"
+                className="btn-primary w-full justify-center py-5 disabled:opacity-70"
               >
                 {loading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -184,7 +184,7 @@ export default function RegisterPage() {
             <div className="mt-6">
               <button
                 onClick={() => signIn("google", { callbackUrl: "/" })}
-                className="w-full flex items-center justify-center gap-3 bg-bg border border-border py-4 font-bold uppercase tracking-widest text-xs hover:border-text transition-all active:scale-[0.98]"
+                className="btn-outline w-full justify-center py-5"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path

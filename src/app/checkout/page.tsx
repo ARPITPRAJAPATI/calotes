@@ -64,7 +64,9 @@ export default function CheckoutPage() {
     setAddress({ ...address, [e.target.name]: e.target.value });
 
   if (status === "loading" || status === "unauthenticated") return (
-    <div className="h-[70vh] flex items-center justify-center"><Loader2 className="animate-spin text-accent" /></div>
+    <div className="h-[70vh] flex items-center justify-center">
+      <Loader2 className="animate-spin text-terracotta" />
+    </div>
   );
 
   return (
@@ -73,7 +75,7 @@ export default function CheckoutPage() {
       <div className="px-6 md:px-12 max-w-[1800px] mx-auto border-b border-border/40 py-10 mb-16">
         <Link href="/shop" className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-muted hover:text-text transition-all duration-300">
           <div className="w-8 h-px bg-muted group-hover:w-12 group-hover:bg-text transition-all duration-500" />
-          <span>Back to Archive</span>
+          <span>Back to Collection</span>
         </Link>
       </div>
 
@@ -82,7 +84,7 @@ export default function CheckoutPage() {
           Checkout
         </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
           {/* Form */}
           <div className="lg:col-span-7">
             <form id="checkout-form" onSubmit={handlePayment} className="space-y-16">
@@ -95,7 +97,7 @@ export default function CheckoutPage() {
                   ].map(f => (
                     <input key={f.name} required type="text" name={f.name} placeholder={f.placeholder}
                       value={(address as any)[f.name]} onChange={handleInputChange}
-                      className="w-full bg-card border border-border/50 p-4 text-xs font-bold uppercase tracking-widest outline-none focus:border-accent transition-colors placeholder:text-muted/50 text-text"
+                      className="w-full bg-bg-warm border border-border p-4 text-[10px] font-bold uppercase tracking-widest outline-none focus:border-terracotta transition-colors placeholder:text-muted/50 text-text"
                     />
                   ))}
                 </div>
@@ -112,7 +114,7 @@ export default function CheckoutPage() {
                   ].map(f => (
                     <input key={f.name} required type="text" name={f.name} placeholder={f.placeholder}
                       value={(address as any)[f.name]} onChange={handleInputChange}
-                      className="w-full bg-card border border-border/50 p-4 text-xs font-bold uppercase tracking-widest outline-none focus:border-accent transition-colors placeholder:text-muted/50 text-text"
+                      className="w-full bg-bg-warm border border-border p-4 text-[10px] font-bold uppercase tracking-widest outline-none focus:border-terracotta transition-colors placeholder:text-muted/50 text-text"
                     />
                   ))}
                 </div>
@@ -122,8 +124,8 @@ export default function CheckoutPage() {
 
           {/* Summary */}
           <div className="lg:col-span-5">
-            <div className="sticky top-32 space-y-6 bg-card p-8 border border-border/50">
-              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted mb-8">Order Summary</h2>
+            <div className="sticky top-32 space-y-6 bg-bg-warm border border-border p-8">
+              <h2 className="section-label mb-6">Order Summary</h2>
               <div className="space-y-6 max-h-[40vh] overflow-y-auto pr-4">
                 {items.map((item) => (
                   <div key={`${item.productId}-${item.size}`} className="flex gap-4 border-b border-border/50 pb-6">
@@ -145,19 +147,19 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-text">
                   <span className="text-muted">Shipping</span><span>Calculated</span>
                 </div>
-                <div className="flex justify-between text-sm font-black uppercase tracking-widest border-t border-border/50 pt-4 text-text">
-                  <span>Total</span><span className="text-accent">₹{cartTotal}</span>
+                <div className="flex justify-between text-sm font-black uppercase tracking-widest border-t border-border pt-4 text-text">
+                  <span>Total</span><span className="text-terracotta">₹{cartTotal.toLocaleString("en-IN")}</span>
                 </div>
               </div>
-              <div className="flex justify-center pt-6">
+              <div className="pt-6">
                 <button type="submit" form="checkout-form" disabled={loading || !items.length}
-                  className="flex items-center gap-3 awwwards-btn-accent px-10 py-5 disabled:opacity-40"
+                  className="btn-primary w-full justify-center py-5 flex items-center gap-3 disabled:opacity-40"
                 >
-                  {loading ? <Loader2 className="animate-spin" size={16} /> : <><Lock size={14} /> Secure Payment</>}
+                  {loading ? <Loader2 className="animate-spin" size={16} /> : <><Lock size={13} /> Secure Payment</>}
                 </button>
               </div>
-              <div className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted mt-6">
-                <ShieldCheck size={12} className="text-accent" /> Encrypted & Secure
+              <div className="flex items-center justify-center gap-2 section-label mt-2">
+                <ShieldCheck size={11} className="text-terracotta" /> Encrypted &amp; Secure
               </div>
             </div>
           </div>

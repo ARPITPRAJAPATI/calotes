@@ -49,7 +49,7 @@ function LoginFormInner() {
 
       <div className="mb-10">
         <h1 className="font-display font-black text-4xl uppercase tracking-tighter mb-2">Welcome Back</h1>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Sign in to access your collection.</p>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Sign in to access your items.</p>
       </div>
 
       {error && (
@@ -80,9 +80,9 @@ function LoginFormInner() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-text text-bg py-5 text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 hover:bg-bg-dark transition-colors mt-8 disabled:opacity-50"
+          className="btn-primary w-full justify-center py-5 mt-8 disabled:opacity-50"
         >
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Enter Archive <ArrowRight size={14} /></>}
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Enter Items <ArrowRight size={14} /></>}
         </button>
       </form>
 
@@ -94,7 +94,7 @@ function LoginFormInner() {
         </div>
         <button
           onClick={() => signIn("google", { callbackUrl })}
-          className="awwwards-btn w-full flex items-center justify-center gap-3"
+          className="btn-outline w-full justify-center py-5"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -128,7 +128,7 @@ export default function LoginPage() {
         <div className="absolute bottom-12 left-12 text-white">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-2 text-accent">Calotes — Since 2026</p>
           <p className="font-display font-black text-5xl uppercase tracking-tighter leading-[0.9]">
-            The Archive<br />is Waiting.
+            The Items<br />are Waiting.
           </p>
         </div>
       </div>

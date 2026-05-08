@@ -1,47 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  /* Calotes Brand Palette — Simple Premium Light Theme */
-  --color-bg: #FFFFFF;
-  --color-bg-dark: #F9F9F9;
-  --color-text: #000000;
-  --color-muted: #666666;
-  --color-accent: #000000;
-  --color-accent-2: #111111;
-  --color-border: rgba(0, 0, 0, 0.08);
-  --color-card: #FFFFFF;
+  /* Calotes Vintage — Clean White Palette */
+  --color-bg:       #FFFFFF;
+  --color-bg-warm:  #F9F9F9;
+  --color-bg-card:  #F0F0F0;
+  --color-text:     #0F0A05;
+  --color-muted:    #737373;
+  --color-accent:   #E53935;
+  --color-terracotta: #D32F2F;
+  --color-border:   rgba(0, 0, 0, 0.1);
+  --color-border-warm: rgba(0, 0, 0, 0.15);
 
   /* Typography */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-barlow), sans-serif;
-  --font-serif: var(--font-playfair), serif;
-  
-  /* Custom Utilities */
-  --transition-premium: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-smooth: all 0.5s ease;
+  --font-sans:    var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-barlow), 'Barlow', sans-serif;
+  --font-serif:   var(--font-playfair), 'Cormorant Garamond', serif;
 }
 
-@layer utilities {
-  .awwwards-btn {
-    @apply inline-flex items-center justify-center border border-text px-8 py-4 rounded-sm uppercase tracking-[0.2em] text-[10px] font-bold transition-all duration-300 bg-transparent text-text hover:bg-text hover:text-bg;
-  }
-  
-  .awwwards-btn-accent {
-    @apply inline-flex items-center justify-center border border-text px-8 py-4 rounded-sm uppercase tracking-[0.2em] text-[10px] font-bold transition-all duration-300 bg-text text-bg hover:bg-transparent hover:text-text;
-  }
+/* ─── Global Reset ─────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
 
-  .premium-card {
-    @apply bg-white border border-border rounded-sm overflow-hidden transition-all duration-500 hover:border-text/30 hover:shadow-sm;
-  }
-
-  .reveal-text {
-    @apply relative overflow-hidden inline-block;
-  }
-  .reveal-text::after {
-    content: '';
-    @apply absolute inset-0 bg-bg transition-transform duration-1000 ease-out translate-x-full;
-  }
-}
+html { scroll-behavior: smooth; }
 
 body {
   background-color: var(--color-bg);
@@ -50,14 +30,114 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.01em;
+  /* Subtle grain texture */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
 }
 
-::-webkit-scrollbar { width: 4px; }
+/* ─── Scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: var(--color-bg); }
-::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 20px; }
+::-webkit-scrollbar-thumb { background: rgba(245,237,225,0.1); border-radius: 20px; }
 
-.img-zoom img { transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1); }
-.img-zoom:hover img { transform: scale(1.05); }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─── Buttons ─────────────────────────────────────────── */
+/* ─── Button Components (plain CSS to avoid Tailwind v4 @apply issues) ─── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border: 1px solid var(--color-terracotta);
+  background-color: var(--color-terracotta);
+  color: var(--color-bg);
+  padding: 1rem 2rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  transition: all 0.3s ease;
+}
+.btn-primary:hover {
+  background-color: transparent;
+  color: var(--color-terracotta);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border: 1px solid var(--color-border-warm);
+  color: var(--color-text);
+  padding: 1rem 2rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  transition: all 0.3s ease;
+}
+.btn-outline:hover {
+  border-color: var(--color-terracotta);
+  color: var(--color-terracotta);
+}
+
+/* Legacy aliases */
+.awwwards-btn       { display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; border: 1px solid rgba(245,237,225,0.15); color: var(--color-text); padding: 1rem 2rem; font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.25em; transition: all 0.3s ease; }
+.awwwards-btn:hover { border-color: var(--color-terracotta); color: var(--color-terracotta); }
+
+.awwwards-btn-accent        { display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; border: 1px solid var(--color-terracotta); background-color: var(--color-terracotta); color: var(--color-bg); padding: 1rem 2rem; font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.25em; transition: all 0.3s ease; }
+.awwwards-btn-accent:hover  { background-color: transparent; color: var(--color-terracotta); }
+
+.vintage-card { background: var(--color-bg-card); border: 1px solid var(--color-border); overflow: hidden; transition: all 0.5s ease; }
+.section-label { font-size: 0.5625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5em; color: var(--color-muted); }
+
+@layer utilities {
+  .text-outline {
+    -webkit-text-stroke: 1px var(--color-text);
+    color: transparent;
+  }
+}
+
+/* ─── Typography Utilities ──────────────────────────────── */
+.display-heading {
+  font-family: var(--font-display), 'Barlow', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 0.88;
+}
+
+.serif-italic {
+  font-family: var(--font-serif), 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* ─── Animations ────────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 15s linear infinite;
+  will-change: transform;
+}
+.marquee-track-fast {
+  animation: marquee 20s linear infinite;
+  will-change: transform;
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fade-up 0.8s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+/* ─── Hover Effects ─────────────────────────────────────── */
+.img-zoom img { transition: transform 1.2s cubic-bezier(0.16,1,0.3,1); }
+.img-zoom:hover img { transform: scale(1.06); }
 
 .underline-hover {
   position: relative;
@@ -67,21 +147,14 @@ body {
   content: '';
   position: absolute;
   left: 0;
-  bottom: -1px;
+  bottom: -2px;
   width: 0;
   height: 1px;
-  background: currentColor;
+  background: var(--color-terracotta);
   transition: width 0.4s ease;
 }
 .underline-hover:hover::after { width: 100%; }
 
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-.marquee-track {
-  animation: marquee 30s linear infinite;
-  will-change: transform;
-}
-
-
+/* ─── Product Card ──────────────────────────────────────── */
+.product-card-img { transition: transform 1.4s cubic-bezier(0.16,1,0.3,1); }
+.product-card:hover .product-card-img { transform: scale(1.08); }

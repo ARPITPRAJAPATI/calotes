@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "@/components/Providers";
 import CartDrawer from "@/components/CartDrawer";
 import Navbar from "@/components/Navbar";
+import AnnouncementBar from "@/components/AnnouncementBar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
@@ -36,12 +37,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${barlow.variable} ${playfair.variable} antialiased selection:bg-accent selection:text-bg`}>
+    <html lang="en" className={`${inter.variable} ${barlow.variable} ${playfair.variable} antialiased selection:bg-terracotta selection:text-bg`}>
       <body className="relative bg-bg text-text min-h-screen flex flex-col">
         {/* Vintage Noise Texture Overlay */}
         <div className="fixed inset-0 z-[-1] bg-noise" />
         
         <Providers>
+          <AnnouncementBar />
           <Navbar />
           <main className="flex-1 flex flex-col">
             {children}
