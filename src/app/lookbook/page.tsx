@@ -32,28 +32,23 @@ export default function LookbookPage() {
         </motion.h1>
       </div>
 
-      {/* Masonry / Staggered Grid */}
+      {/* Grid of Small Photos */}
       <div className="max-w-[1800px] mx-auto px-6 md:px-12">
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-8">
           {LOOKS.map((look, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8 }}
-              className="break-inside-avoid group relative overflow-hidden bg-card border border-border/50"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
+              className="group relative aspect-square rounded-[2rem] overflow-hidden bg-bg-dark border border-border/20"
             >
-              <img src={look.img} alt={look.title} className="w-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
-              <div className="absolute inset-0 bg-gradient-to-t from-bg-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute inset-x-0 bottom-0 p-8 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 flex justify-between items-end">
-                <div>
-                  <h3 className="text-card font-display font-black text-2xl uppercase tracking-tighter mb-1">{look.title}</h3>
-                  <p className="text-card/70 text-[10px] font-bold uppercase tracking-widest">{look.desc}</p>
-                </div>
-                <Link href="/shop" className="w-10 h-10 rounded-full bg-accent text-bg flex items-center justify-center hover:bg-card hover:text-accent transition-colors">
-                  <ArrowRight size={16} />
-                </Link>
+              <img src={look.img} alt={look.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90" />
+              <div className="absolute inset-0 p-6 flex flex-col justify-end items-center text-center">
+                <h3 className="text-white font-display font-black text-xs md:text-sm uppercase tracking-[0.2em] mb-1">{look.title}</h3>
+                <p className="text-white/60 text-[8px] font-bold uppercase tracking-[0.3em]">{look.desc}</p>
               </div>
             </motion.div>
           ))}

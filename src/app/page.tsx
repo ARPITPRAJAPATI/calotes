@@ -172,12 +172,12 @@ export default function Home() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="aspect-[4/5] md:aspect-square relative p-4 md:p-12 premium-card bg-bg-dark"
+            className="aspect-[4/5] md:aspect-square relative p-4 md:p-12 rounded-[2rem] overflow-hidden bg-bg-dark border border-border/20 group"
           >
-            <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000" alt="Vintage Philosophy" className="w-full h-full object-cover transition-transform duration-[1.5s]" />
-            <div className="absolute -bottom-8 -right-8 w-48 h-48 bg-white border border-border hidden md:flex flex-col items-center justify-center p-6 text-center shadow-xl">
+            <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000" alt="Vintage Philosophy" className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110" />
+            <div className="absolute -bottom-4 -right-4 w-40 h-40 bg-white/90 backdrop-blur-md border border-border rounded-full hidden md:flex flex-col items-center justify-center p-6 text-center shadow-xl">
               <p className="font-display font-black text-3xl uppercase tracking-tighter leading-none text-text">100%</p>
-              <p className="text-[10px] text-muted font-bold tracking-[0.2em] uppercase mt-2">Authentic</p>
+              <p className="text-[9px] text-muted font-bold tracking-[0.2em] uppercase mt-2">Authentic</p>
             </div>
           </motion.div>
 
