@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Inter, Barlow, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import Providers from "@/components/Providers";
+import CartDrawer from "@/components/CartDrawer";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -25,20 +30,25 @@ export const metadata: Metadata = {
   description: "Curated vintage pieces. Adapt. Stand Out. Be Calotes.",
 };
 
-import Providers from "@/components/Providers";
-import CartDrawer from "@/components/CartDrawer";
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${barlow.variable} ${playfair.variable} antialiased`}>
-      <body>
+    <html lang="en" className={`${inter.variable} ${barlow.variable} ${playfair.variable} antialiased selection:bg-accent selection:text-bg`}>
+      <body className="relative bg-bg text-text min-h-screen flex flex-col">
+        {/* Vintage Noise Texture Overlay */}
+        <div className="fixed inset-0 z-[-1] bg-noise" />
+        
         <Providers>
-          {children}
+          <Navbar />
+          <main className="flex-1 flex flex-col">
+            {children}
+          </main>
+          <Footer />
           <CartDrawer />
+          <WhatsAppButton />
         </Providers>
       </body>
     </html>

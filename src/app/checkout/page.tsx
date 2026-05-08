@@ -64,20 +64,20 @@ export default function CheckoutPage() {
     setAddress({ ...address, [e.target.name]: e.target.value });
 
   if (status === "loading" || status === "unauthenticated") return (
-    <div className="h-screen bg-bg flex items-center justify-center"><Loader2 className="animate-spin text-muted" /></div>
+    <div className="h-[70vh] flex items-center justify-center"><Loader2 className="animate-spin text-accent" /></div>
   );
 
   return (
-    <div className="min-h-screen bg-bg text-text">
+    <div className="w-full pt-32 pb-24 flex-1">
       {/* Header */}
-      <div className="pt-28 pb-4 px-6 md:px-12 border-b border-border">
+      <div className="px-6 md:px-12 max-w-[1800px] mx-auto border-b border-border pb-8 mb-16">
         <Link href="/shop" className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted hover:text-text transition-colors">
           <ArrowLeft size={12} /> Back to Archive
         </Link>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-20">
-        <h1 className="font-display font-black text-5xl md:text-7xl uppercase tracking-tighter mb-20">
+      <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+        <h1 className="font-display font-black text-5xl md:text-7xl uppercase tracking-tighter mb-20 text-text">
           Checkout
         </h1>
 
@@ -86,7 +86,7 @@ export default function CheckoutPage() {
           <div className="lg:col-span-7">
             <form id="checkout-form" onSubmit={handlePayment} className="space-y-16">
               <div>
-                <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted mb-8">Contact</h2>
+                <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-accent mb-8 flex items-center gap-2">Contact</h2>
                 <div className="space-y-4">
                   {[
                     { name: "fullName", placeholder: "Full Name" },
@@ -94,14 +94,14 @@ export default function CheckoutPage() {
                   ].map(f => (
                     <input key={f.name} required type="text" name={f.name} placeholder={f.placeholder}
                       value={(address as any)[f.name]} onChange={handleInputChange}
-                      className="w-full bg-transparent border-b border-border py-4 text-xs font-bold uppercase tracking-widest outline-none focus:border-text transition-colors placeholder:text-muted"
+                      className="w-full bg-card border border-border/50 p-4 text-xs font-bold uppercase tracking-widest outline-none focus:border-accent transition-colors placeholder:text-muted/50 text-text"
                     />
                   ))}
                 </div>
               </div>
 
               <div>
-                <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted mb-8">Shipping Address</h2>
+                <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-accent mb-8">Shipping Address</h2>
                 <div className="space-y-4">
                   {[
                     { name: "street", placeholder: "Street Address" },
@@ -111,7 +111,7 @@ export default function CheckoutPage() {
                   ].map(f => (
                     <input key={f.name} required type="text" name={f.name} placeholder={f.placeholder}
                       value={(address as any)[f.name]} onChange={handleInputChange}
-                      className="w-full bg-transparent border-b border-border py-4 text-xs font-bold uppercase tracking-widest outline-none focus:border-text transition-colors placeholder:text-muted"
+                      className="w-full bg-card border border-border/50 p-4 text-xs font-bold uppercase tracking-widest outline-none focus:border-accent transition-colors placeholder:text-muted/50 text-text"
                     />
                   ))}
                 </div>
@@ -121,40 +121,40 @@ export default function CheckoutPage() {
 
           {/* Summary */}
           <div className="lg:col-span-5">
-            <div className="sticky top-32 space-y-6">
+            <div className="sticky top-32 space-y-6 bg-card p-8 border border-border/50">
               <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted mb-8">Order Summary</h2>
               <div className="space-y-6 max-h-[40vh] overflow-y-auto pr-4">
                 {items.map((item) => (
-                  <div key={`${item.productId}-${item.size}`} className="flex gap-4 border-b border-border pb-6">
-                    <div className="w-16 h-20 bg-card shrink-0">
+                  <div key={`${item.productId}-${item.size}`} className="flex gap-4 border-b border-border/50 pb-6">
+                    <div className="w-16 h-20 bg-bg shrink-0 border border-border/30">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 py-1">
-                      <h3 className="text-[10px] font-black uppercase tracking-wider line-clamp-1">{item.name}</h3>
+                      <h3 className="text-[10px] font-black uppercase tracking-wider line-clamp-1 text-text">{item.name}</h3>
                       <p className="text-[10px] text-muted font-bold uppercase mt-1">Size: {item.size} · Qty: {item.quantity}</p>
-                      <p className="text-xs font-bold mt-2">₹{item.price * item.quantity}</p>
+                      <p className="text-xs font-black mt-2 text-text">₹{item.price * item.quantity}</p>
                     </div>
                   </div>
                 ))}
               </div>
               <div className="border-t border-border pt-6 space-y-4">
-                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-text">
                   <span className="text-muted">Subtotal</span><span>₹{cartTotal}</span>
                 </div>
-                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-text">
                   <span className="text-muted">Shipping</span><span>Calculated</span>
                 </div>
-                <div className="flex justify-between text-sm font-black uppercase tracking-widest border-t border-border pt-4">
-                  <span>Total</span><span>₹{cartTotal}</span>
+                <div className="flex justify-between text-sm font-black uppercase tracking-widest border-t border-border/50 pt-4 text-text">
+                  <span>Total</span><span className="text-accent">₹{cartTotal}</span>
                 </div>
               </div>
               <button type="submit" form="checkout-form" disabled={loading || !items.length}
-                className="w-full bg-text text-bg py-6 text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 hover:bg-bg-dark transition-colors disabled:opacity-40"
+                className="w-full mt-6 awwwards-btn-accent flex items-center justify-center gap-3 disabled:opacity-40"
               >
                 {loading ? <Loader2 className="animate-spin" size={16} /> : <><Lock size={14} /> Secure Payment</>}
               </button>
-              <div className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted">
-                <ShieldCheck size={12} /> Encrypted & Secure
+              <div className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted mt-6">
+                <ShieldCheck size={12} className="text-accent" /> Encrypted & Secure
               </div>
             </div>
           </div>
