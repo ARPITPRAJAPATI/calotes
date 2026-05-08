@@ -137,7 +137,7 @@ export default function Home() {
           <div className="absolute -right-12 top-0 text-[100px] font-display font-black text-border leading-none select-none hidden xl:block">02</div>
           <h2 className="font-display font-black text-4xl sm:text-5xl uppercase tracking-tighter text-center mb-24">Curated Categories</h2>
           
-        <div className="flex gap-3 md:gap-4 overflow-x-auto pb-8 snap-x no-scrollbar px-6 md:px-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 px-6 md:px-12">
           {[
             { title: "Jerseys", img: "https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800", link: "/shop/mens" },
             { title: "Gym Core", img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800", link: "/shop/womens" },
@@ -146,11 +146,23 @@ export default function Home() {
             { title: "Oversized", img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800", link: "/shop/plus-size" },
             { title: "Accessories", img: "https://images.unsplash.com/photo-1523206489230-c012c64b2b48?q=80&w=800", link: "/shop/accessories" }
           ].map((cat, i) => (
-            <Link key={i} href={cat.link} className="relative min-w-[140px] md:min-w-[200px] aspect-square group rounded-[1.5rem] overflow-hidden snap-start flex-shrink-0">
-              <img src={cat.img} alt={cat.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80" />
-              <div className="absolute inset-0 p-4 flex flex-col justify-end items-center text-center">
-                <h3 className="font-display font-black text-[10px] md:text-xs text-white uppercase tracking-[0.2em]">{cat.title}</h3>
+            <Link 
+              key={i} 
+              href={cat.link} 
+              className="relative aspect-[3/4] group overflow-hidden bg-bg-dark border border-border/10"
+            >
+              <img 
+                src={cat.img} 
+                alt={cat.title} 
+                className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110" 
+              />
+              {/* Subtle bottom gradient just for text legibility */}
+              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent opacity-80" />
+              
+              <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6">
+                <h3 className="text-white font-display font-black text-xs md:text-sm uppercase tracking-[0.2em] leading-none">
+                  {cat.title}
+                </h3>
               </div>
             </Link>
           ))}

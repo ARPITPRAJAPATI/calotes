@@ -109,51 +109,29 @@ export default function ProductDetailsPage() {
       <div className="max-w-[1800px] mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 mb-32">
 
-          {/* Left: Image Gallery */}
-          <div className="lg:col-span-7 flex flex-col gap-4">
-            {/* Main Image/Video */}
-            <motion.div
-              key={selectedImage}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="aspect-[3/4] overflow-hidden bg-card relative border border-border/50"
-            >
-              {product.images[selectedImage].endsWith(".mp4") ? (
-                <video autoPlay loop muted playsInline className="w-full h-full object-cover">
-                  <source src={product.images[selectedImage]} type="video/mp4" />
-                </video>
-              ) : (
-                <img
-                  src={product.images[selectedImage]}
-                  alt={product.name}
-                  className="w-full h-full object-cover transition-all duration-700"
-                />
-              )}
-            </motion.div>
-            
-            {/* Thumbnails */}
-            {product.images.length > 1 && (
-              <div className="grid grid-cols-5 gap-3">
-                {product.images.map((media, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImage(idx)}
-                    className={`aspect-[3/4] overflow-hidden transition-all bg-card ${selectedImage === idx ? 'ring-2 ring-accent' : 'opacity-50 hover:opacity-100'}`}
-                  >
-                    {media.endsWith(".mp4") ? (
-                      <video muted className="w-full h-full object-cover"><source src={media} /></video>
-                    ) : (
-                      <img src={media} alt="" className="w-full h-full object-cover group-hover:opacity-100 transition-all duration-500" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* Left: Image Gallery (Stacked on Desktop) */}
+          <div className="lg:col-span-6 flex flex-col gap-8">
+            <div className="flex flex-col gap-6 md:gap-12">
+              {product.images.map((img, idx) => (
+                <div key={idx} className="aspect-[3/4] bg-bg-dark overflow-hidden">
+                  {img.endsWith(".mp4") ? (
+                    <video autoPlay loop muted playsInline className="w-full h-full object-cover">
+                      <source src={img} type="video/mp4" />
+                    </video>
+                  ) : (
+                    <img
+                      src={img}
+                      alt={`${product.name} - View ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Right: Product Info */}
-          <div className="lg:col-span-5 lg:sticky lg:top-36 lg:h-max space-y-12">
+          {/* Right: Product Info (Sticky) */}
+          <div className="lg:col-span-6 lg:sticky lg:top-32 lg:h-max space-y-12 py-12">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-accent mb-4 flex items-center gap-2">
                 <Sparkles size={12} /> Pre-Loved Authentic

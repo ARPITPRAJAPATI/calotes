@@ -128,53 +128,82 @@ export default function Navbar() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-[100] bg-bg-dark flex flex-col p-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-bg flex flex-col"
           >
-            <div className="flex justify-between items-center pb-8 border-b border-border">
-              <span className="font-display font-black text-3xl uppercase tracking-tighter">Calotes</span>
+            <div className="flex justify-between items-center p-6 border-b border-border">
+              <span className="font-display font-black text-2xl uppercase tracking-tighter">Calotes</span>
               <button onClick={() => setMobileMenuOpen(false)}>
-                <X size={28} strokeWidth={1.5} className="text-text hover:text-accent" />
+                <X size={28} strokeWidth={1} className="text-text" />
               </button>
             </div>
             
-            <nav className="flex-1 overflow-y-auto py-8 flex flex-col gap-6">
-              <Link href="/shop" onClick={() => setMobileMenuOpen(false)} className="text-3xl font-display font-black uppercase tracking-tighter hover:text-accent transition-colors">
-                Shop All
-              </Link>
-              
-              <div className="space-y-4 pl-4 border-l border-border/50">
-                {categories.map((cat) => (
-                  <Link 
-                    key={cat.href} 
-                    href={cat.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block text-sm font-bold uppercase tracking-widest text-muted hover:text-text transition-colors"
-                  >
-                    {cat.name}
+            <nav className="flex-1 overflow-y-auto px-6 py-12 flex flex-col">
+              <div className="space-y-10">
+                <motion.div 
+                  initial={{ x: 20, opacity: 0 }} 
+                  animate={{ x: 0, opacity: 1 }} 
+                  transition={{ delay: 0.1 }}
+                >
+                  <Link href="/shop" onClick={() => setMobileMenuOpen(false)} className="text-5xl font-display font-black uppercase tracking-tighter block leading-none">
+                    Archive
                   </Link>
-                ))}
-              </div>
+                </motion.div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  {categories.slice(1, 5).map((cat, i) => (
+                    <motion.div
+                      key={cat.href}
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.2 + i * 0.1 }}
+                    >
+                      <Link 
+                        href={cat.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="group block space-y-3"
+                      >
+                        <div className="aspect-[4/5] bg-bg-dark rounded-xl overflow-hidden relative">
+                          <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
+                          <div className="absolute inset-0 flex items-center justify-center p-2">
+                             <span className="text-[10px] font-black uppercase tracking-widest text-center">{cat.name}</span>
+                          </div>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
 
-              <Link href="/lookbook" onClick={() => setMobileMenuOpen(false)} className="text-3xl font-display font-black uppercase tracking-tighter hover:text-accent transition-colors mt-4">
-                Lookbook
-              </Link>
-              <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="text-3xl font-display font-black uppercase tracking-tighter hover:text-accent transition-colors">
-                About Us
-              </Link>
+                <motion.div 
+                  initial={{ x: 20, opacity: 0 }} 
+                  animate={{ x: 0, opacity: 1 }} 
+                  transition={{ delay: 0.6 }}
+                  className="space-y-8 pt-8 border-t border-border"
+                >
+                  <Link href="/lookbook" onClick={() => setMobileMenuOpen(false)} className="text-4xl font-display font-black uppercase tracking-tighter block leading-none">
+                    Lookbook
+                  </Link>
+                  <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="text-4xl font-display font-black uppercase tracking-tighter block leading-none">
+                    About
+                  </Link>
+                </motion.div>
+              </div>
             </nav>
 
-            <div className="border-t border-border pt-8 flex flex-col gap-4">
+            <div className="p-6 border-t border-border bg-bg-dark/50">
               <Link 
                 href={session ? "/profile" : "/login"} 
                 onClick={() => setMobileMenuOpen(false)}
-                className="awwwards-btn text-center"
+                className="awwwards-btn-accent w-full flex items-center justify-center py-5"
               >
-                {session ? "My Account" : "Login / Register"}
+                {session ? "My Archive" : "Login / Sign Up"}
               </Link>
+              <div className="flex justify-center gap-8 mt-8 text-[10px] font-black uppercase tracking-[0.3em] text-muted">
+                <a href="#" className="hover:text-text">Instagram</a>
+                <a href="#" className="hover:text-text">WhatsApp</a>
+              </div>
             </div>
           </motion.div>
         )}

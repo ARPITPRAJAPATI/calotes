@@ -105,20 +105,20 @@ function ShopContent() {
         </div>
       </div>
 
-      <div className="max-w-[1800px] mx-auto px-6 md:px-12 flex gap-16">
+      <div className="max-w-[1800px] mx-auto px-4 md:px-24 flex gap-8 lg:gap-16">
         {/* Desktop Sidebar Filters */}
-        <aside className="hidden lg:block w-56 shrink-0 sticky top-32 h-max">
+        <aside className="hidden lg:block w-48 shrink-0 sticky top-32 h-max">
           <h3 className="text-[10px] font-black uppercase tracking-[0.3em] mb-8 text-muted border-b border-border pb-4">
             Curations
           </h3>
-          <ul className="space-y-5">
+          <ul className="space-y-4">
             {categories.map((cat) => (
               <li key={cat.slug}>
                 <button
                   onClick={() => setActiveCategory(cat.slug)}
-                  className={`text-[9px] uppercase tracking-[0.3em] font-black transition-all flex items-center gap-6 group w-full text-left ${activeCategory === cat.slug ? 'text-text' : 'text-muted/50 hover:text-text'}`}
+                  className={`text-[9px] uppercase tracking-[0.3em] font-black transition-all flex items-center gap-4 group w-full text-left ${activeCategory === cat.slug ? 'text-text' : 'text-muted/50 hover:text-text'}`}
                 >
-                  <span className={`h-[1px] transition-all duration-700 ${activeCategory === cat.slug ? 'w-10 bg-text' : 'w-0 bg-muted group-hover:w-4'}`}></span>
+                  <span className={`h-[1px] transition-all duration-700 ${activeCategory === cat.slug ? 'w-8 bg-text' : 'w-0 bg-muted group-hover:w-3'}`}></span>
                   <span>{cat.name}</span>
                 </button>
               </li>
@@ -142,7 +142,7 @@ function ShopContent() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-16"
+              className="grid grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-x-2 md:gap-x-4 gap-y-10"
             >
               {products.map((product, idx) => (
                 <motion.div
@@ -153,34 +153,23 @@ function ShopContent() {
                   className="group"
                 >
                   <Link href={`/shop/product/${product.slug}`} className="block">
-                    <div className="relative premium-card aspect-[3/4] mb-6">
+                    <div className="relative aspect-[3/4] mb-4 overflow-hidden border border-border/10 bg-bg-dark">
                       {product.compareAtPrice && (
-                        <div className="absolute top-4 left-4 z-10 bg-black text-white px-3 py-1.5 text-[8px] font-black uppercase tracking-widest shadow-md">
+                        <div className="absolute top-3 left-3 z-10 bg-black text-white px-2 py-1 text-[8px] font-black uppercase tracking-widest">
                           Sale
-                        </div>
-                      )}
-                      {(product.sizes?.includes("XXL") || product.sizes?.includes("XXXL")) && (
-                        <div className="absolute top-4 right-4 z-10 bg-white/90 border border-border text-text px-3 py-1.5 text-[8px] font-black uppercase tracking-widest">
-                          Plus Size
                         </div>
                       )}
                       <img
                         src={product.images[0]}
                         alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-[1s] ease-out group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                       />
-                      <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] bg-white/95 backdrop-blur-sm flex justify-between items-center border-t border-border">
-                        <span className="text-text text-[9px] font-black uppercase tracking-widest">View details</span>
-                        <ArrowRight size={14} className="text-text" />
-                      </div>
                     </div>
-                    <div className="flex justify-between items-start">
-                      <div className="max-w-[70%]">
-                        <h3 className="text-[10px] font-black uppercase tracking-widest leading-snug line-clamp-2 mb-2">{product.name}</h3>
-                        <p className="text-[9px] text-muted font-bold uppercase tracking-[0.2em]">{product.brand}</p>
-                      </div>
-                      <div className="text-right shrink-0 ml-4">
-                        <p className="text-[10px] font-black">₹{product.price}</p>
+                    <div className="space-y-1.5">
+                      <h3 className="text-[9px] md:text-[10px] font-black uppercase tracking-wider leading-tight line-clamp-2">{product.name}</h3>
+                      <div className="flex justify-between items-center">
+                        <p className="text-[8px] md:text-[9px] text-muted font-bold uppercase tracking-[0.2em]">{product.brand}</p>
+                        <p className="text-[9px] md:text-[10px] font-black">₹{product.price}</p>
                       </div>
                     </div>
                   </Link>
@@ -225,6 +214,17 @@ function ShopContent() {
           </>
         )}
       </AnimatePresence>
+      {/* Mobile Floating Filter Button */}
+      <div className="fixed bottom-8 right-6 z-40 lg:hidden">
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          onClick={() => setIsFilterOpen(true)}
+          className="w-14 h-14 bg-text text-bg rounded-full shadow-2xl flex items-center justify-center border border-border"
+        >
+          <SlidersHorizontal size={20} />
+        </motion.button>
+      </div>
     </>
   );
 }
