@@ -37,13 +37,13 @@ export default function Navbar() {
     <>
       <header
         className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          scrolled ? "bg-bg/90 backdrop-blur-md border-b border-border py-4" : "bg-transparent py-6"
+          scrolled ? "bg-white/90 backdrop-blur-md border-b border-border py-4" : "bg-transparent py-8"
         }`}
       >
         <div className="max-w-[1800px] mx-auto px-6 md:px-12 flex items-center justify-between">
           {/* Left - Navigation Links */}
           <nav className="hidden lg:flex items-center gap-8">
-            <Link href="/shop" className="text-xs font-bold uppercase tracking-widest hover:text-accent transition-colors underline-hover">
+            <Link href="/shop" className="text-[9px] font-black uppercase tracking-[0.3em] hover:opacity-50 transition-opacity underline-hover">
               Shop
             </Link>
             
@@ -52,8 +52,8 @@ export default function Navbar() {
               onMouseEnter={() => setDropdownOpen(true)}
               onMouseLeave={() => setDropdownOpen(false)}
             >
-              <button className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest hover:text-accent transition-colors underline-hover pb-1">
-                Categories <ChevronDown size={14} />
+              <button className="flex items-center gap-1 text-[9px] font-black uppercase tracking-[0.3em] hover:opacity-50 transition-opacity underline-hover pb-1">
+                Categories <ChevronDown size={10} />
               </button>
               
               <AnimatePresence>
@@ -80,10 +80,10 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
 
-            <Link href="/lookbook" className="text-xs font-bold uppercase tracking-widest hover:text-accent transition-colors underline-hover">
+            <Link href="/lookbook" className="text-[9px] font-black uppercase tracking-[0.3em] hover:opacity-50 transition-opacity underline-hover">
               Lookbook
             </Link>
-            <Link href="/about" className="text-xs font-bold uppercase tracking-widest hover:text-accent transition-colors underline-hover">
+            <Link href="/about" className="text-[9px] font-black uppercase tracking-[0.3em] hover:opacity-50 transition-opacity underline-hover">
               About
             </Link>
           </nav>
@@ -99,17 +99,17 @@ export default function Navbar() {
           <div className="flex items-center gap-6">
             <Link 
               href={session ? "/profile" : "/login"} 
-              className="hidden lg:block text-xs font-bold uppercase tracking-widest hover:text-accent transition-colors underline-hover"
+              className="hidden lg:block text-[9px] font-black uppercase tracking-[0.3em] hover:opacity-50 transition-opacity underline-hover"
             >
               {session ? "Profile" : "Login"}
             </Link>
 
             <button
               onClick={() => setIsCartOpen(true)}
-              className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest hover:text-accent transition-colors relative group"
+              className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] hover:opacity-50 transition-opacity relative group"
             >
-              <ShoppingBag size={18} strokeWidth={1.5} />
-              <span className="hidden sm:inline">Cart</span>
+              <ShoppingBag size={16} strokeWidth={1.5} />
+              <span className="hidden sm:inline">Bag</span>
               {cartCount > 0 && (
                 <span className="absolute -top-2 -right-2 w-4 h-4 bg-accent-2 text-bg text-[8px] font-black rounded-full flex items-center justify-center">
                   {cartCount}

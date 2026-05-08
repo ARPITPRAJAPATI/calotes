@@ -11,23 +11,22 @@ export default function Footer() {
           
           {/* Brand Col */}
           <div className="md:col-span-5">
-            <span className="font-display font-black text-5xl md:text-6xl uppercase tracking-tighter block mb-6">
+            <span className="font-display font-black text-6xl md:text-8xl uppercase tracking-tighter block mb-10">
               CALOTES
             </span>
-            <p className="text-sm text-muted leading-relaxed max-w-sm mb-10 font-bold tracking-wide">
-              Adapt. Stand Out. Be Calotes. <br />
-              India's premium archive for authentic pre-owned vintage and streetwear.
+            <p className="text-[10px] text-muted leading-[1.8] max-w-sm mb-12 font-medium tracking-[0.2em] uppercase opacity-60">
+              India's premium archive for authentic pre-owned vintage and streetwear. Curated for the modern icon.
             </p>
             
             {/* Newsletter */}
-            <form className="flex border-b border-border pb-2 max-w-sm group" onSubmit={(e) => e.preventDefault()}>
+            <form className="flex border-b border-border/60 pb-3 max-w-sm group" onSubmit={(e) => e.preventDefault()}>
               <input 
                 type="email" 
                 placeholder="Join the archive (Email)"
-                className="flex-1 bg-transparent text-xs font-bold uppercase tracking-widest outline-none placeholder:text-muted/50 py-2 transition-colors group-focus-within:text-accent"
+                className="flex-1 bg-transparent text-[9px] font-black uppercase tracking-[0.3em] outline-none placeholder:text-muted/40 py-2 transition-colors group-focus-within:text-text"
               />
-              <button type="submit" className="text-xs font-black uppercase tracking-widest text-text hover:text-accent-2 transition-colors px-2 flex items-center gap-1">
-                Subscribe <ArrowUpRight size={14} />
+              <button type="submit" className="text-[9px] font-black uppercase tracking-[0.3em] text-text/50 hover:text-text transition-colors px-2 flex items-center gap-2 group-focus-within:text-text">
+                Join <ArrowUpRight size={12} />
               </button>
             </form>
           </div>
@@ -38,7 +37,7 @@ export default function Footer() {
             <ul className="space-y-4">
               {["All Archive", "Denim", "Outerwear", "Plus Size", "Accessories"].map(l => (
                 <li key={l}>
-                  <Link href={`/shop/${l.toLowerCase().replace(' ', '-')}`} className="text-xs font-bold uppercase tracking-widest hover:text-accent transition-colors underline-hover">
+                  <Link href={`/shop/${l.toLowerCase().replace(' ', '-')}`} className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70 hover:opacity-100 transition-opacity underline-hover">
                     {l}
                   </Link>
                 </li>
@@ -51,7 +50,7 @@ export default function Footer() {
             <ul className="space-y-4">
               {["About Us", "Shipping Policy", "Returns", "Size Guide", "Contact"].map(l => (
                 <li key={l}>
-                  <Link href={`/${l.toLowerCase().replace(' ', '-')}`} className="text-xs font-bold uppercase tracking-widest hover:text-accent transition-colors underline-hover">
+                  <Link href={`/${l.toLowerCase().replace(' ', '-')}`} className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70 hover:opacity-100 transition-opacity underline-hover">
                     {l}
                   </Link>
                 </li>

@@ -28,10 +28,10 @@ export default function AboutPage() {
       <section className="px-6 md:px-12 max-w-[1800px] mx-auto mb-32 md:mb-48">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[60vh] md:h-[80vh]">
           <div className="md:col-span-2 relative bg-card border border-border/50">
-            <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1200" alt="Vintage Sourcing" className="w-full h-full object-cover grayscale" />
+            <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1200" alt="Vintage Sourcing" className="w-full h-full object-cover" />
           </div>
           <div className="relative bg-card border border-border/50 hidden md:block">
-            <img src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=800" alt="Vintage Style" className="w-full h-full object-cover grayscale" />
+            <img src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=800" alt="Vintage Style" className="w-full h-full object-cover" />
           </div>
         </div>
       </section>

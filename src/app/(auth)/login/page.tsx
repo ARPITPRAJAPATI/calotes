@@ -122,7 +122,7 @@ export default function LoginPage() {
         <img
           src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2000&auto=format&fit=crop"
           alt="Calotes Editorial"
-          className="w-full h-full object-cover grayscale"
+          className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/30" />
         <div className="absolute bottom-12 left-12 text-white">

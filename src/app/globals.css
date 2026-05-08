@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  /* Calotes Brand Palette — Dark Warm Vintage Theme */
-  --color-bg: #1A140F;      /* Deep warm dark */
-  --color-bg-dark: #0F0A05; /* Even darker for contrast */
-  --color-text: #F5EDE1;    /* Warm cream */
-  --color-muted: #A39688;   /* Muted cream/taupe */
-  --color-accent: #6B8BA4;  /* Faded denim blue */
-  --color-accent-2: #C86B4B;/* Soft terracotta / warm orange */
-  --color-border: rgba(245, 237, 225, 0.15);
-  --color-card: #261D16;    /* Slightly lighter than bg */
+  /* Calotes Brand Palette — Simple Premium Light Theme */
+  --color-bg: #FFFFFF;
+  --color-bg-dark: #F9F9F9;
+  --color-text: #000000;
+  --color-muted: #666666;
+  --color-accent: #000000;
+  --color-accent-2: #111111;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-card: #FFFFFF;
 
   /* Typography */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -17,131 +17,71 @@
   --font-serif: var(--font-playfair), serif;
   
   /* Custom Utilities */
-  --transition-smooth: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-premium: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: all 0.5s ease;
 }
 
 @layer utilities {
   .awwwards-btn {
-    @apply relative z-0 overflow-hidden bg-transparent text-text border border-text/20 px-8 py-4 uppercase tracking-[0.2em] text-[10px] font-bold transition-colors duration-500 hover:text-bg hover:border-text;
-  }
-  .awwwards-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--color-text);
-    transform: translateY(100%);
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: -1;
-  }
-  .awwwards-btn:hover::before {
-    transform: translateY(0);
-  }
-  .awwwards-btn-accent {
-    @apply relative z-0 overflow-hidden bg-accent-2 text-bg border border-accent-2 px-8 py-4 uppercase tracking-[0.2em] text-[10px] font-bold transition-colors duration-500 hover:text-text;
-  }
-  .awwwards-btn-accent::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--color-bg);
-    transform: translateY(100%);
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: -1;
-  }
-  .awwwards-btn-accent:hover::before {
-    transform: translateY(0);
-  }
-  .text-outline {
-    -webkit-text-stroke: 1px var(--color-text);
-    color: transparent;
-  }
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    @apply inline-flex items-center justify-center border border-text px-8 py-4 rounded-sm uppercase tracking-[0.2em] text-[10px] font-bold transition-all duration-300 bg-transparent text-text hover:bg-text hover:text-bg;
   }
   
-  /* Noise overlay for vintage feel */
-  .bg-noise {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
-    pointer-events: none;
+  .awwwards-btn-accent {
+    @apply inline-flex items-center justify-center border border-text px-8 py-4 rounded-sm uppercase tracking-[0.2em] text-[10px] font-bold transition-all duration-300 bg-text text-bg hover:bg-transparent hover:text-text;
+  }
+
+  .premium-card {
+    @apply bg-white border border-border rounded-sm overflow-hidden transition-all duration-500 hover:border-text/30 hover:shadow-sm;
+  }
+
+  .reveal-text {
+    @apply relative overflow-hidden inline-block;
+  }
+  .reveal-text::after {
+    content: '';
+    @apply absolute inset-0 bg-bg transition-transform duration-1000 ease-out translate-x-full;
   }
 }
 
-/* Base Styles */
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
 }
 
-/* Brutalist Form Resets */
-input, button, select, textarea {
-  font-family: inherit;
-}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 20px; }
 
-button {
-  cursor: pointer;
-}
-
-input:focus {
-  outline: none;
-}
-
-/* Interactive Elements */
-a, button, input {
-  transition: var(--transition-smooth);
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar { 
-  width: 5px; 
-}
-::-webkit-scrollbar-track { 
-  background: var(--color-bg); 
-}
-::-webkit-scrollbar-thumb { 
-  background: var(--color-text); 
-  border-radius: 10px; 
-}
-
-/* Editorial Utilities */
-.img-zoom img {
-  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-.img-zoom:hover img {
-  transform: scale(1.06);
-}
+.img-zoom img { transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1); }
+.img-zoom:hover img { transform: scale(1.05); }
 
 .underline-hover {
   position: relative;
+  @apply inline-block;
 }
 .underline-hover::after {
   content: '';
   position: absolute;
   left: 0;
-  bottom: -2px;
+  bottom: -1px;
   width: 0;
   height: 1px;
   background: currentColor;
-  transition: width 0.3s ease;
+  transition: width 0.4s ease;
 }
-.underline-hover:hover::after {
-  width: 100%;
-}
+.underline-hover:hover::after { width: 100%; }
 
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
 .marquee-track {
-  animation: marquee 20s linear infinite;
+  animation: marquee 30s linear infinite;
   will-change: transform;
 }
-.marquee-track:hover {
-  animation-play-state: paused;
-}
+
+

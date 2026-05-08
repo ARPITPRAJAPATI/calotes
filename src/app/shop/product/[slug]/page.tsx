@@ -91,15 +91,18 @@ export default function ProductDetailsPage() {
 
   return (
     <div className="w-full pt-28 pb-24 flex-1">
-      {/* Sticky Breadcrumb */}
-      <div className="px-6 md:px-12 border-b border-border pb-4 mb-12 sticky top-20 bg-bg/90 backdrop-blur-md z-40">
+      {/* Breadcrumb Navigation */}
+      <div className="px-6 md:px-12 border-b border-border/40 py-8 mb-12">
         <div className="max-w-[1800px] mx-auto flex items-center justify-between">
-          <Link href="/shop" className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted hover:text-text transition-colors">
-            <ArrowLeft size={12} /> Back to Archive
+          <Link href="/shop" className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-muted hover:text-text transition-all duration-300">
+            <div className="w-8 h-px bg-muted group-hover:w-12 group-hover:bg-text transition-all duration-500" />
+            <span>Back to Archive</span>
           </Link>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-muted hidden sm:block">
-            {product.category.name} / {product.brand}
-          </span>
+          <div className="hidden sm:flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.2em] text-muted/40">
+            <span>Archive</span>
+            <div className="w-1 h-1 rounded-full bg-border" />
+            <span className="text-muted">{product.category.name}</span>
+          </div>
         </div>
       </div>
 
@@ -124,7 +127,7 @@ export default function ProductDetailsPage() {
                 <img
                   src={product.images[selectedImage]}
                   alt={product.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-all duration-700"
                 />
               )}
             </motion.div>
@@ -141,7 +144,7 @@ export default function ProductDetailsPage() {
                     {media.endsWith(".mp4") ? (
                       <video muted className="w-full h-full object-cover"><source src={media} /></video>
                     ) : (
-                      <img src={media} alt="" className="w-full h-full object-cover" />
+                      <img src={media} alt="" className="w-full h-full object-cover group-hover:opacity-100 transition-all duration-500" />
                     )}
                   </button>
                 ))}
@@ -213,7 +216,7 @@ export default function ProductDetailsPage() {
             <div className="flex flex-col gap-4">
               <button
                 onClick={handleAddToCart}
-                className="w-full py-6 bg-text text-bg text-[10px] font-black uppercase tracking-[0.3em] hover:bg-bg-dark transition-colors duration-300"
+                className="awwwards-btn-accent w-full py-6"
               >
                 {added ? "✓ Added to Bag" : "Add to Bag"}
               </button>

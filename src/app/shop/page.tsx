@@ -53,9 +53,9 @@ function ShopContent() {
 
   return (
     <>
-      {/* Page Header */}
-      <div className="px-6 md:px-12 max-w-[1800px] mx-auto border-b border-border pb-12 mb-16">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
+      {/* Page Header & Visual Categories */}
+      <div className="px-6 md:px-12 max-w-[1800px] mx-auto mb-16">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-16 border-b border-border pb-12">
           <div>
             <motion.p 
               initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
@@ -65,7 +65,7 @@ function ShopContent() {
             </motion.p>
             <motion.h1 
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-              className="font-display font-black text-6xl md:text-8xl lg:text-9xl uppercase tracking-tighter leading-[0.85]"
+              className="font-display font-black text-6xl md:text-9xl lg:text-[10vw] uppercase tracking-tighter leading-[0.8]"
             >
               Archive
             </motion.h1>
@@ -82,6 +82,27 @@ function ShopContent() {
             </button>
           </div>
         </div>
+
+        {/* Aged Arc Style Category Selection */}
+        <div className="flex gap-4 overflow-x-auto pb-6 no-scrollbar snap-x">
+          {categories.filter(c => c.slug !== "all").map((cat) => (
+            <button
+              key={cat.slug}
+              onClick={() => setActiveCategory(cat.slug)}
+              className={`relative min-w-[120px] md:min-w-[180px] aspect-square rounded-2xl overflow-hidden snap-start shrink-0 group border-2 transition-all ${activeCategory === cat.slug ? 'border-text ring-2 ring-text/10' : 'border-transparent'}`}
+            >
+              <img 
+                src={`https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=400&auto=format&fit=crop`} 
+                alt={cat.name} 
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
+              <div className="absolute inset-0 flex items-center justify-center p-4">
+                <span className="text-[9px] md:text-[11px] font-black text-white uppercase tracking-widest text-center">{cat.name}</span>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="max-w-[1800px] mx-auto px-6 md:px-12 flex gap-16">
@@ -95,10 +116,10 @@ function ShopContent() {
               <li key={cat.slug}>
                 <button
                   onClick={() => setActiveCategory(cat.slug)}
-                  className={`text-xs uppercase tracking-widest font-bold transition-all flex items-center gap-4 group w-full text-left ${activeCategory === cat.slug ? 'text-text' : 'text-muted hover:text-text'}`}
+                  className={`text-[9px] uppercase tracking-[0.3em] font-black transition-all flex items-center gap-6 group w-full text-left ${activeCategory === cat.slug ? 'text-text' : 'text-muted/50 hover:text-text'}`}
                 >
-                  <span className={`h-px transition-all duration-500 ${activeCategory === cat.slug ? 'w-8 bg-accent' : 'w-0 bg-muted group-hover:w-4'}`}></span>
-                  <span className={activeCategory === cat.slug ? 'text-accent' : ''}>{cat.name}</span>
+                  <span className={`h-[1px] transition-all duration-700 ${activeCategory === cat.slug ? 'w-10 bg-text' : 'w-0 bg-muted group-hover:w-4'}`}></span>
+                  <span>{cat.name}</span>
                 </button>
               </li>
             ))}
@@ -132,37 +153,34 @@ function ShopContent() {
                   className="group"
                 >
                   <Link href={`/shop/product/${product.slug}`} className="block">
-                    <div className="relative overflow-hidden aspect-[3/4] mb-6 bg-card border border-border/50">
+                    <div className="relative premium-card aspect-[3/4] mb-6">
                       {product.compareAtPrice && (
-                        <div className="absolute top-4 left-4 z-10 bg-accent text-bg px-3 py-1.5 text-[9px] font-black uppercase tracking-widest shadow-md">
+                        <div className="absolute top-4 left-4 z-10 bg-black text-white px-3 py-1.5 text-[8px] font-black uppercase tracking-widest shadow-md">
                           Sale
                         </div>
                       )}
                       {(product.sizes?.includes("XXL") || product.sizes?.includes("XXXL")) && (
-                        <div className="absolute top-4 right-4 z-10 border border-text text-text bg-bg-dark/80 backdrop-blur-sm px-3 py-1.5 text-[9px] font-black uppercase tracking-widest">
+                        <div className="absolute top-4 right-4 z-10 bg-white/90 border border-border text-text px-3 py-1.5 text-[8px] font-black uppercase tracking-widest">
                           Plus Size
                         </div>
                       )}
                       <img
                         src={product.images[0]}
                         alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                        className="w-full h-full object-cover transition-transform duration-[1s] ease-out group-hover:scale-105"
                       />
-                      <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] bg-bg-dark/90 backdrop-blur-sm flex justify-between items-center">
-                        <span className="text-text text-[10px] font-black uppercase tracking-widest">View details</span>
+                      <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] bg-white/95 backdrop-blur-sm flex justify-between items-center border-t border-border">
+                        <span className="text-text text-[9px] font-black uppercase tracking-widest">View details</span>
                         <ArrowRight size={14} className="text-text" />
                       </div>
                     </div>
                     <div className="flex justify-between items-start">
                       <div className="max-w-[70%]">
-                        <h3 className="text-[11px] font-black uppercase tracking-widest leading-snug line-clamp-2">{product.name}</h3>
-                        <p className="text-[10px] text-muted font-bold uppercase tracking-[0.2em] mt-2">{product.brand}</p>
+                        <h3 className="text-[10px] font-black uppercase tracking-widest leading-snug line-clamp-2 mb-2">{product.name}</h3>
+                        <p className="text-[9px] text-muted font-bold uppercase tracking-[0.2em]">{product.brand}</p>
                       </div>
                       <div className="text-right shrink-0 ml-4">
-                        {product.compareAtPrice && (
-                          <p className="text-[10px] text-muted line-through mb-1">₹{product.compareAtPrice}</p>
-                        )}
-                        <p className={`text-xs font-black ${product.compareAtPrice ? 'text-accent' : 'text-text'}`}>₹{product.price}</p>
+                        <p className="text-[10px] font-black">₹{product.price}</p>
                       </div>
                     </div>
                   </Link>

@@ -70,9 +70,10 @@ export default function CheckoutPage() {
   return (
     <div className="w-full pt-32 pb-24 flex-1">
       {/* Header */}
-      <div className="px-6 md:px-12 max-w-[1800px] mx-auto border-b border-border pb-8 mb-16">
-        <Link href="/shop" className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted hover:text-text transition-colors">
-          <ArrowLeft size={12} /> Back to Archive
+      <div className="px-6 md:px-12 max-w-[1800px] mx-auto border-b border-border/40 py-10 mb-16">
+        <Link href="/shop" className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-muted hover:text-text transition-all duration-300">
+          <div className="w-8 h-px bg-muted group-hover:w-12 group-hover:bg-text transition-all duration-500" />
+          <span>Back to Archive</span>
         </Link>
       </div>
 
@@ -148,11 +149,13 @@ export default function CheckoutPage() {
                   <span>Total</span><span className="text-accent">₹{cartTotal}</span>
                 </div>
               </div>
-              <button type="submit" form="checkout-form" disabled={loading || !items.length}
-                className="w-full mt-6 awwwards-btn-accent flex items-center justify-center gap-3 disabled:opacity-40"
-              >
-                {loading ? <Loader2 className="animate-spin" size={16} /> : <><Lock size={14} /> Secure Payment</>}
-              </button>
+              <div className="flex justify-center pt-6">
+                <button type="submit" form="checkout-form" disabled={loading || !items.length}
+                  className="flex items-center gap-3 awwwards-btn-accent px-10 py-5 disabled:opacity-40"
+                >
+                  {loading ? <Loader2 className="animate-spin" size={16} /> : <><Lock size={14} /> Secure Payment</>}
+                </button>
+              </div>
               <div className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted mt-6">
                 <ShieldCheck size={12} className="text-accent" /> Encrypted & Secure
               </div>

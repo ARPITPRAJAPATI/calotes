@@ -84,12 +84,14 @@ export default function CartDrawer() {
                   <span>Subtotal</span>
                   <span>₹{cartTotal}</span>
                 </div>
-                <button
-                  onClick={() => { setIsCartOpen(false); router.push("/checkout"); }}
-                  className="w-full bg-text text-bg py-5 text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-bg-dark transition-colors"
-                >
-                  Checkout <ArrowRight size={14} />
-                </button>
+                <div className="flex justify-center pt-4">
+                  <button
+                    onClick={() => { setIsCartOpen(false); router.push("/checkout"); }}
+                    className="awwwards-btn-accent px-10 py-5 flex items-center justify-center gap-3"
+                  >
+                    Checkout <ArrowRight size={14} />
+                  </button>
+                </div>
                 <p className="text-[10px] text-center text-muted font-bold uppercase tracking-widest">
                   Shipping calculated at checkout
                 </p>
