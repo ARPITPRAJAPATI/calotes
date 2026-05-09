@@ -10,9 +10,18 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const categorySlug = searchParams.get('category');
     const brand = searchParams.get('brand');
+    const searchTerm = searchParams.get('q');
     const sort = searchParams.get('sort') || '-createdAt';
     
     let query: any = {};
+
+    if (searchTerm) {
+      query.$or = [
+        { name: { $regex: searchTerm, $options: 'i' } },
+        { brand: { $regex: searchTerm, $options: 'i' } },
+        { description: { $regex: searchTerm, $options: 'i' } }
+      ];
+    }
     
     if (categorySlug) {
       const category = await Category.findOne({ slug: categorySlug });

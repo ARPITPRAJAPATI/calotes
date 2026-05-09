@@ -35,6 +35,7 @@ export default function ProductDetailsPage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [added, setAdded] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -43,6 +44,13 @@ export default function ProductDetailsPage() {
         const data = await res.json();
         const found = data.find((p: any) => p.slug === params.slug);
         setProduct(found);
+        
+        // Fetch related products
+        if (found) {
+          const relRes = await fetch(`/api/products?category=${found.category.slug}`);
+          const relData = await relRes.json();
+          setRelatedProducts(relData.filter((p: any) => p._id !== found._id).slice(0, 4));
+        }
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     };
@@ -262,23 +270,25 @@ export default function ProductDetailsPage() {
         </div>
 
         {/* You May Also Like */}
-        <div className="border-t border-border pt-24 mb-12">
-          <h2 className="font-display font-black text-4xl uppercase tracking-tighter mb-12 text-center">You May Also Like</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {MOCK_RELATED.map((item, idx) => (
-              <Link href={`/shop/product/${item.slug}`} key={idx} className="group block">
-                <div className="aspect-[3/4] overflow-hidden bg-card mb-4 border border-border/50 relative">
-                  <img src={item.img} alt={item.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
-                  <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-bg-dark/90 text-center">
-                     <span className="text-text text-[10px] font-black uppercase tracking-widest">View details</span>
+        {relatedProducts.length > 0 && (
+          <div className="border-t border-border pt-24 mb-12">
+            <h2 className="font-display font-black text-4xl uppercase tracking-tighter mb-12 text-center">You May Also Like</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {relatedProducts.map((item, idx) => (
+                <Link href={`/shop/product/${item.slug}`} key={idx} className="group block">
+                  <div className="aspect-[3/4] overflow-hidden bg-card mb-4 border border-border/50 relative">
+                    <img src={item.images[0]} alt={item.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+                    <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-bg-dark/90 text-center">
+                       <span className="text-text text-[10px] font-black uppercase tracking-widest">View details</span>
+                    </div>
                   </div>
-                </div>
-                <h3 className="text-xs font-black uppercase tracking-wider mb-1 truncate">{item.name}</h3>
-                <p className="text-[10px] font-bold text-muted">₹{item.price}</p>
-              </Link>
-            ))}
+                  <h3 className="text-xs font-black uppercase tracking-wider mb-1 truncate">{item.name}</h3>
+                  <p className="text-[10px] font-bold text-muted">₹{item.price.toLocaleString("en-IN")}</p>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
     </div>

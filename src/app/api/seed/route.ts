@@ -19,7 +19,10 @@ const SAMPLE_PRODUCTS = [
     brand: 'Harley Davidson',
     condition: 'Great',
     sizes: ['L'],
-    images: ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=1000&auto=format&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=1000&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1000&auto=format&fit=crop'
+    ],
     category_slug: 'mens',
     measurements: { pitToPit: '22"', length: '28"' }
   },
@@ -32,7 +35,10 @@ const SAMPLE_PRODUCTS = [
     brand: 'Carhartt',
     condition: 'Excellent',
     sizes: ['M'],
-    images: ['https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1000&auto=format&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1000&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=1000&auto=format&fit=crop'
+    ],
     category_slug: 'outerwear',
     measurements: { pitToPit: '23"', length: '26"' }
   },
@@ -44,7 +50,10 @@ const SAMPLE_PRODUCTS = [
     brand: 'Levis',
     condition: 'Good',
     sizes: ['32x30'],
-    images: ['https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=1000&auto=format&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=1000&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?q=80&w=1000&auto=format&fit=crop'
+    ],
     category_slug: 'mens',
     measurements: { waist: '32"', length: '30"' }
   },
@@ -56,7 +65,10 @@ const SAMPLE_PRODUCTS = [
     brand: 'Nike',
     condition: 'Great',
     sizes: ['XL'],
-    images: ['https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1000&auto=format&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1000&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1000&auto=format&fit=crop'
+    ],
     category_slug: 'mens',
     measurements: { pitToPit: '25"', length: '29"' }
   },
@@ -68,7 +80,10 @@ const SAMPLE_PRODUCTS = [
     brand: 'Burberry',
     condition: 'Excellent',
     sizes: ['L'],
-    images: ['https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=1000&auto=format&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=1000&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1000&auto=format&fit=crop'
+    ],
     category_slug: 'outerwear',
   }
 ];

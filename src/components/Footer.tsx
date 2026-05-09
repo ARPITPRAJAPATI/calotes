@@ -27,7 +27,7 @@ export default function Footer() {
             >
               <input
                 type="email"
-                placeholder="Join the archive (email)"
+                placeholder="JOIN THE MAILING LIST (EMAIL)"
                 className="flex-1 bg-transparent text-[9px] font-bold uppercase tracking-[0.3em] outline-none placeholder:text-muted/40 text-text py-2"
               />
               <button
@@ -43,7 +43,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2 md:col-start-7">
             <h4 className="section-label mb-6">Shop</h4>
             <ul className="space-y-3">
-              {["All Archive", "Denim", "Outerwear", "Oversized", "Plus Size", "Accessories"].map(l => (
+              {["All Items", "Denim", "Outerwear", "Oversized", "Plus Size", "Accessories"].map(l => (
                 <li key={l}>
                   <Link
                     href={`/shop?category=${l.toLowerCase().replace(" ", "-")}`}
