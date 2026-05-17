@@ -2,11 +2,12 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, SlidersHorizontal, Loader2, ArrowRight, Search } from "lucide-react";
+import { X, SlidersHorizontal, Loader2, ArrowRight, Search, Heart } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import ProductImageSlider from "@/components/ProductImageSlider";
 import { Product } from "@/types";
+import { useWishlist } from "@/context/WishlistContext";
 
 const CATEGORIES = [
   { name: "All Items", slug: "all" },
@@ -20,6 +21,7 @@ const CATEGORIES = [
 function ShopContent() {
   const searchParams   = useSearchParams();
   const initialCat     = searchParams.get("category") || "all";
+  const { toggleWishlist, isInWishlist } = useWishlist();
 
   const [products,      setProducts]      = useState<Product[]>([]);
   const [loading,       setLoading]       = useState(true);
@@ -188,14 +190,45 @@ function ShopContent() {
                   <Link href={`/shop/product/${product.slug}`}>
                     {/* Image */}
                     <div className="relative aspect-[3/4] overflow-hidden bg-bg-warm">
-                      {product.compareAtPrice && (
-                        <span className="absolute top-2 left-2 z-20 text-[7px] font-bold uppercase tracking-widest bg-terracotta/90 text-bg px-2 py-0.5">
-                          Sale
+                      {product.compareAtPrice ? (
+                        <div className="absolute top-2 left-2 z-20 flex flex-col gap-1.5 items-start">
+                          <span className="text-[7px] font-bold uppercase tracking-widest bg-terracotta/90 text-bg px-2 py-0.5 shadow-sm">
+                            Sale
+                          </span>
+                          <span className="text-[7px] font-bold uppercase tracking-widest bg-bg/85 backdrop-blur-[2px] text-muted px-2 py-0.5 shadow-sm">
+                            {product.condition || "Pre-Loved"}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="absolute top-2 left-2 z-20 text-[7px] font-bold uppercase tracking-widest bg-bg/85 backdrop-blur-[2px] text-muted px-2 py-0.5 shadow-sm">
+                          {product.condition || "Pre-Loved"}
                         </span>
                       )}
-                      <span className="absolute top-2 right-2 z-20 text-[7px] font-bold uppercase tracking-widest bg-bg/80 text-muted px-2 py-0.5">
-                        {product.condition || "Pre-Loved"}
-                      </span>
+                      
+                      {/* Pure borderless Wishlist Symbol */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleWishlist({
+                            productId: product._id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.images[0],
+                            slug: product.slug,
+                            category: typeof product.category === 'object' && product.category ? (product.category as any).name : "Vintage",
+                          });
+                        }}
+                        className="absolute top-2.5 right-2.5 z-30 p-1 bg-transparent border-none outline-none text-text hover:text-terracotta hover:scale-110 transition-all duration-300 cursor-pointer"
+                        title={isInWishlist(product._id) ? "Remove from Wishlist" : "Add to Wishlist"}
+                      >
+                        <Heart 
+                          size={15} 
+                          className={isInWishlist(product._id) ? "fill-terracotta text-terracotta" : "text-text"} 
+                          strokeWidth={2}
+                        />
+                      </button>
+
                       {product.stock !== undefined && product.stock <= 0 && (
                         <div className="absolute inset-0 bg-black/45 backdrop-blur-[1px] z-20 flex items-center justify-center">
                           <span className="text-[10px] font-black uppercase tracking-[0.3em] bg-bg text-text px-4 py-2 border border-border">

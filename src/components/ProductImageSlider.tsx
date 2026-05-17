@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface ProductImageSliderProps {
@@ -15,6 +15,8 @@ export default function ProductImageSlider({
   isSoldOut = false,
 }: ProductImageSliderProps) {
   const [currentIdx, setCurrentIdx] = useState(0);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
   if (!images || images.length === 0) {
     return (
@@ -24,20 +26,55 @@ export default function ProductImageSlider({
     );
   }
 
-  const handlePrev = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handlePrev = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setCurrentIdx((prev) => (prev === 0 ? images.length - 1 : prev - 1));
   };
 
-  const handleNext = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleNext = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setCurrentIdx((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+    touchEndX.current = e.targetTouches[0].clientX; // initialize
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const threshold = 40; // minimum touch swipe offset in px
+    const diff = touchStartX.current - touchEndX.current;
+    
+    if (Math.abs(diff) > threshold) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (diff > 0) {
+        // Swiped Left -> show next image
+        handleNext();
+      } else {
+        // Swiped Right -> show previous image
+        handlePrev();
+      }
+    }
+  };
+
   return (
-    <div className="relative w-full h-full group/slider overflow-hidden">
+    <div 
+      className="relative w-full h-full group/slider overflow-hidden cursor-pointer"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Slider viewport */}
       <div className="w-full h-full relative">
         <img
@@ -54,17 +91,17 @@ export default function ProductImageSlider({
         <>
           <button
             onClick={handlePrev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 bg-bg/90 border border-border flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300 z-10 hover:bg-text hover:text-bg cursor-pointer"
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-black/10 backdrop-blur-[2px] text-white hover:bg-black/35 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover/slider:opacity-100 transition-all duration-300 z-10 rounded-full border-none shadow-none cursor-pointer"
             aria-label="Previous image"
           >
-            <ChevronLeft size={12} strokeWidth={2} />
+            <ChevronLeft size={14} strokeWidth={2.5} />
           </button>
           <button
             onClick={handleNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 bg-bg/90 border border-border flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300 z-10 hover:bg-text hover:text-bg cursor-pointer"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-black/10 backdrop-blur-[2px] text-white hover:bg-black/35 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover/slider:opacity-100 transition-all duration-300 z-10 rounded-full border-none shadow-none cursor-pointer"
             aria-label="Next image"
           >
-            <ChevronRight size={12} strokeWidth={2} />
+            <ChevronRight size={14} strokeWidth={2.5} />
           </button>
         </>
       )}

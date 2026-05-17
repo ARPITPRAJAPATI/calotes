@@ -254,10 +254,6 @@ export default function FitCanvasPage() {
             <ShoppingBag size={10} />
             <span>Bag <span className="hidden xs:inline">({cartCount})</span></span>
           </button>
-          
-          <Link href="/shop" className="btn-outline hidden md:flex items-center gap-2 py-2.5">
-            <X size={14} /> Close Studio
-          </Link>
         </div>
       </div>
 

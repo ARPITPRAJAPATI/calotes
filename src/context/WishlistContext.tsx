@@ -50,17 +50,15 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   );
 
   const toggleWishlist = useCallback((item: WishlistItem) => {
-    setItems((prev) => {
-      const exists = prev.find((i) => i.productId === item.productId);
-      if (exists) {
-        toast("Removed from wishlist", { icon: "💔" });
-        return prev.filter((i) => i.productId !== item.productId);
-      } else {
-        toast.success("Added to wishlist ♥");
-        return [...prev, item];
-      }
-    });
-  }, []);
+    const exists = items.find((i) => i.productId === item.productId);
+    if (exists) {
+      toast("Removed from wishlist", { icon: "💔" });
+      setItems((prev) => prev.filter((i) => i.productId !== item.productId));
+    } else {
+      toast.success("Added to wishlist ♥");
+      setItems((prev) => [...prev, item]);
+    }
+  }, [items]);
 
   const clearWishlist = useCallback(() => {
     setItems([]);
