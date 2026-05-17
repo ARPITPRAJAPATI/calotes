@@ -1,10 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ArrowUpRight } from "lucide-react";
 
 export default function Footer() {
-  return (
+  const pathname = usePathname();
+
+  // Hide Footer on administrative dashboard routes
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
     <footer className="bg-bg-warm border-t border-border pt-20 pb-10 px-6 md:px-12">
       <div className="max-w-[1800px] mx-auto">
 

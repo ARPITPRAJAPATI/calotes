@@ -1,11 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Star } from "lucide-react";
 
 export default function AnnouncementBar() {
   const [isVisible, setIsVisible] = useState(true);
+  const pathname = usePathname();
+
+  // Hide AnnouncementBar on admin routes
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <AnimatePresence>

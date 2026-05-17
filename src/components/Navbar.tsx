@@ -24,6 +24,11 @@ export default function Navbar() {
   const { setIsOpen: setIsWishlistOpen, count: wishlistCount } = useWishlist();
   const pathname = usePathname();
 
+  // Hide Navbar on administrative dashboard routes
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
+
   const [scrolled,        setScrolled]        = useState(false);
   const [mobileMenuOpen,  setMobileMenuOpen]  = useState(false);
   const [dropdownOpen,    setDropdownOpen]    = useState(false);
