@@ -1,12 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CookieBanner() {
+  const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
 
+  // Hide CookieBanner on admin routes
   useEffect(() => {
+    if (pathname?.startsWith('/admin')) {
+      setIsVisible(false);
+      return;
+    }
     const consent = localStorage.getItem('cookie-consent');
     if (!consent) {
       // Delay slightly for premium, natural entrance

@@ -226,8 +226,8 @@ export default function AdminPromoPage() {
         </div>
 
         {/* List Column */}
-        <div className="lg:col-span-2 bg-card border border-border overflow-hidden">
-          <table className="w-full text-left text-sm">
+        <div className="lg:col-span-2 bg-card border border-border overflow-x-auto">
+          <table className="w-full text-left text-sm min-w-[600px]">
             <thead className="bg-bg text-[10px] font-black uppercase tracking-widest text-muted border-b border-border">
               <tr>
                 <th className="p-4">Coupon Code</th>

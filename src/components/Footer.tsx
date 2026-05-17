@@ -11,6 +11,8 @@ export default function Footer() {
   if (pathname?.startsWith("/admin")) {
     return null;
   }
+
+  return (
     <footer className="bg-bg-warm border-t border-border pt-20 pb-10 px-6 md:px-12">
       <div className="max-w-[1800px] mx-auto">
 

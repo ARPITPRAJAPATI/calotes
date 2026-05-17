@@ -66,9 +66,9 @@ export default function AdminCustomersPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] text-xs font-black uppercase tracking-widest text-muted gap-4">
-        <Loader2 className="w-8 h-8 animate-spin text-text" />
-        Retrieving Customers Directory...
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-xs font-black uppercase tracking-widest text-text gap-4">
+        <Loader2 className="w-8 h-8 animate-spin text-terracotta" />
+        <span>Retrieving Customers Directory...</span>
       </div>
     );
   }
@@ -94,8 +94,8 @@ export default function AdminCustomersPage() {
         </button>
       </div>
 
-      <div className="bg-card border border-border overflow-hidden">
-        <table className="w-full text-left text-sm">
+      <div className="bg-card border border-border overflow-x-auto">
+        <table className="w-full text-left text-sm min-w-[600px]">
           <thead className="bg-bg text-[10px] font-black uppercase tracking-widest text-muted border-b border-border">
             <tr>
               <th className="p-4">Customer Details</th>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, Trash2, Edit, ExternalLink, Search } from 'lucide-react';
+import { Plus, Trash2, Edit, ExternalLink, Search, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface Product {
@@ -100,8 +100,9 @@ export default function AdminProductsPage() {
 
       <div className="bg-card border border-border overflow-hidden">
         {isLoading ? (
-          <div className="p-12 text-center text-xs font-black uppercase tracking-widest text-muted">
-            Loading Catalog Archives...
+          <div className="p-16 flex flex-col items-center justify-center text-xs font-black uppercase tracking-widest text-text gap-3">
+            <Loader2 className="w-6 h-6 animate-spin text-terracotta" />
+            <span>Loading Catalog Archives...</span>
           </div>
         ) : (
           <div className="overflow-x-auto">
