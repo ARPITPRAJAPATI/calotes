@@ -34,6 +34,12 @@ export async function PUT(
     const { id } = await params;
     const body = await req.json();
     
+    if (!body.sku || body.sku.trim() === '' || body.sku === 'null') {
+      const brandPrefix = (body.brand || 'VINT').replace(/[^a-zA-Z0-9]/g, '').substring(0, 4).toUpperCase();
+      const randHex = Math.random().toString(36).substring(2, 7).toUpperCase();
+      body.sku = `CV-${brandPrefix}-${randHex}`;
+    }
+
     const updatedProduct = await Product.findByIdAndUpdate(id, body, { new: true });
     if (!updatedProduct) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });

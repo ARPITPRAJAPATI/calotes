@@ -50,7 +50,6 @@ export default function NewProductPage() {
       const data = await res.json();
       if (res.ok) {
         setCategories(data);
-        if (data.length > 0) setCategory(data[0]._id);
       }
     } catch (err) {
       toast.error('Failed to load categories');
@@ -310,6 +309,7 @@ export default function NewProductPage() {
                 className="w-full bg-card border border-border px-4 py-3 text-xs font-bold tracking-widest focus:outline-none focus:border-text transition-colors cursor-pointer"
                 required
               >
+                <option value="">Select Category</option>
                 {categories.map((cat) => (
                   <option key={cat._id} value={cat._id}>
                     {cat.name}

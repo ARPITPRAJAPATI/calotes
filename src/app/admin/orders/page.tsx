@@ -18,6 +18,7 @@ interface OrderItem {
   size: string;
   price: number;
   quantity: number;
+  image?: string;
 }
 
 interface Order {
@@ -142,6 +143,22 @@ export default function AdminOrdersPage() {
                     <span className="text-[9px] text-muted normal-case font-semibold tracking-normal">
                       {order.user?.email || 'N/A'}
                     </span>
+                    <div className="mt-2 flex flex-col gap-1.5 text-[8px] text-muted tracking-wider">
+                      {order.items?.map((item, idx) => (
+                        <div key={idx} className="flex items-center gap-2 border-t border-border/30 pt-1 mt-1 first:border-0 first:pt-0 first:mt-0">
+                          {item.image ? (
+                            <img src={item.image} alt={item.name} className="w-5 h-6 object-cover border border-border/20 shrink-0" />
+                          ) : (
+                            <div className="w-5 h-6 bg-muted/20 border border-border/20 flex items-center justify-center text-[5px] shrink-0">
+                              N/A
+                            </div>
+                          )}
+                          <span className="line-clamp-1 max-w-[200px]">
+                            {item.name} ({item.size}) x{item.quantity} - ₹{item.price}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </td>
                 {/* Date */}
