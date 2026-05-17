@@ -107,9 +107,9 @@ export default function AdminPromoPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] text-xs font-black uppercase tracking-widest text-muted gap-4">
-        <Loader2 className="w-8 h-8 animate-spin text-text" />
-        Retrieving Discount Registers...
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-xs font-black uppercase tracking-widest text-text gap-4">
+        <Loader2 className="w-8 h-8 animate-spin text-terracotta" />
+        <span>Retrieving Discount Registers...</span>
       </div>
     );
   }

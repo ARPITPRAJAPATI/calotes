@@ -117,9 +117,9 @@ export default function AdminSettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] text-xs font-black uppercase tracking-widest text-muted gap-4">
-        <Loader2 className="w-8 h-8 animate-spin text-text" />
-        Loading Store Configurations...
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-xs font-black uppercase tracking-widest text-text gap-4">
+        <Loader2 className="w-8 h-8 animate-spin text-terracotta" />
+        <span>Loading Store Configurations...</span>
       </div>
     );
   }

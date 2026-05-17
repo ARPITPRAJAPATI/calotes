@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { Upload, Trash2, ArrowLeft } from 'lucide-react';
+import { Upload, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
@@ -197,8 +197,9 @@ export default function EditProductPage({ params }: PageProps) {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[50vh] text-xs font-black uppercase tracking-widest text-muted">
-        Loading Piece Archives...
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-xs font-black uppercase tracking-widest text-text gap-4">
+        <Loader2 className="w-8 h-8 animate-spin text-terracotta" />
+        <span>Loading Piece Archives...</span>
       </div>
     );
   }
