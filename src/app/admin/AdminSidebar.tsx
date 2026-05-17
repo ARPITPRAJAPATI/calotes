@@ -35,7 +35,7 @@ export default function AdminSidebar() {
       {/* Sidebar Navigation Panel (Responsive) */}
       <aside
         className={`fixed lg:sticky top-0 left-0 h-screen w-64 bg-card border-r border-border flex flex-col shrink-0 z-50 lg:z-30 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          isOpen ? 'translate-x-0 pt-16 lg:pt-0' : '-translate-x-full lg:translate-x-0'
+          isOpen ? 'translate-x-0 pt-16 lg:pt-0 shadow-[8px_0_24px_rgba(0,0,0,0.2)]' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         {/* Desktop Title Header */}
