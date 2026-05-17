@@ -6,20 +6,7 @@ import { X, SlidersHorizontal, Loader2, ArrowRight, Search } from "lucide-react"
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import ProductImageSlider from "@/components/ProductImageSlider";
-
-interface Product {
-  _id: string;
-  name: string;
-  slug: string;
-  price: number;
-  compareAtPrice?: number;
-  images: string[];
-  brand: string;
-  category: { name: string; slug: string };
-  sizes: string[];
-  condition?: string;
-  stock?: number;
-}
+import { Product } from "@/types";
 
 const CATEGORIES = [
   { name: "All Items", slug: "all" },
@@ -58,13 +45,13 @@ function ShopContent() {
         url += (url.includes("?") ? "&" : "?") + `q=${encodeURIComponent(searchQuery)}`;
       }
       
-      const res  = await fetch(url);
+      const res  = await fetch(url, { cache: 'no-store' });
       const data = await res.json();
       if (res.ok && Array.isArray(data)) {
         setProducts(data);
       } else {
         setProducts([]);
-        console.error("API error or invalid products format:", data);
+        console.error(`API error (status ${res.status}):`, data);
       }
     } catch (e) {
       setProducts([]);

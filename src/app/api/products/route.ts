@@ -3,6 +3,9 @@ import connectDB from '@/lib/db';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
 import { auth } from '@/auth';
+import { ProductInputSchema } from '@/lib/validations';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
   try {
@@ -57,15 +60,22 @@ export async function POST(req: Request) {
     await connectDB();
     const body = await req.json();
     
+    // Auto-generate SKU if not present or blank
     if (!body.sku || body.sku.trim() === '' || body.sku === 'null') {
       const brandPrefix = (body.brand || 'VINT').replace(/[^a-zA-Z0-9]/g, '').substring(0, 4).toUpperCase();
       const randHex = Math.random().toString(36).substring(2, 7).toUpperCase();
       body.sku = `CV-${brandPrefix}-${randHex}`;
     }
 
-    const product = await Product.create(body);
+    // Validate body data
+    const validatedData = ProductInputSchema.parse(body);
+
+    const product = await Product.create(validatedData);
     return NextResponse.json(product.toObject(), { status: 201 });
   } catch (error: any) {
+    if (error.name === 'ZodError') {
+      return NextResponse.json({ error: error.errors[0]?.message || 'Invalid product data' }, { status: 400 });
+    }
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }

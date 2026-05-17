@@ -4,19 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, Trash2, Edit, ExternalLink, Search, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-interface Product {
-  _id: string;
-  name: string;
-  slug: string;
-  price: number;
-  condition: string;
-  images: string[];
-  category?: {
-    name: string;
-  };
-  stock: number;
-}
+import { Product } from '@/types';
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);

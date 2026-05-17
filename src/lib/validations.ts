@@ -1,54 +1,47 @@
 import { z } from 'zod';
 
-// Auth Schemas
-export const registerSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+export const ProductInputSchema = z.object({
+  name: z.string().min(1, 'Product name is required').trim(),
+  slug: z.string().min(1, 'Slug is required').trim(),
+  description: z.string().min(1, 'Description is required').trim(),
+  price: z.number().min(0, 'Price must be a positive number'),
+  compareAtPrice: z.number().min(0, 'Compare price must be a positive number').nullable().optional(),
+  images: z.array(z.string().url('Invalid image URL')).min(1, 'At least one image is required'),
+  category: z.string().min(1, 'Category is required'),
+  brand: z.string().trim().default('Vintage'),
+  condition: z.enum(['Excellent', 'Great', 'Good', 'Fair']).default('Great'),
+  sizes: z.array(z.string()).min(1, 'At least one size must be selected'),
+  sku: z.string().nullable().optional(),
+  stock: z.number().int().min(0, 'Stock must be at least 0').default(1),
+  isFeatured: z.boolean().default(false),
+  measurements: z.object({
+    pitToPit: z.string().nullable().optional(),
+    length: z.string().nullable().optional(),
+    waist: z.string().nullable().optional(),
+  }).optional(),
+  tags: z.array(z.string()).optional(),
 });
 
-export const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
+export const CategoryInputSchema = z.object({
+  name: z.string().min(1, 'Category name is required').trim(),
+  slug: z.string().min(1, 'Slug is required').trim(),
+  description: z.string().trim().optional(),
+  parent: z.string().nullable().optional(),
 });
 
-// Product API Schemas
-export const productQuerySchema = z.object({
-  page: z.string().optional().transform(val => (val ? parseInt(val) : 1)),
-  limit: z.string().optional().transform(val => (val ? parseInt(val) : 12)),
-  category: z.string().optional(),
-  search: z.string().optional(),
-  sort: z.enum(['newest', 'price-low', 'price-high', 'popular']).optional().default('newest'),
-  minPrice: z.string().optional().transform(val => (val ? parseInt(val) : undefined)),
-  maxPrice: z.string().optional().transform(val => (val ? parseInt(val) : undefined)),
-  brand: z.string().optional(),
-  condition: z.string().optional(),
-  size: z.string().optional(),
+export const PromoInputSchema = z.object({
+  code: z.string().min(1, 'Promo code is required').trim().transform(v => v.toUpperCase()),
+  discountType: z.enum(['percentage', 'flat']),
+  discountValue: z.number().min(1, 'Discount value must be at least 1'),
+  isActive: z.boolean().default(true),
+  minOrderAmount: z.number().min(0, 'Minimum order amount must be at least 0').default(0),
 });
 
-// Order Schemas
-export const orderItemSchema = z.object({
-  product: z.string(),
-  name: z.string(),
-  price: z.number(),
-  quantity: z.number().min(1),
-  size: z.string().optional(),
-  image: z.string().optional(),
-});
-
-export const shippingAddressSchema = z.object({
-  name: z.string().min(2),
-  phone: z.string().min(10),
-  addressLine1: z.string().min(5),
-  addressLine2: z.string().optional(),
-  city: z.string().min(2),
-  state: z.string().min(2),
-  pincode: z.string().min(6),
-  landmark: z.string().optional(),
-});
-
-export const createOrderSchema = z.object({
-  items: z.array(orderItemSchema).min(1),
-  totalAmount: z.number().min(0),
-  shippingAddress: shippingAddressSchema,
+export const StoreSettingsInputSchema = z.object({
+  storeName: z.string().min(1, 'Store name is required').trim(),
+  contactEmail: z.string().email('Invalid email address').trim(),
+  supportPhone: z.string().min(1, 'Support phone is required').trim(),
+  freeShippingThreshold: z.number().min(0, 'Threshold must be at least 0'),
+  shippingFlatRate: z.number().min(0, 'Flat rate must be at least 0'),
+  featuredPromoCode: z.string().optional(),
 });

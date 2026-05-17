@@ -7,22 +7,7 @@ import { ArrowLeft, ShieldCheck, Ruler, Loader2, MessageCircle, Star, Sparkles, 
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-
-interface Product {
-  _id: string;
-  slug: string;
-  name: string;
-  description: string;
-  price: number;
-  compareAtPrice?: number;
-  images: string[];
-  brand: string;
-  condition: string;
-  sizes: string[];
-  measurements?: { pitToPit?: string; length?: string; waist?: string; };
-  category: { name: string; slug: string; };
-  stock?: number;
-}
+import { Product } from "@/types";
 
 const MOCK_RELATED = [
   { slug: "vintage-levis-501", name: "Vintage Levi's 501", price: 3499, img: "https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?q=80&w=800" },
