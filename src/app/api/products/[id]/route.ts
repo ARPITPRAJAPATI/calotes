@@ -1,0 +1,70 @@
+import { NextResponse } from 'next/server';
+import connectDB from '@/lib/db';
+import Product from '@/models/Product';
+import { auth } from '@/auth';
+
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    await connectDB();
+    const { id } = await params;
+    const product = await Product.findById(id).populate('category').lean();
+    if (!product) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
+    return NextResponse.json(product);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await auth();
+    if (!session || !session.user || (session.user as any).role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    await connectDB();
+    const { id } = await params;
+    const body = await req.json();
+    
+    const updatedProduct = await Product.findByIdAndUpdate(id, body, { new: true });
+    if (!updatedProduct) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
+    
+    return NextResponse.json(updatedProduct.toObject());
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+}
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await auth();
+    if (!session || !session.user || (session.user as any).role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    await connectDB();
+    const { id } = await params;
+    
+    const deletedProduct = await Product.findByIdAndDelete(id);
+    if (!deletedProduct) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
+    
+    return NextResponse.json({ success: true, message: 'Product deleted successfully' });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

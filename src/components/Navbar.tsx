@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCart } from "@/context/CartContext";
-import { ShoppingBag, Menu, X, ChevronDown } from "lucide-react";
+import { useWishlist } from "@/context/WishlistContext";
+import { ShoppingBag, Menu, X, ChevronDown, Sparkles, Heart, Sun, Moon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const CATEGORIES = [
@@ -20,11 +21,37 @@ const CATEGORIES = [
 export default function Navbar() {
   const { data: session } = useSession();
   const { setIsCartOpen, cartCount } = useCart();
+  const { setIsOpen: setIsWishlistOpen, count: wishlistCount } = useWishlist();
   const pathname = usePathname();
 
   const [scrolled,        setScrolled]        = useState(false);
   const [mobileMenuOpen,  setMobileMenuOpen]  = useState(false);
   const [dropdownOpen,    setDropdownOpen]    = useState(false);
+  const [theme,           setTheme]           = useState<"light" | "dark">("light");
+
+  // Read theme on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("theme");
+    if (stored === "dark") {
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
+    } else {
+      setTheme("light");
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (theme === "light") {
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      setTheme("light");
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -49,6 +76,7 @@ export default function Navbar() {
           {/* ── Left nav (desktop) ── */}
           <nav className="hidden lg:flex items-center gap-8 xl:gap-10">
             <Link href="/shop" className="section-label underline-hover">Shop</Link>
+            <Link href="/canvas" className="section-label underline-hover text-terracotta flex items-center gap-1"><Sparkles size={12} /> Studio</Link>
 
             {/* Categories dropdown */}
             <div
@@ -125,6 +153,27 @@ export default function Navbar() {
               )}
             </button>
 
+            {/* Wishlist button */}
+            <button
+              onClick={() => setIsWishlistOpen(true)}
+              className="relative flex items-center gap-2 section-label hover:text-terracotta transition-colors"
+              aria-label="Open wishlist"
+            >
+              <Heart size={18} strokeWidth={1.5} className="text-text" fill={wishlistCount > 0 ? "currentColor" : "none"} />
+              <span className="hidden sm:block">Wishlist</span>
+            </button>
+
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="relative flex items-center gap-2 section-label hover:text-terracotta transition-colors"
+              aria-label="Toggle Theme"
+              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {theme === "dark" ? <Sun size={18} strokeWidth={1.5} /> : <Moon size={18} strokeWidth={1.5} />}
+              <span className="hidden sm:block">Theme</span>
+            </button>
+
             {/* Mobile hamburger */}
             <button
               onClick={() => setMobileMenuOpen(true)}
@@ -154,15 +203,25 @@ export default function Navbar() {
               <Link href="/" className="font-display font-black text-2xl uppercase tracking-tight text-text">
                 Calotes
               </Link>
-              <button onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
-                <X size={24} strokeWidth={1} className="text-muted hover:text-text transition-colors" />
-              </button>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={toggleTheme}
+                  className="text-text hover:text-terracotta transition-colors flex items-center justify-center"
+                  aria-label="Toggle Theme"
+                >
+                  {theme === "dark" ? <Sun size={22} strokeWidth={1.5} /> : <Moon size={22} strokeWidth={1.5} />}
+                </button>
+                <button onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
+                  <X size={24} strokeWidth={1} className="text-muted hover:text-text transition-colors" />
+                </button>
+              </div>
             </div>
 
             {/* Navigation links */}
             <nav className="flex-1 overflow-y-auto px-6 py-10 flex flex-col gap-2">
               {[
                 { label: "Items",  href: "/shop" },
+                { label: "Studio", href: "/canvas" },
                 { label: "Lookbook", href: "/lookbook" },
                 { label: "About",    href: "/about" },
               ].map((item, i) => (

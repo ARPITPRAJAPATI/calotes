@@ -25,6 +25,24 @@ export async function POST(req: Request) {
         razorpaySignature: razorpay_signature,
       }).populate('user');
 
+      // 2. Automatically reduce product inventory stock
+      try {
+        if (updatedOrder && updatedOrder.items) {
+          const Product = (await import('@/models/Product')).default;
+          for (const item of updatedOrder.items) {
+            const productDoc = await Product.findById(item.product);
+            if (productDoc) {
+              const currentStock = productDoc.stock || 0;
+              const quantityPurchased = item.quantity || 1;
+              productDoc.stock = Math.max(0, currentStock - quantityPurchased);
+              await productDoc.save();
+            }
+          }
+        }
+      } catch (stockErr) {
+        console.error("Failed to automatically deduct product stock:", stockErr);
+      }
+
       // Trigger Email Notification (Non-blocking)
       try {
         const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';

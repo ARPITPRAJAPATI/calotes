@@ -2,12 +2,14 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Star } from "lucide-react";
-import { useRef } from "react";
+import { ArrowRight, Star, Heart } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { useWishlist } from "@/context/WishlistContext";
+import ProductImageSlider from "@/components/ProductImageSlider";
 
 /* ─────────────────────────────────────────────────────────
    Latest Arrivals (horizontal scroll – Aged Arc style)
-───────────────────────────────────────────────────────── */
+   ───────────────────────────────────────────────────────── */
 const ARRIVALS = [
   { name: "Vintage Levi's 501",       price: "₹3,499", tag: "Denim",     img: "https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=800" },
   { name: "Carhartt Detroit Jacket",  price: "₹7,999", tag: "Outerwear", img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800" },
@@ -35,11 +37,80 @@ const INSTA_IMGS = [
 
 /* ─────────────────────────────────────────────────────────
    Page Component
-───────────────────────────────────────────────────────── */
+   ───────────────────────────────────────────────────────── */
 export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+
+  const [dbArrivals, setDbArrivals] = useState<any[]>([]);
+  const [dbCategories, setDbCategories] = useState<any[]>([]);
+  const [heroHeadline, setHeroHeadline] = useState("Adapt. Stand Out. Be Calotes.");
+  const [heroSubtext, setHeroSubtext] = useState("Hand-picked vintage & streetwear.\nFor the Indian modern icon.");
+  const [heroImageUrl, setHeroImageUrl] = useState("https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=1600");
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [prodRes, catRes, settingsRes] = await Promise.all([
+          fetch('/api/products?limit=8'),
+          fetch('/api/categories'),
+          fetch('/api/settings')
+        ]);
+        if (prodRes.ok) {
+          const data = await prodRes.json();
+          if (data && data.length > 0) setDbArrivals(data);
+        }
+        if (catRes.ok) {
+          const data = await catRes.json();
+          if (data && data.length > 0) setDbCategories(data);
+        }
+        if (settingsRes.ok) {
+          const data = await settingsRes.json();
+          if (data) {
+            if (data.heroHeadline) setHeroHeadline(data.heroHeadline);
+            if (data.heroSubtext) setHeroSubtext(data.heroSubtext);
+            if (data.heroImageUrl) setHeroImageUrl(data.heroImageUrl);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load homepage data", err);
+      }
+    }
+    loadData();
+  }, []);
+
+  const { toggleWishlist, isInWishlist } = useWishlist();
+
+  const arrivalsList = dbArrivals.length > 0 ? dbArrivals.map((p, idx) => ({
+    productId: p._id,
+    name: p.name,
+    price: p.price,
+    priceFormatted: `₹${p.price.toLocaleString('en-IN')}`,
+    tag: p.category?.name || 'Archive',
+    img: p.images?.[0] || 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=800',
+    imgs: p.images || ['https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=800'],
+    href: `/shop/product/${p.slug}`,
+    slug: p.slug,
+  })) : ARRIVALS.map((a, idx) => ({
+    productId: `static-${idx}`,
+    name: a.name,
+    price: parseInt(a.price.replace(/[₹,]/g, '')) || 2999,
+    priceFormatted: a.price,
+    tag: a.tag,
+    img: a.img,
+    imgs: [a.img],
+    href: '/shop',
+    slug: '',
+  }));
+
+  const categoriesList = dbCategories.length > 0 ? dbCategories.map(c => ({
+    title: c.name,
+    img: c.image || 'https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?q=80&w=900',
+    href: `/shop?category=${c.slug}`
+  })) : CATEGORIES;
+
+  const headlineParts = heroHeadline.split('.').map(x => x.trim()).filter(Boolean);
 
   return (
     <div className="w-full flex flex-col">
@@ -50,7 +121,7 @@ export default function Home() {
         {/* Background image with parallax */}
         <motion.div className="absolute inset-0" style={{ y: heroY }}>
           <img
-            src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=1600&auto=format&fit=crop"
+            src={heroImageUrl}
             alt="Calotes Vintage Hero"
             className="w-full h-full object-cover object-top"
           />
@@ -71,43 +142,40 @@ export default function Home() {
 
             {/* Main heading */}
             <h1 className="font-display font-bold text-[13vw] md:text-[10vw] lg:text-[8vw] uppercase tracking-tight leading-[0.82] text-text mb-8 md:mb-12">
-              <span className="block overflow-hidden">
-                <motion.span
-                  className="block"
-                  initial={{ y: "100%" }}
-                  animate={{ y: 0 }}
-                  transition={{ duration: 1, delay: 0.1, ease: [0.19,1,0.22,1] }}
-                >
-                  Adapt.
-                </motion.span>
-              </span>
-              <span className="block overflow-hidden font-serif italic font-light lowercase tracking-normal text-[0.88em] -mt-1">
-                <motion.span
-                  className="block text-terracotta"
-                  initial={{ y: "100%" }}
-                  animate={{ y: 0 }}
-                  transition={{ duration: 1, delay: 0.2, ease: [0.19,1,0.22,1] }}
-                >
-                  Stand Out.
-                </motion.span>
-              </span>
-              <span className="block overflow-hidden">
-                <motion.span
-                  className="block"
-                  initial={{ y: "100%" }}
-                  animate={{ y: 0 }}
-                  transition={{ duration: 1, delay: 0.3, ease: [0.19,1,0.22,1] }}
-                >
-                  Be Calotes.
-                </motion.span>
-              </span>
+              {headlineParts.map((part, index) => {
+                if (index === 1) {
+                  return (
+                    <span key={index} className="block overflow-hidden font-serif italic font-light lowercase tracking-normal text-[0.88em] -mt-1">
+                      <motion.span
+                        className="block text-terracotta"
+                        initial={{ y: "100%" }}
+                        animate={{ y: 0 }}
+                        transition={{ duration: 1, delay: 0.2, ease: [0.19, 1, 0.22, 1] }}
+                      >
+                        {part}.
+                      </motion.span>
+                    </span>
+                  );
+                }
+                return (
+                  <span key={index} className="block overflow-hidden">
+                    <motion.span
+                      className="block"
+                      initial={{ y: "100%" }}
+                      animate={{ y: 0 }}
+                      transition={{ duration: 1, delay: 0.1 * (index + 1), ease: [0.19, 1, 0.22, 1] }}
+                    >
+                      {part}.
+                    </motion.span>
+                  </span>
+                );
+              })}
             </h1>
 
             {/* Sub-text + CTA row */}
             <div className="flex flex-col items-center gap-8">
-              <p className="text-muted text-[11px] font-medium uppercase tracking-[0.2em] leading-relaxed max-w-sm">
-                Hand-picked vintage & streetwear.<br />
-                For the Indian modern icon.
+              <p className="text-muted text-[11px] font-medium uppercase tracking-[0.2em] leading-relaxed max-w-sm whitespace-pre-line">
+                {heroSubtext}
               </p>
               <Link href="/shop" className="btn-outline px-12 py-5 text-sm tracking-[0.3em]">
                 Shop
@@ -132,7 +200,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           3 · LATEST ARRIVALS (Aged Arc horizontal scroll)
       ══════════════════════════════════════════════════ */}
-      <section className="py-12 md:py-20 overflow-hidden">
+      <section className="py-8 md:py-12 overflow-hidden">
         {/* Section header */}
         <div className="max-w-[1800px] mx-auto px-6 md:px-12 flex items-end justify-between mb-10 md:mb-14">
           <div>
@@ -152,7 +220,7 @@ export default function Home() {
 
         {/* Horizontal scroll rail */}
         <div className="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory pl-6 md:pl-12 pr-6">
-          {ARRIVALS.map((item, i) => (
+          {arrivalsList.map((item, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, x: 30 }}
@@ -161,22 +229,33 @@ export default function Home() {
               transition={{ delay: i * 0.07, duration: 0.7, ease: [0.16,1,0.3,1] }}
               className="product-card group snap-start shrink-0 w-[48vw] sm:w-[36vw] md:w-[26vw] lg:w-[20vw] xl:w-[17vw]"
             >
-              <Link href="/shop">
+              <Link href={item.href}>
                 {/* Image */}
                 <div className="relative aspect-[3/4] overflow-hidden bg-bg-warm">
-                  <img
-                    src={item.img}
-                    alt={item.name}
-                    className="product-card-img w-full h-full object-cover"
-                  />
+                  <ProductImageSlider images={item.imgs} productName={item.name} />
                   {/* Pre-loved badge */}
-                  <span className="absolute top-3 left-3 text-[7px] font-bold uppercase tracking-[0.25em] bg-terracotta/90 text-bg px-2 py-1">
+                  <span className="absolute top-3 left-3 text-[7px] font-bold uppercase tracking-[0.25em] bg-terracotta/90 text-bg px-2 py-1 z-10">
                     Pre-Loved
                   </span>
-                  {/* Tag badge */}
-                  <span className="absolute top-3 right-3 text-[7px] font-bold uppercase tracking-[0.25em] bg-bg/90 text-text px-2 py-1">
-                    {item.tag}
-                  </span>
+                  {/* Heart Wishlist Toggle Button overlay */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleWishlist({
+                        productId: item.productId,
+                        name: item.name,
+                        price: item.price,
+                        image: item.img,
+                        slug: item.slug,
+                        category: item.tag,
+                      });
+                    }}
+                    className="absolute top-3 right-3 p-1.5 bg-bg/90 text-muted hover:text-terracotta transition-colors rounded-none z-20 flex items-center justify-center border border-border/40"
+                    title={isInWishlist(item.productId) ? "Remove from Wishlist" : "Add to Wishlist"}
+                  >
+                    <Heart size={10} className={isInWishlist(item.productId) ? "fill-current text-terracotta" : ""} />
+                  </button>
                 </div>
                 {/* Info */}
                 <div className="p-3 md:p-4 flex justify-between items-start gap-2">
@@ -204,7 +283,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           4 · SHOP BY CATEGORIES
       ══════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-32 bg-bg-warm border-y border-border">
+      <section className="py-10 md:py-16 bg-bg-warm border-y border-border">
         <div className="max-w-[1800px] mx-auto px-6 md:px-12">
           <div className="mb-10 md:mb-14">
             <p className="section-label mb-3">Browse By</p>
@@ -215,7 +294,7 @@ export default function Home() {
 
           {/* Category grid — Aged Arc style */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            {CATEGORIES.map((cat, i) => (
+            {categoriesList.map((cat, i) => (
               <motion.div
                 key={cat.title}
                 initial={{ opacity: 0, y: 20 }}
@@ -258,7 +337,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           5 · WHY CALOTES (Brand Story)
       ══════════════════════════════════════════════════ */}
-      <section className="py-24 md:py-40 px-6 md:px-12 max-w-[1800px] mx-auto w-full">
+      <section className="py-12 md:py-20 px-6 md:px-12 max-w-[1800px] mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
 
           {/* Image side */}
@@ -318,7 +397,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           6 · LOOKBOOK TEASER
       ══════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-32 bg-bg-warm border-y border-border overflow-hidden">
+      <section className="py-10 md:py-16 bg-bg-warm border-y border-border overflow-hidden">
         <div className="max-w-[1800px] mx-auto px-6 md:px-12 mb-10 flex justify-between items-end">
           <div>
             <p className="section-label mb-3">Volume I</p>
@@ -357,7 +436,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           7 · INSTAGRAM COMMUNITY
       ══════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-32 px-6 md:px-12 max-w-[1800px] mx-auto w-full">
+      <section className="py-10 md:py-16 px-6 md:px-12 max-w-[1800px] mx-auto w-full">
         <div className="text-center max-w-lg mx-auto mb-16">
           <p className="section-label mb-4">Community</p>
           <h2 className="font-display font-black text-4xl md:text-5xl uppercase tracking-tighter leading-tight mb-4">

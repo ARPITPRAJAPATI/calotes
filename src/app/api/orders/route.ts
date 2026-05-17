@@ -18,10 +18,20 @@ export async function POST(req: Request) {
     await connectDB();
     const { items, totalAmount, shippingAddress } = await req.json();
 
+    // Map frontend productId/product to database product ObjectId field
+    const mappedItems = (items || []).map((item: any) => ({
+      product: item.product || item.productId,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      size: item.size,
+      image: item.image,
+    }));
+
     // 1. Create order in MongoDB
     const newOrder = await Order.create({
       user: session.user.id,
-      items,
+      items: mappedItems,
       totalAmount,
       shippingAddress,
       paymentStatus: 'Pending',
@@ -49,6 +59,25 @@ export async function POST(req: Request) {
     });
   } catch (error: any) {
     console.error("Order creation failed:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function GET(req: Request) {
+  try {
+    const session = await auth();
+    if (!session || !session.user || (session.user as any).role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    await connectDB();
+    const orders = await Order.find()
+      .populate('user', 'name email')
+      .sort('-createdAt')
+      .lean();
+
+    return NextResponse.json(orders);
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

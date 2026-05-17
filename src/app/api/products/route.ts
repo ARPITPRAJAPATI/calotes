@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
+import { auth } from '@/auth';
 
 export async function GET(req: Request) {
   try {
@@ -37,7 +38,8 @@ export async function GET(req: Request) {
     const products = await Product.find(query)
       .populate('category')
       .sort(sort)
-      .limit(20);
+      .limit(20)
+      .lean();
 
     return NextResponse.json(products);
   } catch (error: any) {
@@ -47,11 +49,16 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
+    const session = await auth();
+    if (!session || !session.user || (session.user as any).role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     await connectDB();
     const body = await req.json();
     
     const product = await Product.create(body);
-    return NextResponse.json(product, { status: 201 });
+    return NextResponse.json(product.toObject(), { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }

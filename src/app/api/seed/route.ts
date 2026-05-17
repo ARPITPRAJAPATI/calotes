@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
+import User from '@/models/User';
+import bcrypt from 'bcryptjs';
 
 const SAMPLE_CATEGORIES = [
   { name: 'Mens', slug: 'mens', description: 'Curated vintage menswear.' },
@@ -95,6 +97,16 @@ export async function POST() {
     // Clear existing
     await Category.deleteMany({});
     await Product.deleteMany({});
+    await User.deleteMany({ email: 'admin@calotes.com' });
+
+    // Seed Admin User
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    await User.create({
+      name: 'Admin Calotes',
+      email: 'admin@calotes.com',
+      password: hashedPassword,
+      role: 'admin',
+    });
     
     // Seed Categories
     const createdCategories = await Category.insertMany(SAMPLE_CATEGORIES);

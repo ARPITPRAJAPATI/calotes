@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, SlidersHorizontal, Loader2, ArrowRight, Search } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import ProductImageSlider from "@/components/ProductImageSlider";
 
 interface Product {
   _id: string;
@@ -17,6 +18,7 @@ interface Product {
   category: { name: string; slug: string };
   sizes: string[];
   condition?: string;
+  stock?: number;
 }
 
 const CATEGORIES = [
@@ -58,9 +60,18 @@ function ShopContent() {
       
       const res  = await fetch(url);
       const data = await res.json();
-      setProducts(data);
-    } catch (e) { console.error(e); }
-    finally     { setLoading(false); }
+      if (res.ok && Array.isArray(data)) {
+        setProducts(data);
+      } else {
+        setProducts([]);
+        console.error("API error or invalid products format:", data);
+      }
+    } catch (e) {
+      setProducts([]);
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -191,17 +202,24 @@ function ShopContent() {
                     {/* Image */}
                     <div className="relative aspect-[3/4] overflow-hidden bg-bg-warm">
                       {product.compareAtPrice && (
-                        <span className="absolute top-2 left-2 z-10 text-[7px] font-bold uppercase tracking-widest bg-terracotta/90 text-bg px-2 py-0.5">
+                        <span className="absolute top-2 left-2 z-20 text-[7px] font-bold uppercase tracking-widest bg-terracotta/90 text-bg px-2 py-0.5">
                           Sale
                         </span>
                       )}
-                      <span className="absolute top-2 right-2 z-10 text-[7px] font-bold uppercase tracking-widest bg-bg/80 text-muted px-2 py-0.5">
+                      <span className="absolute top-2 right-2 z-20 text-[7px] font-bold uppercase tracking-widest bg-bg/80 text-muted px-2 py-0.5">
                         {product.condition || "Pre-Loved"}
                       </span>
-                      <img
-                        src={product.images[0]}
-                        alt={product.name}
-                        className="product-card-img w-full h-full object-cover"
+                      {product.stock !== undefined && product.stock <= 0 && (
+                        <div className="absolute inset-0 bg-black/45 backdrop-blur-[1px] z-20 flex items-center justify-center">
+                          <span className="text-[10px] font-black uppercase tracking-[0.3em] bg-bg text-text px-4 py-2 border border-border">
+                            SOLD
+                          </span>
+                        </div>
+                      )}
+                      <ProductImageSlider 
+                        images={product.images} 
+                        productName={product.name} 
+                        isSoldOut={product.stock !== undefined && product.stock <= 0} 
                       />
                     </div>
                     {/* Info */}

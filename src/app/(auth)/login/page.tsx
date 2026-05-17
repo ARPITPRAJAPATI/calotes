@@ -61,7 +61,7 @@ function LoginFormInner() {
           <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-muted mb-3">Email</label>
           <input
             type="email" required
-            className="w-full bg-transparent border-b border-border py-3 text-xs font-bold uppercase tracking-widest outline-none focus:border-text transition-colors placeholder:text-muted/40"
+            className="w-full bg-transparent border-b border-border py-3 text-xs font-bold tracking-widest outline-none focus:border-text transition-colors placeholder:text-muted/40"
             placeholder="your@email.com"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -71,7 +71,7 @@ function LoginFormInner() {
           <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-muted mb-3">Password</label>
           <input
             type="password" required
-            className="w-full bg-transparent border-b border-border py-3 text-xs font-bold uppercase tracking-widest outline-none focus:border-text transition-colors placeholder:text-muted/40"
+            className="w-full bg-transparent border-b border-border py-3 text-xs font-bold tracking-widest outline-none focus:border-text transition-colors placeholder:text-muted/40"
             placeholder="••••••••"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}

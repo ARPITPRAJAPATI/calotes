@@ -1,0 +1,173 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { Loader2, RefreshCw, Crown, User as UserIcon } from 'lucide-react';
+
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  avatar?: string;
+}
+
+export default function AdminCustomersPage() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async (isSilent = false) => {
+    if (!isSilent) setLoading(true);
+    else setRefreshing(true);
+    try {
+      const res = await fetch('/api/users');
+      const data = await res.json();
+      if (res.ok) {
+        setUsers(data);
+      } else {
+        toast.error(data.error || 'Failed to retrieve customers');
+      }
+    } catch (err) {
+      toast.error('An error occurred while loading customers');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const handleRoleChange = async (id: string, newRole: string) => {
+    const updatingToast = toast.loading('Updating user permissions...');
+    try {
+      const res = await fetch(`/api/users/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: newRole }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success(`Role updated to ${newRole}!`, { id: updatingToast });
+        setUsers((prev) =>
+          prev.map((u) => (u._id === id ? { ...u, role: newRole } : u))
+        );
+      } else {
+        toast.error(data.error || 'Failed to update role', { id: updatingToast });
+      }
+    } catch (err) {
+      toast.error('An error occurred during update', { id: updatingToast });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-xs font-black uppercase tracking-widest text-muted gap-4">
+        <Loader2 className="w-8 h-8 animate-spin text-text" />
+        Retrieving Customers Directory...
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="flex justify-between items-center border-b border-border pb-4">
+        <div>
+          <h1 className="text-3xl font-display font-black uppercase tracking-tighter">
+            Customer Directory
+          </h1>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted mt-1">
+            Total Registered Users: {users.length}
+          </p>
+        </div>
+        <button
+          onClick={() => fetchUsers(true)}
+          disabled={refreshing}
+          className="flex items-center gap-2 border border-border px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-card transition-colors disabled:opacity-50"
+        >
+          <RefreshCw size={12} className={refreshing ? 'animate-spin' : ''} />
+          {refreshing ? 'Refreshing...' : 'Refresh'}
+        </button>
+      </div>
+
+      <div className="bg-card border border-border overflow-hidden">
+        <table className="w-full text-left text-sm">
+          <thead className="bg-bg text-[10px] font-black uppercase tracking-widest text-muted border-b border-border">
+            <tr>
+              <th className="p-4">Customer Details</th>
+              <th className="p-4 w-40">Registration Date</th>
+              <th className="p-4 w-32">Rank</th>
+              <th className="p-4 w-44 text-right">Role Power Control</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border font-bold uppercase tracking-widest text-xs">
+            {users.map((user) => (
+              <tr key={user._id} className="hover:bg-bg/50 transition-colors">
+                {/* Details */}
+                <td className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-bg border border-border flex items-center justify-center text-muted">
+                      {user.role === 'admin' ? (
+                        <Crown size={14} className="text-accent" />
+                      ) : (
+                        <UserIcon size={14} />
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-text">{user.name}</span>
+                      <span className="text-[9px] text-muted normal-case font-semibold tracking-normal">
+                        {user.email}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                {/* Created At */}
+                <td className="p-4 text-muted">
+                  {new Date(user.createdAt).toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </td>
+                {/* Rank Badge */}
+                <td className="p-4">
+                  <span
+                    className={`px-2 py-1 text-[8px] border font-black tracking-widest ${
+                      user.role === 'admin'
+                        ? 'bg-accent/10 border-accent/40 text-text'
+                        : 'bg-bg border-border text-muted'
+                    }`}
+                  >
+                    {user.role === 'admin' ? '👑 Admin' : '👤 Customer'}
+                  </span>
+                </td>
+                {/* Role Switcher */}
+                <td className="p-4 text-right">
+                  <select
+                    value={user.role}
+                    onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                    className="bg-transparent border border-border text-[10px] font-black uppercase tracking-widest p-2 outline-none cursor-pointer"
+                  >
+                    <option value="customer">Make Customer</option>
+                    <option value="admin">Promote to Admin</option>
+                  </select>
+                </td>
+              </tr>
+            ))}
+            {users.length === 0 && (
+              <tr>
+                <td colSpan={4} className="p-12 text-center text-muted font-bold text-xs uppercase tracking-widest">
+                  No customers registered yet.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

@@ -3,13 +3,32 @@
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Package, LogOut, ArrowRight, ArrowUpRight } from "lucide-react";
+import { Loader2, Package, LogOut, ArrowRight, ArrowUpRight, Calendar, Tag, Truck } from "lucide-react";
 import Link from "next/link";
+
+interface OrderItem {
+  product: string;
+  name: string;
+  price: number;
+  quantity: number;
+  size: string;
+  image: string;
+  _id: string;
+}
+
+interface UserOrder {
+  _id: string;
+  items: OrderItem[];
+  totalAmount: number;
+  paymentStatus: 'Pending' | 'Paid' | 'Failed' | 'Refunded';
+  orderStatus: 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+  createdAt: string;
+}
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<UserOrder[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
 
   useEffect(() => {
@@ -17,8 +36,24 @@ export default function ProfilePage() {
   }, [status, router]);
 
   useEffect(() => {
-    if (status === "authenticated") setLoadingOrders(false);
+    if (status === "authenticated") {
+      fetchOrders();
+    }
   }, [status]);
+
+  const fetchOrders = async () => {
+    try {
+      const res = await fetch("/api/orders/user");
+      if (res.ok) {
+        const data = await res.json();
+        setOrders(data);
+      }
+    } catch (err) {
+      console.error("Failed to load user orders", err);
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
 
   if (status === "loading" || status === "unauthenticated") return (
     <div className="h-[70vh] flex items-center justify-center">
@@ -82,8 +117,60 @@ export default function ProfilePage() {
                 </Link>
               </div>
             ) : (
-              <div className="space-y-4">
-                {/* Order List (populated when orders exist) */}
+              <div className="space-y-6">
+                {orders.map((order) => (
+                  <div key={order._id} className="bg-card border border-border p-6 md:p-8 font-bold uppercase tracking-widest text-[9px] space-y-6">
+                    {/* Header */}
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-border/40 pb-4 gap-4">
+                      <div className="space-y-1">
+                        <span className="text-[8px] text-muted block">ORDER REFERENCE</span>
+                        <span className="text-text font-black text-xs">{order._id.toUpperCase()}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-4 sm:gap-6">
+                        <div className="space-y-1">
+                          <span className="text-[8px] text-muted block flex items-center gap-1"><Calendar size={9} /> DATE</span>
+                          <span className="text-text font-black text-[9px]">{new Date(order.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[8px] text-muted block">TOTAL AMOUNT</span>
+                          <span className="text-terracotta font-black text-[10px]">₹{order.totalAmount.toLocaleString("en-IN")}</span>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[8px] text-muted block">PAYMENT</span>
+                          <span className={`px-2 py-0.5 border text-[8px] font-black tracking-widest ${
+                            order.paymentStatus === 'Paid' ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-500'
+                          }`}>
+                            {order.paymentStatus}
+                          </span>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[8px] text-muted block flex items-center gap-1"><Truck size={9} /> DELIVERY</span>
+                          <span className="px-2 py-0.5 bg-accent/10 border border-accent/30 text-accent text-[8px] font-black">
+                            {order.orderStatus}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Garments grid */}
+                    <div className="divide-y divide-border/20">
+                      {order.items.map((item) => (
+                        <div key={item._id} className="flex gap-4 py-4 first:pt-0 last:pb-0 items-center">
+                          <div className="w-10 h-12 bg-bg border border-border/30 shrink-0">
+                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-text font-black truncate text-[10px]">{item.name}</h4>
+                            <p className="text-[8px] text-muted mt-0.5">SIZE: {item.size} · QTY: {item.quantity}</p>
+                          </div>
+                          <div className="text-text font-black text-[10px]">
+                            ₹{(item.price * item.quantity).toLocaleString("en-IN")}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
