@@ -41,11 +41,6 @@ export default function Navbar() {
     }
   }, []);
 
-  // Hide Navbar on administrative dashboard routes after executing all hooks unconditionally
-  if (pathname?.startsWith("/admin")) {
-    return null;
-  }
-
   const toggleTheme = () => {
     if (theme === "light") {
       setTheme("dark");
@@ -66,6 +61,11 @@ export default function Navbar() {
 
   // Close menu on navigation
   useEffect(() => { setMobileMenuOpen(false); }, [pathname]);
+
+  // Hide Navbar on administrative dashboard routes after executing all hooks unconditionally
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <>

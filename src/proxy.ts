@@ -32,9 +32,9 @@ export default auth((req) => {
   if (nextUrl.pathname.startsWith('/api') && !nextUrl.pathname.startsWith('/api/auth')) {
     const ip = (req as any).ip ?? req.headers.get("x-forwarded-for")?.split(",")[0] ?? '127.0.0.1';
     
-    let limit = 30; // Default API limit
+    let limit = 120; // Default API limit (raised to 120 to ensure seamless high-speed browsing)
     if (nextUrl.pathname.startsWith('/api/register')) {
-      limit = 10; // Stricter for register route
+      limit = 15; // Stricter for register route
     }
 
     const allowed = applyRateLimit(ip, limit, 60 * 1000); // 1 minute window

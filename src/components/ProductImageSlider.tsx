@@ -91,17 +91,19 @@ export default function ProductImageSlider({
         <>
           <button
             onClick={handlePrev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-black/10 backdrop-blur-[2px] text-white hover:bg-black/35 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover/slider:opacity-100 transition-all duration-300 z-10 rounded-full border-none shadow-none cursor-pointer"
+            className="absolute left-2 top-1/2 -translate-y-1/2 text-white hover:text-terracotta flex items-center justify-center opacity-100 md:opacity-0 md:group-hover/slider:opacity-100 transition-all duration-300 z-10 cursor-pointer"
+            style={{ border: 'none', background: 'transparent', outline: 'none', boxShadow: 'none' }}
             aria-label="Previous image"
           >
-            <ChevronLeft size={14} strokeWidth={2.5} />
+            <ChevronLeft size={20} strokeWidth={2.5} />
           </button>
           <button
             onClick={handleNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-black/10 backdrop-blur-[2px] text-white hover:bg-black/35 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover/slider:opacity-100 transition-all duration-300 z-10 rounded-full border-none shadow-none cursor-pointer"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:text-terracotta flex items-center justify-center opacity-100 md:opacity-0 md:group-hover/slider:opacity-100 transition-all duration-300 z-10 cursor-pointer"
+            style={{ border: 'none', background: 'transparent', outline: 'none', boxShadow: 'none' }}
             aria-label="Next image"
           >
-            <ChevronRight size={14} strokeWidth={2.5} />
+            <ChevronRight size={20} strokeWidth={2.5} />
           </button>
         </>
       )}

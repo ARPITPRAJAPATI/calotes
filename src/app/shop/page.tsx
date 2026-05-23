@@ -185,8 +185,33 @@ function ShopContent() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05, ease: [0.16,1,0.3,1] }}
-                  className="product-card group"
+                  className="product-card group relative"
                 >
+                  {/* Pure borderless Wishlist Symbol (Outside of Link tag) */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleWishlist({
+                        productId: product._id,
+                        name: product.name,
+                        price: product.price,
+                        image: product.images[0],
+                        slug: product.slug,
+                        category: typeof product.category === 'object' && product.category ? (product.category as any).name : "Vintage",
+                      });
+                    }}
+                    className="absolute top-2.5 right-2.5 z-30 p-1 text-text hover:text-terracotta hover:scale-110 transition-all duration-300 cursor-pointer"
+                    style={{ border: 'none', background: 'transparent', outline: 'none', boxShadow: 'none' }}
+                    title={isInWishlist(product._id) ? "Remove from Wishlist" : "Add to Wishlist"}
+                  >
+                    <Heart 
+                      size={15} 
+                      className={isInWishlist(product._id) ? "fill-terracotta text-terracotta" : "text-text"} 
+                      strokeWidth={2}
+                    />
+                  </button>
+
                   <Link href={`/shop/product/${product.slug}`}>
                     {/* Image */}
                     <div className="relative aspect-[3/4] overflow-hidden bg-bg-warm">
@@ -204,30 +229,6 @@ function ShopContent() {
                           {product.condition || "Pre-Loved"}
                         </span>
                       )}
-                      
-                      {/* Pure borderless Wishlist Symbol */}
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleWishlist({
-                            productId: product._id,
-                            name: product.name,
-                            price: product.price,
-                            image: product.images[0],
-                            slug: product.slug,
-                            category: typeof product.category === 'object' && product.category ? (product.category as any).name : "Vintage",
-                          });
-                        }}
-                        className="absolute top-2.5 right-2.5 z-30 p-1 bg-transparent border-none outline-none text-text hover:text-terracotta hover:scale-110 transition-all duration-300 cursor-pointer"
-                        title={isInWishlist(product._id) ? "Remove from Wishlist" : "Add to Wishlist"}
-                      >
-                        <Heart 
-                          size={15} 
-                          className={isInWishlist(product._id) ? "fill-terracotta text-terracotta" : "text-text"} 
-                          strokeWidth={2}
-                        />
-                      </button>
 
                       {product.stock !== undefined && product.stock <= 0 && (
                         <div className="absolute inset-0 bg-black/45 backdrop-blur-[1px] z-20 flex items-center justify-center">
