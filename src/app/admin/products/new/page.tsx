@@ -40,10 +40,6 @@ export default function NewProductPage() {
 
   const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '28', '30', '32', '34', '36', 'Free Size'];
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
   const fetchCategories = async () => {
     try {
       const res = await fetch('/api/categories');
@@ -51,10 +47,14 @@ export default function NewProductPage() {
       if (res.ok) {
         setCategories(data);
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to load categories');
     }
   };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const handleNameChange = (val: string) => {
     setName(val);
@@ -89,7 +89,7 @@ export default function NewProductPage() {
         setImages((prev) => [...prev, ...uploadedUrls]);
         toast.success(`Successfully uploaded ${uploadedUrls.length} images!`);
       }
-    } catch (err) {
+    } catch {
       toast.error('Image upload failed');
     } finally {
       setIsUploading(false);
@@ -152,7 +152,7 @@ export default function NewProductPage() {
         const errData = await res.json();
         toast.error(errData.error || 'Failed to catalog product');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred');
     } finally {
       setIsSubmitting(false);

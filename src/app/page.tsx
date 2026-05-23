@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Star, Heart } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { useWishlist } from "@/context/WishlistContext";
@@ -120,10 +121,13 @@ export default function Home() {
       <section ref={heroRef} className="relative w-full h-[100svh] min-h-[600px] overflow-hidden flex flex-col">
         {/* Background image with parallax */}
         <motion.div className="absolute inset-0" style={{ y: heroY }}>
-          <img
+          <Image
             src={heroImageUrl}
             alt="Calotes Vintage Hero"
-            className="w-full h-full object-cover object-top"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-top"
           />
           {/* Warm dark overlay */}
           <div className="absolute inset-0 bg-gradient-to-b from-bg/70 via-bg/40 to-bg/80" />
@@ -306,10 +310,12 @@ export default function Home() {
                   href={cat.href}
                   className="relative block aspect-[3/4] group overflow-hidden bg-bg border border-border"
                 >
-                  <img
+                  <Image
                     src={cat.img}
                     alt={cat.title}
-                    className="w-full h-full object-cover transition-transform duration-[1.6s] group-hover:scale-108"
+                    fill
+                    sizes="(max-width: 640px) 48vw, (max-width: 768px) 36vw, (max-width: 1024px) 25vw, 20vw"
+                    className="object-cover transition-transform duration-[1.6s] group-hover:scale-108"
                   />
                   {/* Dark overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-bg/20 to-transparent" />
@@ -348,10 +354,12 @@ export default function Home() {
             transition={{ duration: 0.9, ease: [0.16,1,0.3,1] }}
             className="relative aspect-[4/5] overflow-hidden bg-bg-warm group"
           >
-            <img
+            <Image
               src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000"
               alt="Vintage Philosophy"
-              className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-105"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover transition-transform duration-[2s] group-hover:scale-105"
             />
             {/* Floating "100% Authentic" badge */}
             <div className="absolute bottom-6 right-6 w-28 h-28 bg-bg/95 border border-border-warm rounded-full flex flex-col items-center justify-center text-center shadow-2xl">
@@ -379,10 +387,10 @@ export default function Home() {
 
             <div className="space-y-5 text-muted text-[11px] uppercase tracking-widest leading-[1.9] font-medium max-w-sm">
               <p>
-                We believe true style isn't manufactured — it's discovered. Our selection is curated for those who appreciate the patina of time.
+                {"We believe true style isn't manufactured — it's discovered. Our selection is curated for those who appreciate the patina of time."}
               </p>
               <p className="font-serif italic lowercase text-xl text-text tracking-normal normal-case font-light leading-relaxed">
-                "Every garment has a story. We help you continue it."
+                {"\"Every garment has a story. We help you continue it.\""}
               </p>
             </div>
 

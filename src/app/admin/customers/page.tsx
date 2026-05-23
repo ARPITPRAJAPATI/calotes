@@ -18,10 +18,6 @@ export default function AdminCustomersPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   const fetchUsers = async (isSilent = false) => {
     if (!isSilent) setLoading(true);
     else setRefreshing(true);
@@ -33,13 +29,17 @@ export default function AdminCustomersPage() {
       } else {
         toast.error(data.error || 'Failed to retrieve customers');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred while loading customers');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const handleRoleChange = async (id: string, newRole: string) => {
     const updatingToast = toast.loading('Updating user permissions...');
@@ -59,7 +59,7 @@ export default function AdminCustomersPage() {
       } else {
         toast.error(data.error || 'Failed to update role', { id: updatingToast });
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred during update', { id: updatingToast });
     }
   };

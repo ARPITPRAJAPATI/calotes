@@ -81,7 +81,7 @@ export default function AboutPage() {
           >
             <div className="bg-bg-warm border border-border-warm p-8 md:p-12">
               <p className="font-serif italic text-xl md:text-2xl leading-relaxed text-text mb-8 font-light">
-                "True style cannot be manufactured on an assembly line. It must be discovered — in thrift stores, flea markets, and forgotten wardrobes."
+                {"\"True style cannot be manufactured on an assembly line. It must be discovered — in thrift stores, flea markets, and forgotten wardrobes.\""}
               </p>
               <p className="section-label text-terracotta">— The Founders, Calotes Vintage</p>
             </div>
@@ -119,7 +119,7 @@ export default function AboutPage() {
             <span className="text-terracotta"> Compromise</span>
           </h2>
           <p className="text-muted text-[11px] uppercase tracking-widest font-medium leading-[1.9] mb-10">
-            By choosing pre-owned, you're joining a circular economy that reduces water waste, carbon emissions, and landfill overflow. Look good while doing better.
+            {"By choosing pre-owned, you're joining a circular economy that reduces water waste, carbon emissions, and landfill overflow. Look good while doing better."}
           </p>
           <Link href="/shop" className="btn-primary inline-flex items-center gap-3">
             Shop Sustainably <ArrowRight size={14} />

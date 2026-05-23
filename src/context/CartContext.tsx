@@ -31,11 +31,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    requestAnimationFrame(() => {
+      setIsMounted(true);
+    });
     const savedCart = localStorage.getItem("calotes_cart");
     if (savedCart) {
       try {
-        setItems(JSON.parse(savedCart));
+        const parsed = JSON.parse(savedCart);
+        requestAnimationFrame(() => {
+          setItems(parsed);
+        });
       } catch (e) {
         console.error("Failed to parse cart", e);
       }

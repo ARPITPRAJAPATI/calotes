@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { X, Heart, ShoppingBag, Trash2, Sparkles } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
@@ -94,12 +95,14 @@ export default function WishlistDrawer() {
                     <Link
                       href={`/shop/product/${item.slug}`}
                       onClick={() => setIsOpen(false)}
-                      className="w-20 h-24 bg-bg-warm shrink-0 overflow-hidden border border-border/50"
+                      className="w-20 h-24 bg-bg-warm shrink-0 overflow-hidden border border-border/50 relative"
                     >
-                      <img
+                      <Image
                         src={item.image}
                         alt={item.name}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                        fill
+                        sizes="80px"
+                        className="object-cover hover:scale-105 transition-transform duration-700"
                       />
                     </Link>
 

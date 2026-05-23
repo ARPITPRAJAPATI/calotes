@@ -26,10 +26,6 @@ export default function AdminSettingsPage() {
     { name: 'Monochrome', color: '#000000' },
   ];
 
-  useEffect(() => {
-    fetchSettings();
-  }, []);
-
   const fetchSettings = async () => {
     try {
       const res = await fetch('/api/settings');
@@ -46,12 +42,16 @@ export default function AdminSettingsPage() {
       } else {
         toast.error('Failed to load settings');
       }
-    } catch (err) {
+    } catch {
       toast.error('Error fetching website settings');
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -73,7 +73,7 @@ export default function AdminSettingsPage() {
       } else {
         toast.error(data.error || 'Failed to upload image');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred during upload');
     } finally {
       setIsUploading(false);
@@ -108,7 +108,7 @@ export default function AdminSettingsPage() {
         const errData = await res.json();
         toast.error(errData.error || 'Failed to save settings');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred while saving');
     } finally {
       setSaving(false);

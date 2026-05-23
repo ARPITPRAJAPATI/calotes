@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -33,11 +33,15 @@ export default function Navbar() {
   useEffect(() => {
     const stored = localStorage.getItem("theme");
     if (stored === "dark") {
-      setTheme("dark");
       document.documentElement.classList.add("dark");
+      requestAnimationFrame(() => {
+        setTheme("dark");
+      });
     } else {
-      setTheme("light");
       document.documentElement.classList.remove("dark");
+      requestAnimationFrame(() => {
+        setTheme("light");
+      });
     }
   }, []);
 
@@ -59,8 +63,19 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const lastPathname = useRef(pathname);
+
   // Close menu on navigation
-  useEffect(() => { setMobileMenuOpen(false); }, [pathname]);
+  useEffect(() => {
+    if (lastPathname.current !== pathname) {
+      lastPathname.current = pathname;
+      if (mobileMenuOpen) {
+        requestAnimationFrame(() => {
+          setMobileMenuOpen(false);
+        });
+      }
+    }
+  }, [pathname, mobileMenuOpen]);
 
   // Hide Navbar on administrative dashboard routes after executing all hooks unconditionally
   if (pathname?.startsWith("/admin")) {

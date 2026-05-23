@@ -27,6 +27,21 @@ interface CanvasItem extends Product {
   scale: number;
 }
 
+function generateCanvasItem(product: Product, isMobile: boolean, transparentUrl?: string): CanvasItem {
+  const randomOffset = () => 30 + (Math.random() * 20);
+  const desktopOffset = () => 100 + (Math.random() * 50);
+  
+  return {
+    ...product,
+    images: transparentUrl ? [transparentUrl, ...product.images.slice(1)] : product.images,
+    uniqueId: `${product._id}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    x: isMobile ? randomOffset() : desktopOffset(),
+    y: isMobile ? randomOffset() : desktopOffset(),
+    selectedSize: product.sizes.length > 0 ? product.sizes[0] : "OS",
+    scale: 1,
+  };
+}
+
 export default function FitCanvasPage() {
   const { addToCart, setIsCartOpen, cartCount } = useCart();
   const { toggleWishlist, isInWishlist, count: wishlistCount, setIsOpen: setIsWishlistOpen } = useWishlist();
@@ -39,6 +54,21 @@ export default function FitCanvasPage() {
   const [cutoutCache, setCutoutCache] = useState<Record<string, string>>({});
   const canvasRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
+
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch("/api/products");
+      const data = await res.json();
+      if (res.ok && Array.isArray(data)) {
+        // Filter out out-of-stock items for the canvas
+        setProducts(data.filter(p => p.stock === undefined || p.stock > 0));
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -63,27 +93,12 @@ export default function FitCanvasPage() {
           const map = await res.json();
           setCutoutCache(prev => ({ ...prev, ...map }));
         }
-      } catch (err) {
-        console.error("Failed to load server cutout cache:", err);
+      } catch {
+        // Silent catch for unused err
       }
     };
     fetchGlobalCutouts();
   }, []);
-
-  const fetchProducts = async () => {
-    try {
-      const res = await fetch("/api/products");
-      const data = await res.json();
-      if (res.ok && Array.isArray(data)) {
-        // Filter out out-of-stock items for the canvas
-        setProducts(data.filter(p => p.stock === undefined || p.stock > 0));
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const [processingItemId, setProcessingItemId] = useState<string | null>(null);
 
@@ -95,15 +110,7 @@ export default function FitCanvasPage() {
 
     // 1. Check in-memory cutout cache first for instant 0ms retrieval!
     if (cutoutCache[product._id]) {
-      const newItem: CanvasItem = {
-        ...product,
-        images: [cutoutCache[product._id], ...product.images.slice(1)],
-        uniqueId: `${product._id}-${Date.now()}`,
-        x: isMobile ? 30 + (Math.random() * 20) : 100 + (Math.random() * 50),
-        y: isMobile ? 30 + (Math.random() * 20) : 100 + (Math.random() * 50),
-        selectedSize: product.sizes.length > 0 ? product.sizes[0] : "OS",
-        scale: 1,
-      };
+      const newItem = generateCanvasItem(product, isMobile, cutoutCache[product._id]);
       setCanvasItems(prev => [...prev, newItem]);
       return;
     }
@@ -145,29 +152,12 @@ export default function FitCanvasPage() {
         }
       };
 
-      const newItem: CanvasItem = {
-        ...product,
-        // Override the image list to use our new transparent cutout
-        images: [transparentUrl, ...product.images.slice(1)],
-        uniqueId: `${product._id}-${Date.now()}`,
-        x: isMobile ? 30 + (Math.random() * 20) : 100 + (Math.random() * 50),
-        y: isMobile ? 30 + (Math.random() * 20) : 100 + (Math.random() * 50),
-        selectedSize: product.sizes.length > 0 ? product.sizes[0] : "OS",
-        scale: 1,
-      };
-      
+      const newItem = generateCanvasItem(product, isMobile, transparentUrl);
       setCanvasItems(prev => [...prev, newItem]);
     } catch (err) {
       console.error("AI Background Removal failed:", err);
       // Fallback to original image if AI fails
-      const newItem: CanvasItem = {
-        ...product,
-        uniqueId: `${product._id}-${Date.now()}`,
-        x: isMobile ? 30 + (Math.random() * 20) : 100 + (Math.random() * 50),
-        y: isMobile ? 30 + (Math.random() * 20) : 100 + (Math.random() * 50),
-        selectedSize: product.sizes.length > 0 ? product.sizes[0] : "OS",
-        scale: 1,
-      };
+      const newItem = generateCanvasItem(product, isMobile);
       setCanvasItems(prev => [...prev, newItem]);
     } finally {
       setProcessingItemId(null);

@@ -21,19 +21,19 @@ export default function AdminCategoriesPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
   const fetchCategories = async () => {
     try {
       const res = await fetch('/api/categories');
       const data = await res.json();
       if (res.ok) setCategories(data);
-    } catch (err) {
+    } catch {
       toast.error('Failed to load categories');
     }
   };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const handleNameChange = (val: string) => {
     setName(val);

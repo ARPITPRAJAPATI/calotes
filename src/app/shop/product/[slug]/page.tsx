@@ -369,7 +369,7 @@ export default function ProductDetailsPage() {
                 <div className="flex text-terracotta mb-4">
                   {[1,2,3,4,5].map(star => <Star key={star} size={11} fill="currentColor" />)}
                 </div>
-                <p className="text-[11px] text-muted leading-relaxed mb-5">"{rev.text}"</p>
+                <p className="text-[11px] text-muted leading-relaxed mb-5">{"\""}{rev.text}{"\""}</p>
                 <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest text-muted border-t border-border pt-3">
                   <span>{rev.name} <span className="text-terracotta ml-2">✓ Verified</span></span>
                   <span>{rev.date}</span>

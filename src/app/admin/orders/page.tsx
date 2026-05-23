@@ -43,10 +43,6 @@ export default function AdminOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
   const fetchOrders = async (isSilent = false) => {
     if (!isSilent) setLoading(true);
     else setRefreshing(true);
@@ -58,13 +54,17 @@ export default function AdminOrdersPage() {
       } else {
         toast.error(data.error || 'Failed to load orders');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred loading orders');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
 
   const handleStatusChange = async (id: string, field: 'orderStatus' | 'paymentStatus', value: string) => {
     const updatingToast = toast.loading(`Updating ${field === 'orderStatus' ? 'Order' : 'Payment'} status...`);
@@ -87,7 +87,7 @@ export default function AdminOrdersPage() {
       } else {
         toast.error(data.error || 'Failed to update status', { id: updatingToast });
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred during update', { id: updatingToast });
     }
   };

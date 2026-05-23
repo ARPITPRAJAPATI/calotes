@@ -27,10 +27,6 @@ export default function AdminPromoPage() {
   const [isActive, setIsActive] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchPromos();
-  }, []);
-
   const fetchPromos = async (silent = false) => {
     if (!silent) setLoading(true);
     else setRefreshing(true);
@@ -42,13 +38,17 @@ export default function AdminPromoPage() {
       } else {
         toast.error('Failed to load coupons');
       }
-    } catch (err) {
+    } catch {
       toast.error('Error fetching discount coupons');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
+
+  useEffect(() => {
+    fetchPromos();
+  }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,7 +81,7 @@ export default function AdminPromoPage() {
       } else {
         toast.error(data.error || 'Failed to create coupon');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred during submission');
     } finally {
       setSubmitting(false);
@@ -100,7 +100,7 @@ export default function AdminPromoPage() {
       } else {
         toast.error(data.error || 'Failed to delete');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred during deletion');
     }
   };

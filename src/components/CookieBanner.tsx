@@ -11,7 +11,11 @@ export default function CookieBanner() {
   // Hide CookieBanner on admin routes
   useEffect(() => {
     if (pathname?.startsWith('/admin')) {
-      setIsVisible(false);
+      if (isVisible) {
+        requestAnimationFrame(() => {
+          setIsVisible(false);
+        });
+      }
       return;
     }
     const consent = localStorage.getItem('cookie-consent');
@@ -22,7 +26,7 @@ export default function CookieBanner() {
       }, 1500);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [pathname, isVisible]);
 
   const acceptCookies = () => {
     localStorage.setItem('cookie-consent', 'true');

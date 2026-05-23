@@ -33,7 +33,12 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) setItems(JSON.parse(stored));
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        requestAnimationFrame(() => {
+          setItems(parsed);
+        });
+      }
     } catch {}
   }, []);
 

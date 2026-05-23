@@ -11,10 +11,6 @@ export default function AdminProductsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
   const fetchProducts = async () => {
     try {
       const res = await fetch('/api/products?sort=-createdAt');
@@ -24,12 +20,16 @@ export default function AdminProductsPage() {
       } else {
         toast.error('Failed to load products');
       }
-    } catch (err) {
+    } catch {
       toast.error('Error fetching catalog');
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this archive piece?')) return;
@@ -44,7 +44,7 @@ export default function AdminProductsPage() {
       } else {
         toast.error('Failed to delete piece');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred');
     }
   };

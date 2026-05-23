@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface ProductImageSliderProps {
@@ -77,10 +78,12 @@ export default function ProductImageSlider({
     >
       {/* Slider viewport */}
       <div className="w-full h-full relative">
-        <img
+        <Image
           src={images[currentIdx]}
           alt={`${productName} - view ${currentIdx + 1}`}
-          className={`w-full h-full object-cover transition-opacity duration-300 ${
+          fill
+          sizes="(max-width: 640px) 48vw, (max-width: 768px) 36vw, (max-width: 1024px) 26vw, (max-width: 1280px) 20vw, 17vw"
+          className={`object-cover transition-opacity duration-300 ${
             isSoldOut ? "opacity-60 grayscale-[40%]" : ""
           }`}
         />

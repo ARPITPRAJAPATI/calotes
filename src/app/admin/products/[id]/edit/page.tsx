@@ -46,10 +46,6 @@ export default function EditProductPage({ params }: PageProps) {
 
   const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '28', '30', '32', '34', '36', 'Free Size'];
 
-  useEffect(() => {
-    fetchCategoriesAndProduct();
-  }, [id]);
-
   const fetchCategoriesAndProduct = async () => {
     try {
       // 1. Fetch categories
@@ -85,12 +81,16 @@ export default function EditProductPage({ params }: PageProps) {
         toast.error('Product not found');
         router.push('/admin/products');
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to load data');
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchCategoriesAndProduct();
+  }, [id]);
 
   const handleNameChange = (val: string) => {
     setName(val);
@@ -125,7 +125,7 @@ export default function EditProductPage({ params }: PageProps) {
         setImages((prev) => [...prev, ...uploadedUrls]);
         toast.success(`Uploaded ${uploadedUrls.length} images!`);
       }
-    } catch (err) {
+    } catch {
       toast.error('Image upload failed');
     } finally {
       setIsUploading(false);
@@ -188,7 +188,7 @@ export default function EditProductPage({ params }: PageProps) {
         const errData = await res.json();
         toast.error(errData.error || 'Failed to update catalog');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred');
     } finally {
       setIsSubmitting(false);
