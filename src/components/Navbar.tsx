@@ -6,16 +6,17 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { ShoppingBag, Menu, X, ChevronDown, Sparkles, Heart, Sun, Moon } from "lucide-react";
+import { ShoppingBag, Menu, X, ChevronDown, Sparkles, Heart, Sun, Moon, User, MoreHorizontal } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Logo from "./Logo";
 
 const CATEGORIES = [
-  { name: "All Items",  href: "/shop" },
-  { name: "Denim",        href: "/shop?category=denim" },
-  { name: "Outerwear",    href: "/shop?category=outerwear" },
-  { name: "Oversized",    href: "/shop?category=oversized" },
-  { name: "Plus Size",    href: "/shop?category=plus-size" },
-  { name: "Accessories",  href: "/shop?category=accessories" },
+  { name: "All Items", href: "/shop" },
+  { name: "Denim", href: "/shop?category=denim" },
+  { name: "Outerwear", href: "/shop?category=outerwear" },
+  { name: "Oversized", href: "/shop?category=oversized" },
+  { name: "Plus Size", href: "/shop?category=plus-size" },
+  { name: "Accessories", href: "/shop?category=accessories" },
 ];
 
 export default function Navbar() {
@@ -24,10 +25,10 @@ export default function Navbar() {
   const { setIsOpen: setIsWishlistOpen, count: wishlistCount } = useWishlist();
   const pathname = usePathname();
 
-  const [scrolled,        setScrolled]        = useState(false);
-  const [mobileMenuOpen,  setMobileMenuOpen]  = useState(false);
-  const [dropdownOpen,    setDropdownOpen]    = useState(false);
-  const [theme,           setTheme]           = useState<"light" | "dark">("light");
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   // Read theme on mount
   useEffect(() => {
@@ -85,16 +86,15 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 w-full z-50 transition-all duration-700 ${
-          scrolled
+        className={`sticky top-0 w-full z-50 transition-all duration-700 ${scrolled
             ? "bg-bg/95 backdrop-blur-md border-b border-border py-3"
             : "bg-transparent py-6 md:py-8"
-        }`}
+          }`}
       >
-        <div className="max-w-[1800px] mx-auto px-5 md:px-10 flex items-center justify-between">
-
-          {/* ── Left nav (desktop) ── */}
-          <nav className="hidden lg:flex items-center gap-8 xl:gap-10">
+        {/* ─── DESKTOP HEADER LAYOUT ─── */}
+        <div className="hidden lg:flex max-w-[1800px] mx-auto px-10 items-center justify-between relative w-full">
+          {/* Left nav */}
+          <nav className="flex items-center gap-8 xl:gap-10">
             <Link href="/shop" className="section-label underline-hover">Shop</Link>
             <Link href="/canvas" className="section-label underline-hover text-terracotta flex items-center gap-1"><Sparkles size={12} /> Studio</Link>
 
@@ -133,29 +133,29 @@ export default function Navbar() {
             </div>
 
             <Link href="/lookbook" className="section-label underline-hover">Lookbook</Link>
-            <Link href="/about"    className="section-label underline-hover">About</Link>
+            <Link href="/about" className="section-label underline-hover">About</Link>
           </nav>
 
-          {/* ── Center logo ── */}
+          {/* Center logo (Desktop) */}
           <Link
             href="/"
-            className="lg:absolute lg:left-1/2 lg:-translate-x-1/2 flex flex-col items-start lg:items-center leading-none z-10"
+            className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center z-10 hover:opacity-80 transition-opacity"
           >
-            <span className="font-display font-black text-2xl md:text-3xl uppercase tracking-tight text-text hover:text-terracotta transition-colors duration-500">
-              Calotes
-            </span>
-            <span className="text-[7px] font-bold uppercase tracking-[0.5em] text-muted mt-0.5">
-              Vintage
-            </span>
+            <Logo className="w-20 h-20 md:w-24 md:h-24" />
           </Link>
 
-          {/* ── Right actions ── */}
+          {/* Right actions (Desktop) */}
           <div className="flex items-center gap-5 md:gap-7">
             <Link
               href={session ? "/profile" : "/login"}
-              className="hidden lg:block section-label underline-hover"
+              className="flex items-center gap-2 section-label hover:text-terracotta transition-colors"
+              aria-label={session ? "View Profile" : "Login"}
+              title={session ? "Profile" : "Login"}
             >
-              {session ? "Profile" : "Login"}
+              <User size={18} strokeWidth={1.5} />
+              <span className="hidden sm:block">
+                {session ? "Profile" : "Login"}
+              </span>
             </Link>
 
             {/* Cart button */}
@@ -193,14 +193,77 @@ export default function Navbar() {
               {theme === "dark" ? <Sun size={18} strokeWidth={1.5} /> : <Moon size={18} strokeWidth={1.5} />}
               <span className="hidden sm:block">Theme</span>
             </button>
+          </div>
+        </div>
 
-            {/* Mobile hamburger */}
+        {/* ─── MOBILE & TABLET HEADER LAYOUT (pure icons without circles) ─── */}
+        <div className="lg:hidden w-full px-4 flex items-center justify-between relative">
+          {/* Left actions: Three dots (Menu) + Profile */}
+          <div className="flex items-center gap-1.5 xs:gap-2 z-10">
+            {/* Menu trigger (pure three-dots icon button) */}
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden text-text hover:text-terracotta transition-colors"
+              className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
               aria-label="Open menu"
+              title="Menu"
             >
-              <Menu size={22} strokeWidth={1.5} />
+              <MoreHorizontal size={18} strokeWidth={2} />
+            </button>
+
+            {/* Profile trigger (pure User icon button) */}
+            <Link
+              href={session ? "/profile" : "/login"}
+              className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
+              aria-label={session ? "View Profile" : "Login"}
+              title={session ? "Profile" : "Login"}
+            >
+              <User size={18} strokeWidth={1.5} />
+            </Link>
+          </div>
+
+          {/* Center logo (absolute position for perfect alignment, responsive size to prevent collision) */}
+          <Link
+            href="/"
+            className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center justify-center leading-none z-10 hover:opacity-80 transition-opacity"
+          >
+            <Logo className="w-14 h-14" />
+          </Link>
+
+          {/* Right actions: Bag + Wishlist + Theme */}
+          <div className="flex items-center gap-1.5 xs:gap-2 z-10">
+            {/* Bag Button */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
+              aria-label="Open cart"
+              title="Bag"
+            >
+              <ShoppingBag size={18} strokeWidth={1.5} />
+              {cartCount > 0 && (
+                <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 bg-terracotta text-bg text-[7px] font-black rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+
+            {/* Wishlist Button */}
+            <button
+              onClick={() => setIsWishlistOpen(true)}
+              className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
+              aria-label="Open wishlist"
+              title="Wishlist"
+            >
+              <Heart size={18} strokeWidth={1.5} fill={wishlistCount > 0 ? "currentColor" : "none"} />
+            </button>
+
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
+              aria-label="Toggle Theme"
+              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {theme === "dark" ? <Sun size={18} strokeWidth={1.5} /> : <Moon size={18} strokeWidth={1.5} />}
             </button>
           </div>
         </div>
@@ -220,8 +283,8 @@ export default function Navbar() {
           >
             {/* Header */}
             <div className="flex justify-between items-center px-6 py-5 border-b border-border">
-              <Link href="/" className="font-display font-black text-2xl uppercase tracking-tight text-text">
-                Calotes
+              <Link href="/" className="flex items-center justify-center hover:opacity-80 transition-opacity">
+                <Logo className="w-14 h-14" />
               </Link>
               <div className="flex items-center gap-4">
                 <button
@@ -240,16 +303,16 @@ export default function Navbar() {
             {/* Navigation links */}
             <nav className="flex-1 overflow-y-auto px-6 py-10 flex flex-col gap-2">
               {[
-                { label: "Items",  href: "/shop" },
+                { label: "Items", href: "/shop" },
                 { label: "Studio", href: "/canvas" },
                 { label: "Lookbook", href: "/lookbook" },
-                { label: "About",    href: "/about" },
+                { label: "About", href: "/about" },
               ].map((item, i) => (
                 <motion.div
                   key={item.href}
                   initial={{ x: 30, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.05 * i, duration: 0.5, ease: [0.16,1,0.3,1] }}
+                  transition={{ delay: 0.05 * i, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <Link
                     href={item.href}

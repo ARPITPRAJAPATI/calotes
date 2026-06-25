@@ -15,7 +15,7 @@ const ARRIVALS = [
   { name: "Vintage Levi's 501",       price: "₹3,499", tag: "Denim",     img: "https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=800" },
   { name: "Carhartt Detroit Jacket",  price: "₹7,999", tag: "Outerwear", img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800" },
   { name: "Harley Davidson Tee",      price: "₹2,499", tag: "Tees",      img: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800" },
-  { name: "Military Field Jacket",    price: "₹6,499", tag: "Outerwear", img: "https://images.unsplash.com/photo-1434389670869-c87520f92276?q=80&w=800" },
+  { name: "Military Field Jacket",    price: "₹6,499", tag: "Outerwear", img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800" },
   { name: "Vintage Nike Hoodie",      price: "₹4,299", tag: "Hoodies",   img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800" },
   { name: "90s Striped Rugby",        price: "₹1,999", tag: "Jerseys",   img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800" },
 ];
@@ -255,10 +255,15 @@ export default function Home() {
                         category: item.tag,
                       });
                     }}
-                    className="absolute top-3 right-3 p-1.5 bg-bg/90 text-muted hover:text-terracotta transition-colors rounded-none z-20 flex items-center justify-center border border-border/40"
+                    className="absolute top-2.5 right-2.5 z-20 p-1 text-text hover:text-terracotta hover:scale-110 transition-all duration-300 cursor-pointer"
+                    style={{ border: 'none', background: 'transparent', outline: 'none', boxShadow: 'none' }}
                     title={isInWishlist(item.productId) ? "Remove from Wishlist" : "Add to Wishlist"}
                   >
-                    <Heart size={10} className={isInWishlist(item.productId) ? "fill-current text-terracotta" : ""} />
+                    <Heart 
+                      size={15} 
+                      className={isInWishlist(item.productId) ? "fill-terracotta text-terracotta" : "text-text"} 
+                      strokeWidth={2}
+                    />
                   </button>
                 </div>
                 {/* Info */}

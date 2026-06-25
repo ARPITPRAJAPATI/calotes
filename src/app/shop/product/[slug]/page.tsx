@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { ArrowLeft, ShieldCheck, Ruler, Loader2, MessageCircle, Star, Sparkles, Heart, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, ShieldCheck, Ruler, Loader2, MessageCircle, Star, Sparkles, Heart, ChevronLeft, ChevronRight, ScanLine } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { Product } from "@/types";
+import PatinaInspector from "@/components/PatinaInspector";
 
 const MOCK_RELATED = [
   { slug: "vintage-levis-501", name: "Vintage Levi's 501", price: 3499, img: "https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?q=80&w=800" },
@@ -25,6 +26,7 @@ export default function ProductDetailsPage() {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [added, setAdded] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [inspectorOpen, setInspectorOpen] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -102,6 +104,19 @@ export default function ProductDetailsPage() {
 
   return (
     <div className="w-full pt-28 pb-24 flex-1">
+      {/* Patina Inspector Modal */}
+      <AnimatePresence>
+        {inspectorOpen && (
+          <PatinaInspector
+            images={product.images}
+            productName={product.name}
+            brand={product.brand}
+            condition={product.condition}
+            category={typeof product.category === "object" ? product.category?.name : product.category}
+            onClose={() => setInspectorOpen(false)}
+          />
+        )}
+      </AnimatePresence>
       {/* Breadcrumb Navigation */}
       <div className="px-6 md:px-12 border-b border-border/40 py-8 mb-6">
         <div className="max-w-[1800px] mx-auto flex items-center justify-between">
@@ -157,42 +172,24 @@ export default function ProductDetailsPage() {
               )}
             </div>
 
-            {/* Slider Thumbnail Dots Indicator */}
-            {product.images.length > 1 && (
-              <div className="flex justify-center gap-2 mt-2">
-                {product.images.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImage(idx)}
-                    className={`h-1 transition-all duration-300 ${
-                      selectedImage === idx ? "w-8 bg-text" : "w-2 bg-border hover:bg-muted"
-                    }`}
-                    aria-label={`Go to slide ${idx + 1}`}
-                  />
-                ))}
+            {/* Patina Inspector — on-brand trigger button */}
+            <button
+              onClick={() => setInspectorOpen(true)}
+              className="group flex items-center justify-between w-full border border-border hover:border-terracotta bg-bg-warm hover:bg-terracotta/5 px-5 py-4 transition-all duration-300"
+            >
+              <div className="flex items-center gap-3">
+                <ScanLine size={12} className="text-terracotta shrink-0" />
+                <div className="text-left">
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-text group-hover:text-terracotta transition-colors">
+                    Inspect Patina &amp; Tags
+                  </p>
+                  <p className="text-[7px] font-bold uppercase tracking-widest text-muted mt-0.5">
+                    Magnify · Authenticate · Explore
+                  </p>
+                </div>
               </div>
-            )}
-
-            {/* Thumbnails list below main slider */}
-            {product.images.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto no-scrollbar py-2 justify-center">
-                {product.images.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImage(idx)}
-                    className={`w-14 h-18 shrink-0 border bg-bg-warm transition-all duration-300 ${
-                      selectedImage === idx ? "border-text" : "border-border/50 hover:border-muted"
-                    }`}
-                  >
-                    {img.endsWith(".mp4") ? (
-                      <div className="w-full h-full bg-card flex items-center justify-center text-[7px] font-black uppercase">Video</div>
-                    ) : (
-                      <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
+              <div className="w-6 h-px bg-border group-hover:w-10 group-hover:bg-terracotta transition-all duration-500" />
+            </button>
           </div>
 
           {/* Right: Product Info (Sticky, 7/12 grid layout) */}
