@@ -1,14 +1,19 @@
-'use client';
+'use client'; // Flags this file as a client component to handle local statuses, dropdown modifications, API calls, and alerts
 
+// Import React hooks
 import { useState, useEffect } from 'react';
+// Import hot toast notification helpers
 import toast from 'react-hot-toast';
+// Import UI vector graphics icons
 import { Loader2, RefreshCw } from 'lucide-react';
 
+// Struct definition of User references
 interface User {
   name: string;
   email: string;
 }
 
+// Struct layout of Order Items
 interface OrderItem {
   product: {
     name: string;
@@ -21,6 +26,7 @@ interface OrderItem {
   image?: string;
 }
 
+// Struct representing Order entities mapping database objects
 interface Order {
   _id: string;
   user?: User;
@@ -39,10 +45,11 @@ interface Order {
 }
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const [orders, setOrders] = useState<Order[]>([]); // Holds full list of orders
+  const [loading, setLoading] = useState(true);      // Loader status indicator spinner
+  const [refreshing, setRefreshing] = useState(false); // Refresher loader control
 
+  // Fetch orders from database APIs
   const fetchOrders = async (isSilent = false) => {
     if (!isSilent) setLoading(true);
     else setRefreshing(true);
@@ -50,7 +57,7 @@ export default function AdminOrdersPage() {
       const res = await fetch('/api/orders');
       const data = await res.json();
       if (res.ok) {
-        setOrders(data);
+        setOrders(data); // Hydrate order state list
       } else {
         toast.error(data.error || 'Failed to load orders');
       }
@@ -62,13 +69,16 @@ export default function AdminOrdersPage() {
     }
   };
 
+  // Run fetch query when page loads initially
   useEffect(() => {
     fetchOrders();
   }, []);
 
+  // PUT updates on specific order parameters (orderStatus or paymentStatus)
   const handleStatusChange = async (id: string, field: 'orderStatus' | 'paymentStatus', value: string) => {
-    const updatingToast = toast.loading(`Updating ${field === 'orderStatus' ? 'Order' : 'Payment'} status...`);
+    const updatingToast = toast.loading(`Updating ${field === 'orderStatus' ? 'Order' : 'Payment'} status...`); // Launch progress toast
     try {
+      // Trigger update API endpoint PUT methods
       const res = await fetch(`/api/orders/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -77,8 +87,8 @@ export default function AdminOrdersPage() {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success('Status updated successfully!', { id: updatingToast });
-        // Update local state smoothly
+        toast.success('Status updated successfully!', { id: updatingToast }); // Update to success status
+        // Sync local React state smoothly to update page layout in-place immediately
         setOrders((prev) =>
           prev.map((order) =>
             order._id === id ? { ...order, [field]: value } : order
@@ -93,6 +103,7 @@ export default function AdminOrdersPage() {
   };
 
   if (loading) {
+    // Full screen loader spinner
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-xs font-black uppercase tracking-widest text-text gap-4">
         <Loader2 className="w-8 h-8 animate-spin text-terracotta" />
@@ -103,12 +114,13 @@ export default function AdminOrdersPage() {
 
   return (
     <div className="space-y-8">
+      {/* HUD Page Header */}
       <div className="flex justify-between items-center border-b border-border pb-4">
         <h1 className="text-3xl font-display font-black uppercase tracking-tighter">
           Order Management
         </h1>
         <button
-          onClick={() => fetchOrders(true)}
+          onClick={() => fetchOrders(true)} // Silent background fetch refresh call
           disabled={refreshing}
           className="flex items-center gap-2 border border-border px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-card transition-colors disabled:opacity-50"
         >
@@ -117,6 +129,7 @@ export default function AdminOrdersPage() {
         </button>
       </div>
 
+      {/* Orders Table layout wrapper */}
       <div className="bg-card border border-border overflow-x-auto">
         <table className="w-full text-left text-sm min-w-[900px]">
           <thead className="bg-bg text-[10px] font-black uppercase tracking-widest text-muted border-b border-border">
@@ -132,17 +145,19 @@ export default function AdminOrdersPage() {
           <tbody className="divide-y divide-border font-bold uppercase tracking-widest text-xs">
             {orders.map((order) => (
               <tr key={order._id} className="hover:bg-bg/50 transition-colors">
-                {/* ID & Hover Info */}
+                {/* Order references ID codes */}
                 <td className="p-4 font-mono select-all text-muted" title={order._id}>
                   #{order._id.slice(-6)}
                 </td>
-                {/* Customer Details */}
+                
+                {/* Customer parameter columns */}
                 <td className="p-4">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-text">{order.user?.name || 'Guest User'}</span>
                     <span className="text-[9px] text-muted normal-case font-semibold tracking-normal">
                       {order.user?.email || 'N/A'}
                     </span>
+                    {/* List sub-items of purchase bundle */}
                     <div className="mt-2 flex flex-col gap-1.5 text-[8px] text-muted tracking-wider">
                       {order.items?.map((item, idx) => (
                         <div key={idx} className="flex items-center gap-2 border-t border-border/30 pt-1 mt-1 first:border-0 first:pt-0 first:mt-0">
@@ -161,7 +176,8 @@ export default function AdminOrdersPage() {
                     </div>
                   </div>
                 </td>
-                {/* Date */}
+                
+                {/* Dates */}
                 <td className="p-4 text-muted">
                   {new Date(order.createdAt).toLocaleDateString(undefined, {
                     month: 'short',
@@ -169,11 +185,13 @@ export default function AdminOrdersPage() {
                     year: 'numeric',
                   })}
                 </td>
-                {/* Total */}
+                
+                {/* Totals */}
                 <td className="p-4 text-text font-black">
                   ₹{order.totalAmount.toLocaleString('en-IN')}
                 </td>
-                {/* Payment Status Dropdown */}
+                
+                {/* Payment Status Dropdown select */}
                 <td className="p-4">
                   <select
                     value={order.paymentStatus}
@@ -191,7 +209,8 @@ export default function AdminOrdersPage() {
                     <option value="Failed">Failed</option>
                   </select>
                 </td>
-                {/* Order Status Dropdown */}
+                
+                {/* Delivery Order Status Dropdown select */}
                 <td className="p-4">
                   <select
                     value={order.orderStatus}
@@ -215,6 +234,7 @@ export default function AdminOrdersPage() {
               </tr>
             ))}
             {orders.length === 0 && (
+              // Empty fallback
               <tr>
                 <td colSpan={6} className="p-12 text-center text-muted font-bold text-xs uppercase tracking-widest">
                   No orders have been received yet.
@@ -227,3 +247,4 @@ export default function AdminOrdersPage() {
     </div>
   );
 }
+

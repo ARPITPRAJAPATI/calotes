@@ -1,30 +1,36 @@
-"use client";
+"use client"; // Flags component as client rendering only (uses local UI triggers, mouse move tracks, and animations)
 
+// Import React hooks for managing coordinate updates, references, event callbacks, and lifecycle triggers
 import { useState, useRef, useCallback, useEffect } from "react";
+// Import vectors
 import { X, Tag, Scissors, Droplets, Scan, Target, ChevronRight, ChevronDown } from "lucide-react";
+// Import Framer Motion
 import { motion, AnimatePresence } from "framer-motion";
 
+// Declared types mapping props passed from parent detail page
 interface PatinaInspectorProps {
-  images: string[];
-  productName: string;
-  brand: string;
-  condition: string;
-  category?: string;
-  onClose: () => void;
+  images: string[];        // Product image list URLs
+  productName: string;     // Product name string
+  brand: string;           // Product brand label
+  condition: string;       // pre-loved condition ranking
+  category?: string;       // Categorization tier tag
+  onClose: () => void;     // Close event callback trigger
 }
 
+// Struct layout of an individual hotspot checkpoint pinned to the photo overlay
 interface Hotspot {
   id: string;
-  label: string;
-  x: number;
-  y: number;
-  icon: React.ElementType;
+  label: string; // Identifier letter (e.g. A, B, C)
+  x: number;     // Left coordinate percentage (0 - 100)
+  y: number;     // Top coordinate percentage (0 - 100)
+  icon: React.ElementType; // Lucide icon component type
   title: string;
   detail: string;
   verdict: string;
-  tag: string;
+  tag: string;   // Label pill (e.g. ARCHIVE VERIFIED)
 }
 
+// Helper builder to output dynamic, copy-written hotspots customized to the brand and condition variables
 function buildHotspots(brand: string, condition: string, category: string): Hotspot[] {
   const conditionTagline: Record<string, string> = {
     Excellent: "Museum-grade preservation. Zero structural compromise.",
@@ -72,8 +78,9 @@ function buildHotspots(brand: string, condition: string, category: string): Hots
   ];
 }
 
-const LENS_SIZE = 160;
-const ZOOM_FACTOR = 2.5;
+// Math constants configuring magnification lens parameters
+const LENS_SIZE = 160;   // Lens diameter in pixels
+const ZOOM_FACTOR = 2.5; // Zoom scale factor
 
 export default function PatinaInspector({
   images,
@@ -83,19 +90,21 @@ export default function PatinaInspector({
   category = "Vintage",
   onClose,
 }: PatinaInspectorProps) {
-  const [activeHotspot, setActiveHotspot] = useState<string | null>(null);
-  const [lensPos, setLensPos] = useState({ x: 0, y: 0 });
-  const [lensActive, setLensActive] = useState(false);
-  const [scanLine, setScanLine] = useState(0);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const imageRef = useRef<HTMLDivElement>(null);
+  // Define state managers
+  const [activeHotspot, setActiveHotspot] = useState<string | null>(null); // Pinned hotspot selected by user
+  const [lensPos, setLensPos] = useState({ x: 0, y: 0 }); // Mouse position relative to image box
+  const [lensBgPosition, setLensBgPosition] = useState("50% 50%"); // Track magnifying background position
+  const [lensActive, setLensActive] = useState(false); // Controls lens magnifier visibility
+  const [scanLine, setScanLine] = useState(0);         // Track progress percentage of automated grid scan animation
+  const [imageLoaded, setImageLoaded] = useState(false); // Toggle grid overlays once image completes loading
+  const [isMobile, setIsMobile] = useState(false);      // Window scale checkpoint toggle
+  const imageRef = useRef<HTMLDivElement>(null);        // Ref reference tracking DOM sizes of image wrapper
 
-  const hotspots = buildHotspots(brand, condition, category);
-  const heroImage = images[0] || "";
-  const activeData = hotspots.find((h) => h.id === activeHotspot);
+  const hotspots = buildHotspots(brand, condition, category); // Generate hotspot lists
+  const heroImage = images[0] || ""; // Display primary image
+  const activeData = hotspots.find((h) => h.id === activeHotspot); // Extract data matching selected hotspot ID
 
-  // Detect mobile
+  // Detect mobile screen width scales on load and resize
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
     check();
@@ -103,39 +112,44 @@ export default function PatinaInspector({
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  // Scan line animation
+  // Run infinite loop animation driving the neon scanner bar using requestAnimationFrame for optimal performance
   useEffect(() => {
     let frame: number;
     let start: number | null = null;
-    const duration = 3000;
+    const duration = 3000; // Time in ms to traverse top to bottom
     const animate = (ts: number) => {
       if (!start) start = ts;
-      const progress = ((ts - start) % duration) / duration;
-      setScanLine(progress * 100);
+      const progress = ((ts - start) % duration) / duration; // Computes 0.0 to 1.0 progress loop
+      setScanLine(progress * 100); // Scale to percentage (0 - 100)
       frame = requestAnimationFrame(animate);
     };
     frame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frame);
+    return () => cancelAnimationFrame(frame); // Halt loops on unmount
   }, []);
 
-  // Lock scroll
+  // Prevent background scrolling while full-screen modal overlays are active
   useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = ""; };
+    document.body.style.overflow = "hidden"; // Lock page body
+    return () => { document.body.style.overflow = ""; }; // Restore page scrolling on close
   }, []);
 
+  // Callback evaluating cursor positioning to move magnifying lens box
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageRef.current || isMobile) return;
-    const rect = imageRef.current.getBoundingClientRect();
-    setLensPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    const rect = imageRef.current.getBoundingClientRect(); // Get absolute layout coordinates of image element
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    // Set local offsets relative to parent boundary
+    setLensPos({ x, y });
+
+    const imageW = rect.width || 1;
+    const imageH = rect.height || 1;
+    const lensBgX = 50 - (x / imageW) * 100 * (ZOOM_FACTOR - 1);
+    const lensBgY = 50 - (y / imageH) * 100 * (ZOOM_FACTOR - 1);
+    setLensBgPosition(`${lensBgX}% ${lensBgY}%`);
   }, [isMobile]);
 
-  const imageW = imageRef.current?.offsetWidth || 1;
-  const imageH = imageRef.current?.offsetHeight || 1;
-  const lensBgX = 50 - (lensPos.x / imageW) * 100 * (ZOOM_FACTOR - 1);
-  const lensBgY = 50 - (lensPos.y / imageH) * 100 * (ZOOM_FACTOR - 1);
-  const lensBgPosition = `${lensBgX}% ${lensBgY}%`;
-
+  // Toggle active selection states on hotspot pins clicks
   const handleHotspot = (id: string) => {
     setActiveHotspot((prev) => (prev === id ? null : id));
   };
@@ -148,7 +162,7 @@ export default function PatinaInspector({
       className="fixed inset-0 z-[200] flex flex-col"
       style={{ backdropFilter: "blur(12px)", background: "rgba(0,0,0,0.94)" }}
     >
-      {/* ── HUD Bar ─────────────────────────────── */}
+      {/* ── HUD Top Bar ── */}
       <div className="flex-shrink-0 h-12 flex items-center justify-between px-4 md:px-8 border-b border-white/10">
         <div className="flex items-center gap-3 min-w-0">
           <Scan size={11} className="text-[#C45B3A] animate-pulse shrink-0" />
@@ -170,10 +184,10 @@ export default function PatinaInspector({
         </div>
       </div>
 
-      {/* ── MOBILE LAYOUT ────────────────────────────────────────── */}
+      {/* ── MOBILE LAYOUT ── */}
       {isMobile && (
         <div className="flex flex-col flex-1 overflow-hidden">
-          {/* Image zone — fixed height on mobile */}
+          {/* Image bounds container */}
           <div className="relative flex-1 min-h-0">
             <div
               ref={imageRef}
@@ -187,7 +201,7 @@ export default function PatinaInspector({
                 onLoad={() => setImageLoaded(true)}
               />
 
-              {/* Scan line */}
+              {/* Laser scan line overlay */}
               {imageLoaded && (
                 <div
                   className="absolute left-0 right-0 h-px pointer-events-none z-10"
@@ -198,7 +212,7 @@ export default function PatinaInspector({
                 />
               )}
 
-              {/* Subtle grid */}
+              {/* Editorial grid design lines */}
               <div
                 className="absolute inset-0 pointer-events-none opacity-[0.06]"
                 style={{
@@ -207,7 +221,7 @@ export default function PatinaInspector({
                 }}
               />
 
-              {/* Hotspot pins */}
+              {/* Interactive pinned hotspots */}
               {imageLoaded && hotspots.map((hotspot) => (
                 <button
                   key={hotspot.id}
@@ -229,9 +243,9 @@ export default function PatinaInspector({
             </div>
           </div>
 
-          {/* Bottom panel — hotspot tabs + detail */}
+          {/* Bottom Panel: tabs and detailed verification text */}
           <div className="flex-shrink-0 border-t border-white/10" style={{ background: "rgba(10,10,10,0.97)" }}>
-            {/* Tab row */}
+            {/* Horizontal tab rows */}
             <div className="flex border-b border-white/8">
               {hotspots.map((hs) => (
                 <button
@@ -259,7 +273,7 @@ export default function PatinaInspector({
               ))}
             </div>
 
-            {/* Detail content */}
+            {/* Hotspot details render block */}
             <AnimatePresence mode="wait">
               {activeData ? (
                 <motion.div
@@ -288,6 +302,7 @@ export default function PatinaInspector({
                   </div>
                 </motion.div>
               ) : (
+                // Hint display if no hotspot pin is selected
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -304,14 +319,14 @@ export default function PatinaInspector({
         </div>
       )}
 
-      {/* ── DESKTOP LAYOUT ───────────────────────────────────────── */}
+      {/* ── DESKTOP LAYOUT ── */}
       {!isMobile && (
         <div className="flex-1 flex items-center justify-center overflow-hidden px-8 py-6">
           <div className="flex items-start gap-8 w-full max-w-[1300px] h-full">
 
-            {/* Image zone */}
+            {/* Left Image Zone Box */}
             <div className="relative flex-shrink-0 w-[340px] xl:w-[400px]">
-              {/* Corner crosshairs */}
+              {/* Brutalist editorial crosshair frames */}
               {[
                 ["top-0 left-0", 0],
                 ["top-0 right-0", 1],
@@ -340,7 +355,7 @@ export default function PatinaInspector({
                   onLoad={() => setImageLoaded(true)}
                 />
 
-                {/* Scan line */}
+                {/* Laser scan line overlay */}
                 {imageLoaded && (
                   <div
                     className="absolute left-0 right-0 h-px pointer-events-none z-20"
@@ -351,7 +366,7 @@ export default function PatinaInspector({
                   />
                 )}
 
-                {/* Grid overlay */}
+                {/* Editorial grid design lines */}
                 <div
                   className="absolute inset-0 pointer-events-none z-10 opacity-[0.08]"
                   style={{
@@ -360,7 +375,7 @@ export default function PatinaInspector({
                   }}
                 />
 
-                {/* Hotspot pins */}
+                {/* Interactive Hotspot pins */}
                 {imageLoaded && hotspots.map((hotspot) => (
                   <button
                     key={hotspot.id}
@@ -380,7 +395,7 @@ export default function PatinaInspector({
                   </button>
                 ))}
 
-                {/* Magnifying lens */}
+                {/* Magnifying lens viewport */}
                 <AnimatePresence>
                   {lensActive && imageLoaded && (
                     <motion.div
@@ -400,6 +415,7 @@ export default function PatinaInspector({
                         overflow: "hidden",
                       }}
                     >
+                      {/* Set background-image zoom frame moving relative to lensBgPosition percentage coordinates calculated above */}
                       <div
                         style={{
                           width: "100%",
@@ -410,6 +426,7 @@ export default function PatinaInspector({
                           backgroundRepeat: "no-repeat",
                         }}
                       />
+                      {/* Grid alignments indicators inside lens */}
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <div className="absolute w-full h-px bg-[#C45B3A]/25" />
                         <div className="absolute w-px h-full bg-[#C45B3A]/25" />
@@ -420,15 +437,14 @@ export default function PatinaInspector({
                 </AnimatePresence>
               </div>
 
-              {/* Hint */}
+              {/* UI instruction hint */}
               <p className="text-center text-[7px] font-bold uppercase tracking-[0.3em] text-white/20 mt-3">
                 Hover to magnify · Click pins to inspect
               </p>
             </div>
 
-            {/* Sidebar */}
+            {/* Right sidebar listing checkpoints and expanded copy-write information */}
             <div className="flex-1 flex flex-col gap-4 min-w-0 h-full overflow-y-auto no-scrollbar py-1">
-              {/* Header */}
               <div className="flex items-center gap-2 mb-1">
                 <Target size={9} className="text-[#C45B3A]" />
                 <span className="text-[8px] font-black uppercase tracking-[0.4em] text-white/35">
@@ -436,7 +452,7 @@ export default function PatinaInspector({
                 </span>
               </div>
 
-              {/* Hotspot list */}
+              {/* Sidebar list items */}
               <div className="space-y-2">
                 {hotspots.map((hs) => (
                   <button
@@ -473,7 +489,7 @@ export default function PatinaInspector({
                 ))}
               </div>
 
-              {/* Detail panel */}
+              {/* Expanded details review card (displays dynamically on active hotspot selections) */}
               <AnimatePresence mode="wait">
                 {activeData ? (
                   <motion.div
@@ -503,13 +519,14 @@ export default function PatinaInspector({
                         {activeData.verdict}
                       </span>
                     </div>
-                    {/* Corner accent */}
+                    {/* Decorative corner visual accents */}
                     <div className="absolute top-0 right-0 w-6 h-6">
                       <div className="absolute top-0 right-0 w-full h-px bg-[#C45B3A]" />
                       <div className="absolute top-0 right-0 w-px h-full bg-[#C45B3A]" />
                     </div>
                   </motion.div>
                 ) : (
+                  // Sidebar fallback preview instructions
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -530,3 +547,4 @@ export default function PatinaInspector({
     </motion.div>
   );
 }
+

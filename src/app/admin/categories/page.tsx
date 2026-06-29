@@ -1,9 +1,13 @@
-'use client';
+'use client'; // Flags this file as a client component to handle dashboard interface interactions, file uploads, and fetches
 
+// Import state and lifecycle hooks
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Upload, AlertCircle } from 'lucide-react';
+// Import UI vector graphics icons
+import { Plus, Trash2, Upload } from 'lucide-react';
+// Import hot toast notification triggers
 import toast from 'react-hot-toast';
 
+// Category interface schema definitions
 interface Category {
   _id: string;
   name: string;
@@ -13,14 +17,18 @@ interface Category {
 }
 
 export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
+  // Category form inputs states
+  const [categories, setCategories] = useState<Category[]>([]); // Holds categories list
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
+  
+  // UI status spinners
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Fetch categories list from backend API
   const fetchCategories = async () => {
     try {
       const res = await fetch('/api/categories');
@@ -35,18 +43,20 @@ export default function AdminCategoriesPage() {
     fetchCategories();
   }, []);
 
+  // Update slug state on changes to category name (converts spaces/special symbols to hyphens)
   const handleNameChange = (val: string) => {
     setName(val);
     setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
   };
 
+  // Upload single category cover image to Cloudinary via upload endpoint
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setIsUploading(true);
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', file); // Bind binary payload
 
     try {
       const res = await fetch('/api/upload', {
@@ -55,7 +65,7 @@ export default function AdminCategoriesPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        setImage(data.url);
+        setImage(data.url); // Set returned secure URL
         toast.success('Category image uploaded successfully!');
       } else {
         toast.error(data.error || 'Upload failed');
@@ -67,6 +77,7 @@ export default function AdminCategoriesPage() {
     }
   };
 
+  // Post category creation payload to backend database api
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !slug) {
@@ -85,11 +96,12 @@ export default function AdminCategoriesPage() {
 
       if (res.ok) {
         toast.success('Collection category created!');
+        // Reset form inputs fields
         setName('');
         setSlug('');
         setDescription('');
         setImage('');
-        fetchCategories();
+        fetchCategories(); // Refresh categories list grid
       } else {
         toast.error(data.error || 'Failed to create category');
       }
@@ -100,8 +112,9 @@ export default function AdminCategoriesPage() {
     }
   };
 
+  // Delete category from database using category ID
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this category?')) return;
+    if (!confirm('Are you sure you want to delete this category?')) return; // Display confirm safety popup
 
     try {
       const res = await fetch(`/api/categories/${id}`, {
@@ -109,7 +122,7 @@ export default function AdminCategoriesPage() {
       });
       if (res.ok) {
         toast.success('Category deleted');
-        fetchCategories();
+        fetchCategories(); // Refresh categories list grid
       } else {
         toast.error('Failed to delete category');
       }
@@ -120,6 +133,7 @@ export default function AdminCategoriesPage() {
 
   return (
     <div className="space-y-12">
+      {/* Page Header title */}
       <div className="border-b border-border pb-4">
         <h1 className="text-4xl font-display font-black uppercase tracking-tighter">
           Collection Categories
@@ -127,7 +141,7 @@ export default function AdminCategoriesPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Creation Form */}
+        {/* Left column - Creation Form */}
         <div className="lg:col-span-1 space-y-6">
           <h2 className="text-xs font-black uppercase tracking-[0.2em] border-b border-border pb-2">
             Create Category
@@ -138,7 +152,7 @@ export default function AdminCategoriesPage() {
               <input
                 type="text"
                 value={name}
-                onChange={(e) => handleNameChange(e.target.value)}
+                onChange={(e) => handleNameChange(e.target.value)} // Slug generator
                 placeholder="e.g., Heavyweight Hoodies"
                 className="w-full bg-card border border-border px-4 py-3 text-xs font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
                 required
@@ -168,6 +182,7 @@ export default function AdminCategoriesPage() {
               />
             </div>
 
+            {/* Banner cover image selection box */}
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-muted block">Cover Image</label>
               {image ? (
@@ -207,7 +222,7 @@ export default function AdminCategoriesPage() {
           </form>
         </div>
 
-        {/* Categories List */}
+        {/* Right column - Categories Grid List */}
         <div className="lg:col-span-2 space-y-6">
           <h2 className="text-xs font-black uppercase tracking-[0.2em] border-b border-border pb-2">
             Existing Collections ({categories.length})
@@ -216,6 +231,7 @@ export default function AdminCategoriesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {categories.map((cat) => (
               <div key={cat._id} className="bg-card border border-border p-4 flex gap-4 relative group">
+                {/* Visual image box */}
                 <div className="w-20 h-20 bg-white border border-border overflow-hidden shrink-0">
                   {cat.image ? (
                     <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
@@ -225,6 +241,7 @@ export default function AdminCategoriesPage() {
                     </div>
                   )}
                 </div>
+                {/* Details layout */}
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <h3 className="text-sm font-black uppercase tracking-tight">{cat.name}</h3>
@@ -235,6 +252,7 @@ export default function AdminCategoriesPage() {
                       </p>
                     )}
                   </div>
+                  {/* Delete button option */}
                   <button
                     onClick={() => handleDelete(cat._id)}
                     className="absolute top-4 right-4 text-muted hover:text-accent-red transition-colors"
@@ -245,6 +263,7 @@ export default function AdminCategoriesPage() {
               </div>
             ))}
 
+            {/* Empty collection state box */}
             {categories.length === 0 && (
               <div className="col-span-full border border-dashed border-border p-12 text-center text-muted font-bold text-xs uppercase tracking-widest">
                 No collection categories configured yet.
@@ -256,3 +275,4 @@ export default function AdminCategoriesPage() {
     </div>
   );
 }
+

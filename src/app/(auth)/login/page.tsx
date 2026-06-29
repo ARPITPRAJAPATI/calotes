@@ -1,61 +1,81 @@
-"use client";
+"use client"; // Flags this file as a client component to handle browser inputs, NextAuth oauth redirects, and client validations
 
+// Import React hooks and Suspense wrappers
 import { useState, Suspense } from "react";
+// Import NextAuth client helper to trigger sign-in procedures
 import { signIn } from "next-auth/react";
+// Import routing hooks
 import { useRouter, useSearchParams } from "next/navigation";
+// Import Link for page transitions
 import Link from "next/link";
+// Import Framer Motion
 import { motion } from "framer-motion";
+// Import vectors
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 
 function LoginFormInner() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const router = useRouter(); // Initialize router redirects
+  const searchParams = useSearchParams(); // Read search parameters (requires Suspense parent container wrapper)
+  const callbackUrl = searchParams.get("callbackUrl") || "/"; // Extract target redirect URL on successful login
+  
+  // Form states
+  const [loading, setLoading] = useState(false); // Tracks submit progress indicator
+  const [error, setError] = useState("");         // Binds authentication failure alerts
+  const [formData, setFormData] = useState({ email: "", password: "" }); // Input values object
 
+  // Handles Credentials login submissions
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
+      // Trigger NextAuth credentials validation provider handler
       const res = await signIn("credentials", {
-        redirect: false,
+        redirect: false, // Prevent NextAuth from doing full page reload redirects
         email: formData.email,
         password: formData.password,
         callbackUrl,
       });
-      if (res?.error) { setError("Invalid credentials."); }
-      else { window.location.href = callbackUrl; }
-    } catch { setError("An unexpected error occurred."); }
-    finally { setLoading(false); }
+      if (res?.error) {
+        setError("Invalid credentials."); // Set alert state
+      } else {
+        // Successful login: perform hard redirect page reload to refresh state contexts
+        window.location.href = callbackUrl;
+      }
+    } catch {
+      setError("An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="w-full max-w-sm">
-      {/* Top Navigation */}
+      {/* Top Branding Navigation Header */}
       <div className="flex justify-between items-center mb-16">
         <Link href="/" className="block">
           <span className="font-display font-black text-3xl uppercase tracking-tighter">Calotes</span>
         </Link>
         <button 
-          onClick={() => router.back()}
+          onClick={() => router.back()} // Go back
           className="text-[10px] font-black uppercase tracking-[0.2em] text-muted hover:text-text transition-colors flex items-center gap-2"
         >
           <ArrowLeft size={12} /> Back
         </button>
       </div>
 
+      {/* Main Headers */}
       <div className="mb-10">
         <h1 className="font-display font-black text-4xl uppercase tracking-tighter mb-2">Welcome Back</h1>
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Sign in to access your items.</p>
       </div>
 
+      {/* Error alert indicator bar */}
       {error && (
         <p className="text-accent text-[10px] font-bold uppercase tracking-widest mb-6 border-l-2 border-accent pl-3">{error}</p>
       )}
 
+      {/* Credentials form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-muted mb-3">Email</label>
@@ -86,6 +106,7 @@ function LoginFormInner() {
         </button>
       </form>
 
+      {/* Google OAuth trigger options */}
       <div className="mt-8">
         <div className="flex items-center gap-4 mb-6">
           <div className="flex-1 h-px bg-border" />
@@ -93,7 +114,7 @@ function LoginFormInner() {
           <div className="flex-1 h-px bg-border" />
         </div>
         <button
-          onClick={() => signIn("google", { callbackUrl })}
+          onClick={() => signIn("google", { callbackUrl })} // Trigger Google NextAuth oauth sign-in process
           className="btn-outline w-full justify-center py-5"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -117,7 +138,7 @@ function LoginFormInner() {
 export default function LoginPage() {
   return (
     <div className="w-full flex-1 grid grid-cols-1 lg:grid-cols-2">
-      {/* Left: Large Fashion Image */}
+      {/* Left Column: Large fashion graphic layout */}
       <div className="hidden lg:block relative overflow-hidden border-r border-border/50">
         <img
           src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2000&auto=format&fit=crop"
@@ -133,7 +154,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right: Form */}
+      {/* Right Column: Form interactive area */}
       <div className="flex items-center justify-center p-8 md:p-16 lg:p-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -141,6 +162,7 @@ export default function LoginPage() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-sm"
         >
+          {/* Wrap the form inner component in a Suspense boundary to prevent build failures from useSearchParams calls */}
           <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="animate-spin text-accent" /></div>}>
             <LoginFormInner />
           </Suspense>
@@ -149,3 +171,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

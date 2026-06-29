@@ -1,20 +1,26 @@
-'use client';
+'use client'; // Flags this file as a client component to support browser state variables, file upload selectors, and fetches
 
-import { useState, useEffect, use } from 'react';
+// Import React state, lifecycle hooks, and contextual hooks
+import { useState, useEffect } from 'react';
+// Import router redirect helper
 import { useRouter } from 'next/navigation';
+// Import UI vector graphics icons
 import { Upload, Trash2, ArrowLeft, Plus } from 'lucide-react';
+// Import hot toast notification helpers
 import toast from 'react-hot-toast';
+// Import Link for page routing transitions
 import Link from 'next/link';
 
+// Category interface mapping
 interface Category {
   _id: string;
   name: string;
 }
 
 export default function NewProductPage() {
-  const router = useRouter();
+  const router = useRouter(); // Initialize router redirection triggers
   
-  // Product state
+  // Product state bindings
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
@@ -33,19 +39,21 @@ export default function NewProductPage() {
   const [waist, setWaist] = useState('');
   const [tags, setTags] = useState('');
 
-  // UI state
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // UI status trackers
+  const [categories, setCategories] = useState<Category[]>([]); // Holds categories list for selection select box
+  const [isUploading, setIsUploading] = useState(false); // Spinner tracker for file uploads
+  const [isSubmitting, setIsSubmitting] = useState(false); // Spinner tracker for form submissions
 
+  // Predefined sizing options mapping
   const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '28', '30', '32', '34', '36', 'Free Size'];
 
+  // Fetch categories list from database API
   const fetchCategories = async () => {
     try {
       const res = await fetch('/api/categories');
       const data = await res.json();
       if (res.ok) {
-        setCategories(data);
+        setCategories(data); // Hydrate categories selection options
       }
     } catch {
       toast.error('Failed to load categories');
@@ -56,11 +64,13 @@ export default function NewProductPage() {
     fetchCategories();
   }, []);
 
+  // Update slug state on changes to product name (converts name to URL slug characters)
   const handleNameChange = (val: string) => {
     setName(val);
-    setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
+    setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')); // Regex clean replaces spaces/symbols with hyphens
   };
 
+  // Upload loop uploading multiple selected images to Cloudinary via upload APIs
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -69,24 +79,26 @@ export default function NewProductPage() {
     const uploadedUrls: string[] = [];
 
     try {
+      // Loop through all selected image files sequentially
       for (let i = 0; i < files.length; i++) {
         const formData = new FormData();
-        formData.append('file', files[i]);
+        formData.append('file', files[i]); // Bind binary file
         
+        // Execute POST request to upload endpoint
         const res = await fetch('/api/upload', {
           method: 'POST',
           body: formData,
         });
         const data = await res.json();
         if (res.ok) {
-          uploadedUrls.push(data.url);
+          uploadedUrls.push(data.url); // Append returned Cloudinary asset URL
         } else {
           toast.error(`Failed to upload ${files[i].name}: ${data.error}`);
         }
       }
       
       if (uploadedUrls.length > 0) {
-        setImages((prev) => [...prev, ...uploadedUrls]);
+        setImages((prev) => [...prev, ...uploadedUrls]); // Hydrate upload URLs list
         toast.success(`Successfully uploaded ${uploadedUrls.length} images!`);
       }
     } catch {
@@ -96,19 +108,23 @@ export default function NewProductPage() {
     }
   };
 
+  // Delete image from state array
   const removeImage = (indexToRemove: number) => {
     setImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
+  // Toggle selected sizing tag options in state lists
   const toggleSize = (size: string) => {
     setSelectedSizes((prev) =>
       prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
     );
   };
 
+  // Submit product creation payload data to DB catalog APIs
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Required fields check validation
     if (!name || !slug || !description || !price || !category || images.length === 0) {
       toast.error('Please fill in all required fields and upload at least one image');
       return;
@@ -116,6 +132,7 @@ export default function NewProductPage() {
 
     setIsSubmitting(true);
 
+    // Format fields parameter values
     const productData = {
       name,
       slug,
@@ -135,7 +152,7 @@ export default function NewProductPage() {
         length: length || undefined,
         waist: waist || undefined,
       },
-      tags: tags ? tags.split(',').map((t) => t.trim()) : [],
+      tags: tags ? tags.split(',').map((t) => t.trim()) : [], // Convert comma-separated string to tag arrays
     };
 
     try {
@@ -147,7 +164,7 @@ export default function NewProductPage() {
 
       if (res.ok) {
         toast.success('Archive product cataloged!');
-        router.push('/admin/products');
+        router.push('/admin/products'); // Redirect back to list
       } else {
         const errData = await res.json();
         toast.error(errData.error || 'Failed to catalog product');
@@ -161,6 +178,7 @@ export default function NewProductPage() {
 
   return (
     <div className="space-y-8 max-w-5xl">
+      {/* Back button and page headers */}
       <div className="flex items-center gap-4 border-b border-border pb-4">
         <Link href="/admin/products" className="text-muted hover:text-text transition-colors">
           <ArrowLeft size={20} />
@@ -171,7 +189,7 @@ export default function NewProductPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Left column - main fields */}
+        {/* Left column - main inputs */}
         <div className="lg:col-span-2 space-y-6">
           <div className="space-y-4">
             <div className="space-y-1">
@@ -179,7 +197,7 @@ export default function NewProductPage() {
               <input
                 type="text"
                 value={name}
-                onChange={(e) => handleNameChange(e.target.value)}
+                onChange={(e) => handleNameChange(e.target.value)} // Generate slug on change
                 placeholder="e.g., 90s Carhartt Active Jacket"
                 className="w-full bg-card border border-border px-4 py-3 text-xs font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
                 required
@@ -234,7 +252,7 @@ export default function NewProductPage() {
               </div>
             </div>
 
-            {/* Sizes Checkboxes */}
+            {/* Sizing selection checkboxes */}
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-muted block">Available Sizes *</label>
               <div className="flex flex-wrap gap-2">
@@ -255,7 +273,7 @@ export default function NewProductPage() {
               </div>
             </div>
 
-            {/* Measurements */}
+            {/* Vintage garment measurements */}
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-muted block">Measurements (Optional)</label>
               <div className="grid grid-cols-3 gap-4">
@@ -294,7 +312,7 @@ export default function NewProductPage() {
           </div>
         </div>
 
-        {/* Right column - details + image uploads */}
+        {/* Right column - image uploads + administrative details */}
         <div className="space-y-6">
           <h2 className="text-xs font-black uppercase tracking-[0.2em] border-b border-border pb-2">
             Collection Details
@@ -376,6 +394,7 @@ export default function NewProductPage() {
               />
             </div>
 
+            {/* Homepage feature check box */}
             <div className="flex items-center gap-3 py-2 border-y border-border">
               <input
                 type="checkbox"
@@ -389,7 +408,7 @@ export default function NewProductPage() {
               </label>
             </div>
 
-            {/* Multi-Image Upload */}
+            {/* Multi-Image upload zone */}
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-muted block">Images (At least 1) *</label>
               
@@ -404,12 +423,14 @@ export default function NewProductPage() {
                     >
                       <Trash2 size={16} />
                     </button>
+                    {/* Visual cover label indicating cover photos */}
                     <div className="absolute bottom-1 left-1 bg-text text-bg text-[8px] font-bold px-1 py-0.5">
                       {idx === 0 ? 'COVER' : idx + 1}
                     </div>
                   </div>
                 ))}
 
+                {/* Upload drag input zone box */}
                 <label className="border border-dashed border-border aspect-[3/4] flex flex-col items-center justify-center cursor-pointer hover:border-text transition-colors group">
                   <input
                     type="file"
@@ -426,6 +447,7 @@ export default function NewProductPage() {
               </div>
             </div>
 
+            {/* Action buttons */}
             <button
               type="submit"
               disabled={isSubmitting || isUploading}
@@ -439,3 +461,4 @@ export default function NewProductPage() {
     </div>
   );
 }
+

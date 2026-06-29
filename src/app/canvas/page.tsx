@@ -1,13 +1,20 @@
-"use client";
+"use client"; // Flags this file as client rendering only (uses local canvas triggers, client-side AI modules, and drag gestures)
 
+// Import React hooks for managing state variables, side effect triggers, and canvas element refs
 import React, { useState, useEffect, useRef } from "react";
+// Import Framer Motion animation triggers
 import { motion } from "framer-motion";
+// Import UI vector icon components
 import { Loader2, Sparkles, X, ShoppingBag, Maximize2, Trash2, ZoomIn, ZoomOut, Heart } from "lucide-react";
+// Import custom hooks to sync bag and wishlist triggers
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+// Import Link for page transitions
 import Link from "next/link";
+// Import client-side AI image matting background removal modules
 import { removeBackground, preload } from "@imgly/background-removal";
 
+// Struct of raw Product listings queried from MongoDB database
 interface Product {
   _id: string;
   slug: string;
@@ -19,20 +26,23 @@ interface Product {
   stock?: number;
 }
 
+// Struct extension mapping items currently loaded and draggable inside the interactive Fit Studio canvas area
 interface CanvasItem extends Product {
-  uniqueId: string;
-  x: number;
-  y: number;
+  uniqueId: string; // Dynamic ID to allow multiple instances of same product on canvas
+  x: number;        // Horizontal coordinates offset relative to parent canvas block
+  y: number;        // Vertical coordinates offset relative to parent canvas block
   selectedSize?: string;
-  scale: number;
+  scale: number;    // Zoom scale of target cutout element (e.g. 0.5 to 2.0)
 }
 
+// Helper builder mapping product parameters to draggable canvas item parameters
 function generateCanvasItem(product: Product, isMobile: boolean, transparentUrl?: string): CanvasItem {
-  const randomOffset = () => 30 + (Math.random() * 20);
-  const desktopOffset = () => 100 + (Math.random() * 50);
+  const randomOffset = () => 30 + (Math.random() * 20); // Mobile coordinate offsets
+  const desktopOffset = () => 100 + (Math.random() * 50); // Desktop coordinate offsets
   
   return {
     ...product,
+    // Use transparent cutout URL as primary image if generated successfully
     images: transparentUrl ? [transparentUrl, ...product.images.slice(1)] : product.images,
     uniqueId: `${product._id}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
     x: isMobile ? randomOffset() : desktopOffset(),
@@ -43,24 +53,27 @@ function generateCanvasItem(product: Product, isMobile: boolean, transparentUrl?
 }
 
 export default function FitCanvasPage() {
-  const { addToCart, setIsCartOpen, cartCount } = useCart();
-  const { toggleWishlist, isInWishlist, count: wishlistCount, setIsOpen: setIsWishlistOpen } = useWishlist();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState("all");
+  const { addToCart, setIsCartOpen, cartCount } = useCart(); // Extract cart contexts
+  const { toggleWishlist, isInWishlist, count: wishlistCount, setIsOpen: setIsWishlistOpen } = useWishlist(); // Extract wishlist contexts
   
-  // Canvas State
-  const [canvasItems, setCanvasItems] = useState<CanvasItem[]>([]);
-  const [cutoutCache, setCutoutCache] = useState<Record<string, string>>({});
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  // Component states
+  const [products, setProducts] = useState<Product[]>([]); // Wardrobe catalog options
+  const [loading, setLoading] = useState(true);            // Wardrobe query progress spinner loader toggle
+  const [activeCategory, setActiveCategory] = useState("all"); // Filter state variables for wardrobe listing tray
+  
+  // Fit Canvas state management
+  const [canvasItems, setCanvasItems] = useState<CanvasItem[]>([]); // Tracks current items active in the workspace
+  const [cutoutCache, setCutoutCache] = useState<Record<string, string>>({}); // Maps product IDs to cutout transparent image URLs
+  const canvasRef = useRef<HTMLDivElement>(null); // Ref referencing parent workspace container bounding constraints
+  const [isMobile, setIsMobile] = useState(false); // Mobile screen size indicator check
 
+  // Queries catalog items from database to populate wardrobe choices list
   const fetchProducts = async () => {
     try {
       const res = await fetch("/api/products");
       const data = await res.json();
       if (res.ok && Array.isArray(data)) {
-        // Filter out out-of-stock items for the canvas
+        // Filter out out-of-stock items for the canvas fit workspace
         setProducts(data.filter(p => p.stock === undefined || p.stock > 0));
       }
     } catch (e) {
@@ -72,9 +85,9 @@ export default function FitCanvasPage() {
 
   useEffect(() => {
     fetchProducts();
-    // Preload the AI model in the background so it's fully downloaded and ready in memory!
+    // Preload the WASM modules for @imgly/background-removal client-side in the background to prevent loading lags
     preload({
-      model: "isnet_quint8",
+      model: "isnet_quint8", // Quantized 8-bit lightweight image segmentation model layout
       debug: false
     }).catch(e => console.error("AI preloading failed:", e));
 
@@ -84,50 +97,51 @@ export default function FitCanvasPage() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Fetch cached cutouts globally from Server-Side Cutout Cache
+  // Fetch pre-computed cutouts saved globally in MongoDB server collection
   useEffect(() => {
     const fetchGlobalCutouts = async () => {
       try {
         const res = await fetch("/api/cutout");
         if (res.ok) {
-          const map = await res.json();
+          const map = await res.json(); // Returns mapping of productID to Cloudinary/WASM cutout URL
           setCutoutCache(prev => ({ ...prev, ...map }));
         }
       } catch {
-        // Silent catch for unused err
+        // Silent catch to ignore unused warnings
       }
     };
     fetchGlobalCutouts();
   }, []);
 
-  const [processingItemId, setProcessingItemId] = useState<string | null>(null);
+  const [processingItemId, setProcessingItemId] = useState<string | null>(null); // Tracks active ID of product running AI matting
 
+  // Adds selected item to canvas layout, running client-side background removal if no cache is found
   const handleAddToCanvas = async (product: Product) => {
     if (canvasItems.length >= 5) {
       alert("Maximum 5 items allowed on the canvas!");
       return;
     }
 
-    // 1. Check in-memory cutout cache first for instant 0ms retrieval!
+    // Check in-memory state cutoutCache first for instant 0ms retrieval
     if (cutoutCache[product._id]) {
       const newItem = generateCanvasItem(product, isMobile, cutoutCache[product._id]);
       setCanvasItems(prev => [...prev, newItem]);
       return;
     }
 
-    setProcessingItemId(product._id);
+    setProcessingItemId(product._id); // Update loading state variable for product button
     try {
-      // Create a clean, ultra-fast cutout using client-side AI with 8-bit quantized models!
+      // Execute background extraction using WASM model locally on client web thread context
       const imageBlob = await removeBackground(product.images[0], {
         model: "isnet_quint8",
         debug: false
       });
-      const transparentUrl = URL.createObjectURL(imageBlob);
+      const transparentUrl = URL.createObjectURL(imageBlob); // Create local blob URL
 
-      // 2. Cache the cutout in local state so subsequent adds of this item are 0ms!
+      // Cache cutout base locally in memory state variables
       setCutoutCache(prev => ({ ...prev, [product._id]: transparentUrl }));
 
-      // 3. Send to global server-side cache so it is saved globally for all users!
+      // Send generated transparent base64 image data to DB api routes to persistent server caches
       const reader = new FileReader();
       reader.readAsDataURL(imageBlob);
       reader.onloadend = async () => {
@@ -144,7 +158,7 @@ export default function FitCanvasPage() {
           });
           const serverData = await res.json();
           if (res.ok && serverData.cutoutUrl) {
-            // Update cache to use the persistent Cloudinary URL
+            // Update cache pointers to use the persistent Cloudinary URL returned from backend API
             setCutoutCache(prev => ({ ...prev, [product._id]: serverData.cutoutUrl }));
           }
         } catch (e) {
@@ -156,7 +170,7 @@ export default function FitCanvasPage() {
       setCanvasItems(prev => [...prev, newItem]);
     } catch (err) {
       console.error("AI Background Removal failed:", err);
-      // Fallback to original image if AI fails
+      // Fallback to loading original product photo if WASM segmentation crashes
       const newItem = generateCanvasItem(product, isMobile);
       setCanvasItems(prev => [...prev, newItem]);
     } finally {
@@ -164,30 +178,33 @@ export default function FitCanvasPage() {
     }
   };
 
+  // Remove selected item instance from canvas list
   const handleRemoveFromCanvas = (uniqueId: string) => {
     setCanvasItems(canvasItems.filter(item => item.uniqueId !== uniqueId));
   };
 
+  // Change size attribute of item instance on workspace
   const handleSizeChange = (uniqueId: string, size: string) => {
     setCanvasItems(canvasItems.map(item => 
       item.uniqueId === uniqueId ? { ...item, selectedSize: size } : item
     ));
   };
 
+  // Adjust zoom scales of items
   const handleScaleChange = (uniqueId: string, factor: number) => {
     setCanvasItems(prev => prev.map(item => {
       if (item.uniqueId === uniqueId) {
-        const newScale = Math.min(Math.max(item.scale + factor, 0.5), 2.0);
+        const newScale = Math.min(Math.max(item.scale + factor, 0.5), 2.0); // Clamp scales between 0.5x and 2.0x bounds
         return { ...item, scale: newScale };
       }
       return item;
     }));
   };
 
+  // Batch inserts all canvas outfit selections directly to the shopping cart drawer and clears workspace
   const handleAddBundleToCart = () => {
     if (canvasItems.length === 0) return;
     
-    // Add all items to cart
     canvasItems.forEach(item => {
       addToCart({
         productId: item._id,
@@ -199,24 +216,25 @@ export default function FitCanvasPage() {
       });
     });
 
-    // Clear canvas and open cart
-    setCanvasItems([]);
-    setIsCartOpen(true);
+    setCanvasItems([]); // Clear canvas workspace
+    setIsCartOpen(true); // Open shopping drawer
   };
 
+  // Filters wardrobe inventory items matching active category tabs selection
   const filteredProducts = activeCategory === "all" 
     ? products 
     : products.filter(p => p.category?.slug === activeCategory);
 
+  // Math evaluations computing outfit bundle price totals
   const bundleTotal = canvasItems.reduce((sum, item) => sum + item.price, 0);
-  // Apply a 10% discount if they bundle 3 or more items!
+  // Apply a 10% discount promo if users bundle 3 or more garments on the workspace
   const isBundleDiscount = canvasItems.length >= 3;
   const finalTotal = isBundleDiscount ? bundleTotal * 0.9 : bundleTotal;
 
   return (
     <div className="w-full h-screen pt-16 sm:pt-24 pb-0 flex flex-col bg-bg overflow-hidden">
       
-      {/* Header */}
+      {/* Header Info Panel */}
       <div className="px-4 py-3 sm:px-12 sm:py-6 border-b border-border bg-bg z-10 flex flex-row gap-3 justify-between items-center shrink-0">
         <div>
           <h1 className="font-display font-black text-lg sm:text-3xl md:text-4xl uppercase tracking-tighter flex items-center">
@@ -227,7 +245,7 @@ export default function FitCanvasPage() {
           </p>
         </div>
         
-        {/* Right side options: Studio Close, Cart Drawer, Wishlist Drawer */}
+        {/* Wishlist & Shopping Bag triggers */}
         <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           <button
             onClick={() => setIsWishlistOpen(true)}
@@ -247,12 +265,12 @@ export default function FitCanvasPage() {
         </div>
       </div>
 
-      {/* Main Workspace */}
+      {/* Workspace Area */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative bg-bg">
         
-        {/* Left (Desktop) / Top (Mobile) Tray: Categories + Wardrobe Inventory */}
+        {/* Wardrobe inventory selection list */}
         <div className="w-full md:w-80 lg:w-[400px] shrink-0 border-b md:border-b-0 md:border-r border-border bg-bg-warm flex flex-col z-10 shadow-[0_4px_24px_rgba(0,0,0,0.03)] md:shadow-[4px_0_24px_rgba(0,0,0,0.05)] h-auto md:h-full">
-          {/* Category Tabs */}
+          {/* Wardrobe Category Tabs */}
           <div className="flex overflow-x-auto no-scrollbar border-b border-border/50 p-2 sm:p-3 md:p-4 gap-1.5 md:gap-2 justify-start shrink-0 bg-bg">
             {["all", "outerwear", "tops", "bottoms", "accessories"].map(cat => (
               <button
@@ -269,7 +287,7 @@ export default function FitCanvasPage() {
             ))}
           </div>
 
-          {/* Product List in horizontal scrollable format on mobile, and vertical vertical-scroll list on desktop */}
+          {/* Wardrobe Product Items list tray */}
           <div className="flex flex-row md:flex-col gap-2.5 sm:gap-4 overflow-x-auto md:overflow-y-auto no-scrollbar p-2 sm:p-4 justify-start bg-bg-warm flex-1">
             {loading ? (
               <div className="flex items-center justify-center py-6 w-full"><Loader2 className="animate-spin text-terracotta" /></div>
@@ -323,7 +341,7 @@ export default function FitCanvasPage() {
           </div>
         </div>
 
-        {/* Right: The Interactive Canvas */}
+        {/* Right workspace: Interactive Canvas with grid background */}
         <div 
           className="flex-1 relative bg-[#EBEBEB] overflow-hidden" 
           ref={canvasRef}
@@ -337,12 +355,12 @@ export default function FitCanvasPage() {
             </div>
           )}
 
-          {/* Draggable Items */}
+          {/* Draggable Cutout Items rendered with Framer Motion drag gestures */}
           {canvasItems.map((item) => (
             <motion.div
               key={item.uniqueId}
               drag
-              dragConstraints={canvasRef}
+              dragConstraints={canvasRef} // Restrict drag motion boundaries inside canvas coordinates box
               dragMomentum={false}
               whileDrag={{ scale: 1.05, cursor: "grabbing", zIndex: 50 }}
               initial={{ scale: 0, opacity: 0 }}
@@ -351,7 +369,7 @@ export default function FitCanvasPage() {
               className="absolute cursor-grab group drop-shadow-2xl"
               style={{ x: item.x, y: item.y }}
             >
-              {/* Item Image (True AI Cutout) */}
+              {/* Item Image Cutout */}
               <div 
                 className="relative overflow-hidden pointer-events-none drop-shadow-2xl transition-all duration-150"
                 style={{ width: `${(isMobile ? 128 : 208) * item.scale}px` }}
@@ -363,7 +381,7 @@ export default function FitCanvasPage() {
                 />
               </div>
               
-              {/* Floating Controls Overlay (Shows on Hover) */}
+              {/* Floating Controls Overlay (Scale Up/Down, Remove, visible on group hover) */}
               <div className="absolute -top-4 -right-4 bg-bg border border-border p-2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-2 z-10 pointer-events-auto shadow-xl">
                 <button 
                   onClick={() => handleScaleChange(item.uniqueId, 0.1)}
@@ -389,7 +407,7 @@ export default function FitCanvasPage() {
                 </button>
               </div>
 
-              {/* Size Selector floating below */}
+              {/* Floating Size Selector dropdown */}
               {item.sizes.length > 0 && (
                 <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-bg border border-border px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto flex gap-2 shadow-xl w-max">
                   <span className="text-[8px] font-black uppercase tracking-widest text-muted border-r border-border pr-2">Size</span>
@@ -407,7 +425,7 @@ export default function FitCanvasPage() {
         </div>
       </div>
 
-      {/* Footer Checkout Bar */}
+      {/* Footer Checkout details section */}
       <div className="px-6 md:px-12 py-5 border-t border-border bg-bg-warm shrink-0 flex justify-between items-center relative z-20 shadow-[0_-4px_24px_rgba(0,0,0,0.05)]">
         <div className="flex flex-col">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">Canvas Value</p>
@@ -440,3 +458,4 @@ export default function FitCanvasPage() {
     </div>
   );
 }
+

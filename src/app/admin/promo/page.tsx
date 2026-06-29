@@ -1,9 +1,13 @@
-'use client';
+'use client'; // Flags this file as a client component to support client-side form controls, dynamic states, and HTTP requests
 
+// Import state and lifecycle hooks
 import { useState, useEffect } from 'react';
+// Import hot toast notification trigger
 import toast from 'react-hot-toast';
-import { Loader2, Plus, Trash2, Tag, Percent, RefreshCw } from 'lucide-react';
+// Import UI vector graphics icons
+import { Loader2, Plus, Trash2, Tag, RefreshCw } from 'lucide-react';
 
+// Promo coupon interface definition matching database structure
 interface Promo {
   _id: string;
   code: string;
@@ -15,11 +19,12 @@ interface Promo {
 }
 
 export default function AdminPromoPage() {
+  // Coupons list and loaders states
   const [promos, setPromos] = useState<Promo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true); // Initial full-page loading spinner tracker
+  const [refreshing, setRefreshing] = useState(false); // Mini spinner tracker for table refreshes
 
-  // Form states
+  // Creator form inputs states
   const [code, setCode] = useState('');
   const [discountType, setDiscountType] = useState<'percentage' | 'flat'>('percentage');
   const [discountValue, setDiscountValue] = useState('');
@@ -27,6 +32,7 @@ export default function AdminPromoPage() {
   const [isActive, setIsActive] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
+  // Fetch list of promotional codes from database API
   const fetchPromos = async (silent = false) => {
     if (!silent) setLoading(true);
     else setRefreshing(true);
@@ -50,6 +56,7 @@ export default function AdminPromoPage() {
     fetchPromos();
   }, []);
 
+  // Post coupon creation payload to database APIs
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!code || !discountValue) {
@@ -73,11 +80,12 @@ export default function AdminPromoPage() {
 
       if (res.ok) {
         toast.success(`Discount Code ${code.toUpperCase()} created!`);
+        // Reset form inputs fields
         setCode('');
         setDiscountValue('');
         setMinOrderAmount('');
         setIsActive(true);
-        fetchPromos(true);
+        fetchPromos(true); // Refresh lists silently
       } else {
         toast.error(data.error || 'Failed to create coupon');
       }
@@ -88,15 +96,16 @@ export default function AdminPromoPage() {
     }
   };
 
+  // Delete coupon from DB catalog using promo ID
   const handleDelete = async (id: string, codeName: string) => {
-    if (!confirm(`Are you sure you want to delete the code ${codeName}?`)) return;
+    if (!confirm(`Are you sure you want to delete the code ${codeName}?`)) return; // Confirm deletion trigger popup
 
     try {
       const res = await fetch(`/api/promo/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (res.ok) {
         toast.success(`Coupon ${codeName} deleted!`);
-        setPromos((prev) => prev.filter((p) => p._id !== id));
+        setPromos((prev) => prev.filter((p) => p._id !== id)); // Remove from table state instantly
       } else {
         toast.error(data.error || 'Failed to delete');
       }
@@ -106,6 +115,7 @@ export default function AdminPromoPage() {
   };
 
   if (loading) {
+    // Large loading layout spinner
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-xs font-black uppercase tracking-widest text-text gap-4">
         <Loader2 className="w-8 h-8 animate-spin text-terracotta" />
@@ -116,6 +126,7 @@ export default function AdminPromoPage() {
 
   return (
     <div className="space-y-12">
+      {/* Page Header titles and refresh buttons */}
       <div className="flex justify-between items-center border-b border-border pb-4">
         <div>
           <h1 className="text-3xl font-display font-black uppercase tracking-tighter">
@@ -136,7 +147,7 @@ export default function AdminPromoPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Creator Column */}
+        {/* Left Column - Creator Form */}
         <div className="bg-card border border-border p-8 h-fit space-y-6">
           <h2 className="text-xs font-black uppercase tracking-[0.2em] border-b border-border pb-2 text-text flex items-center gap-2">
             <Tag size={14} className="text-accent" />
@@ -201,6 +212,7 @@ export default function AdminPromoPage() {
               </div>
             </div>
 
+            {/* Instant activation checkbox */}
             <div className="flex items-center gap-3 pt-2">
               <input
                 type="checkbox"
@@ -225,7 +237,7 @@ export default function AdminPromoPage() {
           </form>
         </div>
 
-        {/* List Column */}
+        {/* Right Column - Coupon list table */}
         <div className="lg:col-span-2 bg-card border border-border overflow-x-auto">
           <table className="w-full text-left text-sm min-w-[600px]">
             <thead className="bg-bg text-[10px] font-black uppercase tracking-widest text-muted border-b border-border">
@@ -240,12 +252,12 @@ export default function AdminPromoPage() {
             <tbody className="divide-y divide-border font-bold uppercase tracking-widest text-xs">
               {promos.map((promo) => (
                 <tr key={promo._id} className="hover:bg-bg/50 transition-colors">
-                  {/* Code */}
+                  {/* Coupon Code Name */}
                   <td className="p-4 flex items-center gap-2">
                     <Tag size={12} className="text-muted shrink-0" />
                     <span className="text-text font-black">{promo.code}</span>
                   </td>
-                  {/* Discount */}
+                  {/* Value mapping */}
                   <td className="p-4">
                     {promo.discountType === 'percentage' ? (
                       <span className="flex items-center gap-1">
@@ -255,7 +267,7 @@ export default function AdminPromoPage() {
                       <span>₹{promo.discountValue} Off</span>
                     )}
                   </td>
-                  {/* Min order */}
+                  {/* Requirements mapping */}
                   <td className="p-4 text-muted">
                     {promo.minOrderAmount > 0 ? (
                       <span>Min Order: ₹{promo.minOrderAmount}</span>
@@ -263,7 +275,7 @@ export default function AdminPromoPage() {
                       <span>No Minimum</span>
                     )}
                   </td>
-                  {/* Active */}
+                  {/* Status Badge */}
                   <td className="p-4">
                     <span
                       className={`px-2 py-1 text-[8px] border font-black tracking-widest ${
@@ -275,7 +287,7 @@ export default function AdminPromoPage() {
                       {promo.isActive ? 'Active' : 'Expired'}
                     </span>
                   </td>
-                  {/* Delete */}
+                  {/* Delete Coupon Button */}
                   <td className="p-4 text-right">
                     <button
                       onClick={() => handleDelete(promo._id, promo.code)}
@@ -300,3 +312,4 @@ export default function AdminPromoPage() {
     </div>
   );
 }
+

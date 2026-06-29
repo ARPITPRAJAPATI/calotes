@@ -1,14 +1,23 @@
-"use client";
+"use client"; // Flags this file as a client component to handle browser states (search inputs, filters, layout drawer animations)
 
+// Import React hooks for managing state variables, side effect triggers, and suspense boundaries
 import { useState, useEffect, Suspense } from "react";
+// Import Framer Motion animation triggers
 import { motion, AnimatePresence } from "framer-motion";
+// Import UI vector icon components
 import { X, SlidersHorizontal, Loader2, ArrowRight, Search, Heart } from "lucide-react";
+// Import Link for page transitions
 import Link from "next/link";
+// Import hook to access query parameters from URL safely in Client Components
 import { useSearchParams } from "next/navigation";
+// Import carousel image viewer component
 import ProductImageSlider from "@/components/ProductImageSlider";
+// Import Types definitions for Product schema validation
 import { Product } from "@/types";
+// Import wishlist hook managers
 import { useWishlist } from "@/context/WishlistContext";
 
+// Config static category options mapping filters
 const CATEGORIES = [
   { name: "All Items", slug: "all" },
   { name: "Denim",       slug: "denim" },
@@ -19,23 +28,26 @@ const CATEGORIES = [
 ];
 
 function ShopContent() {
-  const searchParams   = useSearchParams();
-  const initialCat     = searchParams.get("category") || "all";
-  const { toggleWishlist, isInWishlist } = useWishlist();
+  const searchParams   = useSearchParams(); // Reads active URL search parameters (requires Suspense parent container wrap)
+  const initialCat     = searchParams.get("category") || "all"; // Extracted default category filter
+  const { toggleWishlist, isInWishlist } = useWishlist(); // Extract wishlist context controls
 
-  const [products,      setProducts]      = useState<Product[]>([]);
-  const [loading,       setLoading]       = useState(true);
-  const [isFilterOpen,  setIsFilterOpen]  = useState(false);
-  const [activeCategory, setActiveCategory] = useState(initialCat);
-  const [searchQuery,   setSearchQuery]    = useState("");
+  // Component states
+  const [products,      setProducts]      = useState<Product[]>([]); // Holds list of fetched items matching query filters
+  const [loading,       setLoading]       = useState(true);          // Controls loading screen overlays
+  const [isFilterOpen,  setIsFilterOpen]  = useState(false);         // Controls visibility of mobile filter panel drawers
+  const [activeCategory, setActiveCategory] = useState(initialCat);    // Track active category filters selection
+  const [searchQuery,   setSearchQuery]    = useState("");           // Holds user typed search queries
 
+  // Debounced side-effect trigger: waits 300ms after user finishes typing before executing API fetch
   useEffect(() => { 
     const delayDebounceFn = setTimeout(() => {
-      fetchProducts();
+      fetchProducts(); // Query API products
     }, 300);
-    return () => clearTimeout(delayDebounceFn);
+    return () => clearTimeout(delayDebounceFn); // Clear debounced timer on text changes
   }, [activeCategory, searchQuery]);
 
+  // Method executing fetch requests to retrieve list of matched products from MongoDB collection API route
   const fetchProducts = async () => {
     setLoading(true);
     try {
@@ -43,14 +55,15 @@ function ShopContent() {
         ? "/api/products"
         : `/api/products?category=${activeCategory}`;
       
+      // Append query parameters if search input is populated
       if (searchQuery) {
         url += (url.includes("?") ? "&" : "?") + `q=${encodeURIComponent(searchQuery)}`;
       }
       
-      const res  = await fetch(url, { cache: 'no-store' });
+      const res  = await fetch(url, { cache: 'no-store' }); // Disable fetch cache queries to fetch fresh inventory
       const data = await res.json();
       if (res.ok && Array.isArray(data)) {
-        setProducts(data);
+        setProducts(data); // Bind list data
       } else {
         setProducts([]);
         console.error(`API error (status ${res.status}):`, data);
@@ -59,13 +72,13 @@ function ShopContent() {
       setProducts([]);
       console.error(e);
     } finally {
-      setLoading(false);
+      setLoading(false); // Stop loading indicator animations
     }
   };
 
   return (
     <>
-      {/* ── Page header ─────────────────────────────── */}
+      {/* ── Page header ── */}
       <div className="px-6 md:px-12 max-w-[1800px] mx-auto mt-[-20px] mb-4">
         <div className="border-b border-border pb-4 mb-4">
           <motion.p
@@ -82,7 +95,7 @@ function ShopContent() {
               Items
             </motion.h1>
             <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-              {/* Search Bar */}
+              {/* Search Bar text input */}
               <div className="relative w-full md:w-64 lg:w-80 group">
                 <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-terracotta transition-colors" />
                 <input
@@ -94,7 +107,7 @@ function ShopContent() {
                 />
                 {searchQuery && (
                   <button 
-                    onClick={() => setSearchQuery("")}
+                    onClick={() => setSearchQuery("")} // Clear search input
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-muted hover:text-text"
                   >
                     <X size={12} />
@@ -102,6 +115,7 @@ function ShopContent() {
                 )}
               </div>
 
+              {/* Counter and filter togglers */}
               <div className="flex items-center gap-5 w-full md:w-auto justify-between md:justify-end">
                 <p className="section-label hidden md:block">{products.length} pieces</p>
                 <button
@@ -116,7 +130,7 @@ function ShopContent() {
           </div>
         </div>
 
-        {/* ── Category tabs ────────────────────────── */}
+        {/* ── Category Horizontal Tabs (Mobile viewport layout) ── */}
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
           {CATEGORIES.map(cat => (
             <button
@@ -134,10 +148,10 @@ function ShopContent() {
         </div>
       </div>
 
-      {/* ── Main layout: sidebar + grid ─────────────── */}
+      {/* ── Main layout: sidebar + grid ── */}
       <div className="max-w-[1800px] mx-auto px-6 md:px-12 flex gap-10 lg:gap-14">
 
-        {/* Desktop sidebar */}
+        {/* Desktop Sidebar navigation filters */}
         <aside className="hidden lg:block w-44 shrink-0 sticky top-28 h-max">
           <h3 className="section-label mb-6 border-b border-border pb-4">Curations</h3>
           <ul className="space-y-4">
@@ -149,6 +163,7 @@ function ShopContent() {
                     activeCategory === cat.slug ? "text-terracotta" : "text-muted hover:text-text"
                   }`}
                 >
+                  {/* Sliding underline visual indicators */}
                   <span className={`h-px transition-all duration-700 ${
                     activeCategory === cat.slug ? "w-8 bg-terracotta" : "w-0 group-hover:w-3 bg-muted"
                   }`} />
@@ -159,14 +174,16 @@ function ShopContent() {
           </ul>
         </aside>
 
-        {/* Product grid */}
+        {/* Product listings grid area */}
         <div className="flex-1 pb-24">
           {loading ? (
+            // Loading Spinner Loader frame
             <div className="h-[50vh] flex flex-col items-center justify-center gap-4">
               <Loader2 className="w-6 h-6 animate-spin text-terracotta" />
               <p className="section-label">Curating items…</p>
             </div>
           ) : products.length === 0 ? (
+            // Empty listings placeholder fallbacks
             <div className="h-[50vh] flex flex-col items-center justify-center gap-6 border border-border">
               <p className="section-label">No pieces in this category.</p>
               <button onClick={() => setActiveCategory("all")} className="btn-outline">
@@ -174,6 +191,7 @@ function ShopContent() {
               </button>
             </div>
           ) : (
+            // Render grid elements
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -184,10 +202,11 @@ function ShopContent() {
                   key={product._id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
+                  // Apply cascade delay animations based on map index locations
                   transition={{ delay: idx * 0.05, ease: [0.16,1,0.3,1] }}
                   className="product-card group relative"
                 >
-                  {/* Pure borderless Wishlist Symbol (Outside of Link tag) */}
+                  {/* Pinned Wishlist toggle overlay button */}
                   <button
                     onClick={(e) => {
                       e.preventDefault();
@@ -198,6 +217,7 @@ function ShopContent() {
                         price: product.price,
                         image: product.images[0],
                         slug: product.slug,
+                        // Parse categories accurately checking nested objects types
                         category: typeof product.category === 'object' && product.category ? (product.category as any).name : "Vintage",
                       });
                     }}
@@ -213,7 +233,7 @@ function ShopContent() {
                   </button>
 
                   <Link href={`/shop/product/${product.slug}`}>
-                    {/* Image */}
+                    {/* Image Viewport Frame */}
                     <div className="relative aspect-[3/4] overflow-hidden bg-bg-warm">
                       {product.compareAtPrice ? (
                         <div className="absolute top-2 left-2 z-20 flex flex-col gap-1.5 items-start">
@@ -230,6 +250,7 @@ function ShopContent() {
                         </span>
                       )}
 
+                      {/* Display SOLD OUT overlay on depleted product stocks */}
                       {product.stock !== undefined && product.stock <= 0 && (
                         <div className="absolute inset-0 bg-black/45 backdrop-blur-[1px] z-20 flex items-center justify-center">
                           <span className="text-[10px] font-black uppercase tracking-[0.3em] bg-bg text-text px-4 py-2 border border-border">
@@ -243,7 +264,7 @@ function ShopContent() {
                         isSoldOut={product.stock !== undefined && product.stock <= 0} 
                       />
                     </div>
-                    {/* Info */}
+                    {/* Information Footer */}
                     <div className="mt-3 space-y-1">
                       <h3 className="text-[9px] md:text-[10px] font-black uppercase tracking-wide leading-tight line-clamp-2">
                         {product.name}
@@ -265,7 +286,7 @@ function ShopContent() {
         </div>
       </div>
 
-      {/* ── Mobile floating filter btn ───────────────── */}
+      {/* ── Mobile floating filter toggle button ── */}
       <div className="fixed bottom-8 right-5 z-40 lg:hidden">
         <button
           onClick={() => setIsFilterOpen(true)}
@@ -275,15 +296,17 @@ function ShopContent() {
         </button>
       </div>
 
-      {/* ── Filter drawer ────────────────────────────── */}
+      {/* ── Mobile Filter Drawer Panel Modal ── */}
       <AnimatePresence>
         {isFilterOpen && (
           <>
+            {/* Backdrop Blur panel overlay */}
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="fixed inset-0 bg-bg/70 backdrop-blur-sm z-[100]"
               onClick={() => setIsFilterOpen(false)}
             />
+            {/* Drawer layout */}
             <motion.div
               initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 200 }}
@@ -296,6 +319,7 @@ function ShopContent() {
                 </button>
               </div>
 
+              {/* Scrollable checklist items */}
               <div className="flex-1 overflow-y-auto px-8 py-8 space-y-8">
                 <div>
                   <h3 className="section-label mb-5">Categories</h3>
@@ -316,6 +340,7 @@ function ShopContent() {
                 </div>
               </div>
 
+              {/* Confirm results buttons */}
               <div className="px-8 py-6 border-t border-border">
                 <button
                   onClick={() => setIsFilterOpen(false)}
@@ -335,6 +360,7 @@ function ShopContent() {
 export default function ShopPage() {
   return (
     <div className="w-full pt-28 md:pt-36 pb-24">
+      {/* Search parameters parsing requires an ancestor Suspense boundary wrap to support Next.js SSR build pipeline */}
       <Suspense
         fallback={
           <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
@@ -348,3 +374,4 @@ export default function ShopPage() {
     </div>
   );
 }
+

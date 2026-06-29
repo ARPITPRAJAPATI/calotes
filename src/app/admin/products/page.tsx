@@ -1,38 +1,46 @@
-'use client';
+'use client'; // Flags this file as a client component to support browser state hooks, toast alerts, table clicks, and fetches
 
+// Import React state and lifecycle hooks
 import { useState, useEffect } from 'react';
+// Import link tags
 import Link from 'next/link';
+// Import UI vector icon components
 import { Plus, Trash2, Edit, ExternalLink, Search, Loader2 } from 'lucide-react';
+// Import hot toast notification helper
 import toast from 'react-hot-toast';
+// Import Product struct types definitions
 import { Product } from '@/types';
 
 export default function AdminProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]); // Holds entire catalog list
+  const [searchTerm, setSearchTerm] = useState('');       // Binds text search input
+  const [isLoading, setIsLoading] = useState(true);        // Spinner loader controller
 
+  // Query catalog API endpoint to retrieve all archive products sorted newest first
   const fetchProducts = async () => {
     try {
       const res = await fetch('/api/products?sort=-createdAt');
       const data = await res.json();
       if (res.ok) {
-        setProducts(data);
+        setProducts(data); // Hydrate local state
       } else {
         toast.error('Failed to load products');
       }
     } catch {
       toast.error('Error fetching catalog');
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Disable spinner
     }
   };
 
+  // Run catalog retrieval operations on component mounts
   useEffect(() => {
     fetchProducts();
   }, []);
 
+  // DELETE request handler: triggers a product deletion API call
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this archive piece?')) return;
+    if (!confirm('Are you sure you want to delete this archive piece?')) return; // Guard confirm modal
 
     try {
       const res = await fetch(`/api/products/${id}`, {
@@ -40,6 +48,7 @@ export default function AdminProductsPage() {
       });
       if (res.ok) {
         toast.success('Piece deleted from catalog');
+        // Filter out deleted product record from state list in-place to update UI immediately
         setProducts((prev) => prev.filter((p) => p._id !== id));
       } else {
         toast.error('Failed to delete piece');
@@ -49,12 +58,14 @@ export default function AdminProductsPage() {
     }
   };
 
+  // Compute in-memory list filtering based on search terms matching product names
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="space-y-8">
+      {/* HUD Page Header */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-end border-b border-border pb-4 gap-4">
         <div>
           <h1 className="text-3xl font-display font-black uppercase tracking-tighter">
@@ -65,14 +76,14 @@ export default function AdminProductsPage() {
           </p>
         </div>
         <Link
-          href="/admin/products/new"
+          href="/admin/products/new" // Create new product routing link
           className="bg-text text-bg px-4 py-3 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-bg-dark transition-colors shrink-0"
         >
           <Plus size={14} /> Catalog New Piece
         </Link>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search Input bar */}
       <div className="relative">
         <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted">
           <Search size={16} />
@@ -86,8 +97,10 @@ export default function AdminProductsPage() {
         />
       </div>
 
+      {/* Table grid listing elements */}
       <div className="bg-card border border-border overflow-hidden">
         {isLoading ? (
+          // Spinner Loader view
           <div className="p-16 flex flex-col items-center justify-center text-xs font-black uppercase tracking-widest text-text gap-3">
             <Loader2 className="w-6 h-6 animate-spin text-terracotta" />
             <span>Loading Catalog Archives...</span>
@@ -110,6 +123,7 @@ export default function AdminProductsPage() {
                 {filteredProducts.map((product) => (
                   <tr key={product._id} className="hover:bg-bg/50 transition-colors">
                     <td className="p-4">
+                      {/* Image Thumbnail wrapper */}
                       <div className="w-12 h-16 bg-white border border-border overflow-hidden">
                         {product.images && product.images[0] ? (
                           <img
@@ -142,6 +156,7 @@ export default function AdminProductsPage() {
                       </span>
                     </td>
                     <td className="p-4 text-right">
+                      {/* Edit, Delete, View buttons layout bar */}
                       <div className="flex items-center justify-end gap-3">
                         <Link
                           href={`/shop/product/${product.slug}`}
@@ -152,7 +167,7 @@ export default function AdminProductsPage() {
                         </Link>
                         <span className="text-border">|</span>
                         <Link
-                          href={`/admin/products/${product._id}/edit`}
+                          href={`/admin/products/${product._id}/edit`} // Directs to editing panel
                           className="text-[9px] text-muted hover:text-text flex items-center gap-1 transition-colors"
                         >
                           <Edit size={10} /> Edit
@@ -169,6 +184,7 @@ export default function AdminProductsPage() {
                   </tr>
                 ))}
                 {filteredProducts.length === 0 && (
+                  // Empty state fallbacks
                   <tr>
                     <td colSpan={7} className="p-12 text-center text-muted">
                       No archive pieces found matching that description.
@@ -183,3 +199,4 @@ export default function AdminProductsPage() {
     </div>
   );
 }
+

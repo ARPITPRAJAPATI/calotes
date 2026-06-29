@@ -1,5 +1,6 @@
-import { z } from 'zod';
+import { z } from 'zod'; // Import Zod validation library
 
+// Schema mapping Product validation rules
 export const ProductInputSchema = z.object({
   name: z.string().min(1, 'Product name is required').trim(),
   slug: z.string().min(1, 'Slug is required').trim(),
@@ -22,6 +23,7 @@ export const ProductInputSchema = z.object({
   tags: z.array(z.string()).optional(),
 });
 
+// Schema mapping Category validation rules
 export const CategoryInputSchema = z.object({
   name: z.string().min(1, 'Category name is required').trim(),
   slug: z.string().min(1, 'Slug is required').trim(),
@@ -29,14 +31,16 @@ export const CategoryInputSchema = z.object({
   parent: z.string().nullable().optional(),
 });
 
+// Schema mapping PromoCode validation rules
 export const PromoInputSchema = z.object({
-  code: z.string().min(1, 'Promo code is required').trim().transform(v => v.toUpperCase()),
+  code: z.string().min(1, 'Promo code is required').trim().transform(v => v.toUpperCase()), // Auto-transforms to uppercase format
   discountType: z.enum(['percentage', 'flat']),
   discountValue: z.number().min(1, 'Discount value must be at least 1'),
   isActive: z.boolean().default(true),
   minOrderAmount: z.number().min(0, 'Minimum order amount must be at least 0').default(0),
 });
 
+// Schema mapping Store settings validation rules
 export const StoreSettingsInputSchema = z.object({
   storeName: z.string().min(1, 'Store name is required').trim(),
   contactEmail: z.string().email('Invalid email address').trim(),
@@ -45,3 +49,4 @@ export const StoreSettingsInputSchema = z.object({
   shippingFlatRate: z.number().min(0, 'Flat rate must be at least 0'),
   featuredPromoCode: z.string().optional(),
 });
+

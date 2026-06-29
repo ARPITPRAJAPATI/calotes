@@ -1,48 +1,64 @@
-"use client";
+"use client"; // Enable client-side React rendering features (hooks, context, animations)
 
+// Import React hooks for lifecycle management and state tracking
 import { useState, useEffect } from "react";
+// Import Next.js hooks for accessing route params (slug) and page routing triggers
 import { useParams, useRouter } from "next/navigation";
+// Import Framer Motion for premium smooth enter/exit animations
 import { motion, AnimatePresence } from "framer-motion";
+// Import icons from Lucide React to decorate headings, buttons, and badges
 import { ArrowLeft, ShieldCheck, Ruler, Loader2, MessageCircle, Star, Sparkles, Heart, ChevronLeft, ChevronRight, ScanLine } from "lucide-react";
+// Import Next.js Link component for client-side navigation
 import Link from "next/link";
+// Import custom Cart state manager hook to add items to bag
 import { useCart } from "@/context/CartContext";
+// Import custom Wishlist manager hook to toggle pieces in saved list
 import { useWishlist } from "@/context/WishlistContext";
+// Import Product TypeScript interface structure
 import { Product } from "@/types";
+// Import the custom PatinaInspector full-screen details inspect modal
 import PatinaInspector from "@/components/PatinaInspector";
 
+// Static mock related products to fall back on if dynamic fetch returns empty
 const MOCK_RELATED = [
   { slug: "vintage-levis-501", name: "Vintage Levi's 501", price: 3499, img: "https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?q=80&w=800" },
   { slug: "carhartt-jacket", name: "Carhartt Detroit Jacket", price: 7999, img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800" },
 ];
 
 export default function ProductDetailsPage() {
-  const params = useParams();
-  const router = useRouter();
-  const { addToCart, setIsCartOpen } = useCart();
-  const { toggleWishlist, isInWishlist } = useWishlist();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState<string>("");
-  const [added, setAdded] = useState(false);
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-  const [inspectorOpen, setInspectorOpen] = useState(false);
+  const params = useParams(); // Extract route path parameters (e.g. params.slug)
+  const router = useRouter(); // Initialize router instance for navigation actions
+  const { addToCart, setIsCartOpen } = useCart(); // Extract cart actions from CartContext
+  const { toggleWishlist, isInWishlist } = useWishlist(); // Extract wishlist actions from WishlistContext
+  
+  // Define component states
+  const [product, setProduct] = useState<Product | null>(null); // Holds active product details
+  const [loading, setLoading] = useState(true); // Controls loading spinner lifecycle
+  const [selectedImage, setSelectedImage] = useState(0); // Tracks index of the active displayed image
+  const [selectedSize, setSelectedSize] = useState<string>(""); // Tracks the user-selected size
+  const [added, setAdded] = useState(false); // Temporarily switches button text on "Add to Bag" click
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]); // Holds list of fetched matching products
+  const [inspectorOpen, setInspectorOpen] = useState(false); // Controls opening/closing of Patina Inspector
 
+  // Fetch product data on mount and whenever the URL slug parameter changes
   useEffect(() => {
     const fetchProduct = async () => {
       try {
+        // Retrieve products from API endpoint
         const res = await fetch(`/api/products?slug=${params.slug}`);
         const data = await res.json();
         
         if (res.ok && Array.isArray(data)) {
+          // Find the specific product matching the URL slug
           const found = data.find((p: any) => p.slug === params.slug);
           setProduct(found || null);
           
-          // Fetch related products
+          // Fetch matching products from the same category to render in "You May Also Like"
           if (found && found.category?.slug) {
             const relRes = await fetch(`/api/products?category=${found.category.slug}`);
             const relData = await relRes.json();
             if (relRes.ok && Array.isArray(relData)) {
+              // Filter out the active product and limit related products display to 4 items
               setRelatedProducts(relData.filter((p: any) => p._id !== found._id).slice(0, 4));
             } else {
               setRelatedProducts([]);
@@ -56,18 +72,21 @@ export default function ProductDetailsPage() {
         setProduct(null);
         setRelatedProducts([]);
       } finally {
-        setLoading(false);
+        setLoading(false); // Stop loading indicator once network request is complete
       }
     };
     fetchProduct();
   }, [params.slug]);
 
+  // Event handler for adding active product to shopping bag
   const handleAddToCart = () => {
     if (!product) return;
+    // Enforce size selection if product specifies size options
     if (product.sizes.length > 0 && !selectedSize) {
       alert("Select a size first.");
       return;
     }
+    // Add item metadata to Cart Context
     addToCart({
       productId: product._id,
       name: product.name,
@@ -76,25 +95,29 @@ export default function ProductDetailsPage() {
       size: selectedSize || "OS",
       quantity: 1,
     });
-    setAdded(true);
+    setAdded(true); // Temporarily update button label to show checkmark
     setTimeout(() => {
       setAdded(false);
-      setIsCartOpen(true);
+      setIsCartOpen(true); // Open slide-out cart drawer after 1 second
     }, 1000);
   };
 
+  // Build a WhatsApp redirection link with pre-filled product query details
   const handleWhatsApp = () => {
     if (!product) return;
     const msg = `Hi Calotes, I'm interested in the ${product.name} (₹${product.price}). Is it available?`;
     window.open(`https://wa.me/919999999999?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
+  // Render full-screen loader layout during API fetch phase
   if (loading) return (
     <div className="h-screen flex flex-col items-center justify-center bg-bg gap-4">
       <Loader2 className="w-8 h-8 animate-spin text-terracotta" />
       <p className="section-label">Accessing Items…</p>
     </div>
   );
+
+  // Render 404 fallback page if target product slug is not found in database
   if (!product) return (
     <div className="h-screen bg-bg flex flex-col items-center justify-center gap-6">
       <p className="text-muted uppercase tracking-widest font-bold text-xs">This piece is no longer in the items list.</p>
@@ -104,7 +127,7 @@ export default function ProductDetailsPage() {
 
   return (
     <div className="w-full pt-28 pb-24 flex-1">
-      {/* Patina Inspector Modal */}
+      {/* ── Patina Inspector Modal (Framer Motion AnimatePresence handles smooth mount/unmount animations) ── */}
       <AnimatePresence>
         {inspectorOpen && (
           <PatinaInspector
@@ -117,7 +140,8 @@ export default function ProductDetailsPage() {
           />
         )}
       </AnimatePresence>
-      {/* Breadcrumb Navigation */}
+
+      {/* ── Breadcrumb Navigation Header Bar ── */}
       <div className="px-6 md:px-12 border-b border-border/40 py-8 mb-6">
         <div className="max-w-[1800px] mx-auto flex items-center justify-between">
           <Link href="/shop" className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-muted hover:text-text transition-all duration-300">
@@ -135,10 +159,10 @@ export default function ProductDetailsPage() {
       <div className="max-w-[1800px] mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 mb-12">
 
-          {/* Left: Interactive Image Slider (Slightly smaller, 5/12 grid layout) */}
+          {/* ── Left Column: Interactive Image Gallery and Slider Controls ── */}
           <div className="lg:col-span-5 flex flex-col gap-4">
             <div className="relative aspect-[3/4] bg-bg-warm overflow-hidden border border-border/30 group">
-              {/* Image / Video render */}
+              {/* Conditional render support for mp4 video files or static images */}
               {product.images[selectedImage].endsWith(".mp4") ? (
                 <video autoPlay loop muted playsInline className="w-full h-full object-cover">
                   <source src={product.images[selectedImage]} type="video/mp4" />
@@ -151,7 +175,7 @@ export default function ProductDetailsPage() {
                 />
               )}
 
-              {/* Slider Arrows (visible if more than 1 image) */}
+              {/* Slider Arrows (visible if the product has multiple images uploaded) */}
               {product.images.length > 1 && (
                 <>
                   <button
@@ -172,7 +196,7 @@ export default function ProductDetailsPage() {
               )}
             </div>
 
-            {/* Patina Inspector — on-brand trigger button */}
+            {/* Premium action trigger to launch full-screen Patina Inspector */}
             <button
               onClick={() => setInspectorOpen(true)}
               className="group flex items-center justify-between w-full border border-border hover:border-terracotta bg-bg-warm hover:bg-terracotta/5 px-5 py-4 transition-all duration-300"
@@ -192,7 +216,7 @@ export default function ProductDetailsPage() {
             </button>
           </div>
 
-          {/* Right: Product Info (Sticky, 7/12 grid layout) */}
+          {/* ── Right Column: Sticky Product Metadata and Purchase Panel ── */}
           <div className="lg:col-span-7 lg:sticky lg:top-32 lg:h-max space-y-10 py-8">
             <div>
               <p className="section-label mb-4 flex items-center gap-2">
@@ -212,7 +236,7 @@ export default function ProductDetailsPage() {
                 )}
               </div>
 
-              {/* Dynamic Rarity/Stock Badge */}
+              {/* Dynamic inventory warnings and scarcity banners */}
               <div className="mt-6">
                 {product.stock !== undefined && product.stock > 0 ? (
                   product.stock === 1 ? (
@@ -232,6 +256,7 @@ export default function ProductDetailsPage() {
               </div>
             </div>
 
+            {/* Condition verification panel */}
             <div className="flex items-center gap-3 border-y border-border py-5 bg-bg-warm px-4">
               <ShieldCheck size={16} className="text-terracotta" />
               <div className="flex flex-col">
@@ -240,7 +265,7 @@ export default function ProductDetailsPage() {
               </div>
             </div>
 
-            {/* Size Selection */}
+            {/* Size selection layout */}
             {product.sizes.length > 0 && (
               <div>
                 <div className="flex justify-between items-end mb-4">
@@ -271,7 +296,7 @@ export default function ProductDetailsPage() {
               </div>
             )}
 
-            {/* Actions */}
+            {/* Shopping trigger buttons */}
             <div className="flex flex-col gap-3">
               {product.stock !== undefined && product.stock <= 0 ? (
                 <div className="space-y-4">
@@ -288,7 +313,6 @@ export default function ProductDetailsPage() {
                 </div>
               ) : (
                 <>
-                  {/* Add to Bag and Wishlist actions */}
                   <div className="flex gap-3">
                     <button
                       onClick={handleAddToCart}
@@ -311,6 +335,7 @@ export default function ProductDetailsPage() {
                       <Heart size={16} className={isInWishlist(product._id) ? "fill-current text-terracotta" : ""} />
                     </button>
                   </div>
+                  {/* Redirect to buy via direct messaging channel */}
                   <button
                     onClick={handleWhatsApp}
                     className="w-full py-5 bg-transparent border border-[#25D366]/60 text-[#25D366] text-[9px] font-bold uppercase tracking-[0.3em] hover:bg-[#25D366] hover:text-white transition-colors duration-300 flex items-center justify-center gap-3"
@@ -321,7 +346,7 @@ export default function ProductDetailsPage() {
               )}
             </div>
 
-            {/* Description & Details Accordion-style layout */}
+            {/* Description & Measurements data blocks */}
             <div className="space-y-8 pt-8 border-t border-border">
               <div className="space-y-4">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">The Story</p>
@@ -343,7 +368,7 @@ export default function ProductDetailsPage() {
           </div>
         </div>
 
-        {/* Reviews Section */}
+        {/* ── Community Reviews layout ── */}
         <div className="border-t border-border pt-10 mb-16">
           <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-6">
             <div>
@@ -376,7 +401,7 @@ export default function ProductDetailsPage() {
           </div>
         </div>
 
-        {/* You May Also Like */}
+        {/* ── Related products list slider recommendation ── */}
         {relatedProducts.length > 0 && (
           <div className="border-t border-border pt-10 mb-6">
             <h2 className="font-display font-black text-4xl uppercase tracking-tighter mb-6 text-center">You May Also Like</h2>
@@ -401,3 +426,4 @@ export default function ProductDetailsPage() {
     </div>
   );
 }
+

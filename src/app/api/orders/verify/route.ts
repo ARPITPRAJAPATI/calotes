@@ -1,39 +1,45 @@
-import { NextResponse } from 'next/server';
-import crypto from 'crypto';
-import connectDB from '@/lib/db';
-import Order from '@/models/Order';
+import { NextResponse } from 'next/server'; // Import response helper
+import crypto from 'crypto'; // Import built-in Node.js crypto package for HMAC hashing
+import connectDB from '@/lib/db'; // Import connection cache helper
+import Order from '@/models/Order'; // Import Order schema model
 
+// POST verification API route: verifies Razorpay webhook signature payload authenticity and updates stock/email notifications
 export async function POST(req: Request) {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, order_id } = await req.json();
 
+    // Construct validation payload string (Format: "orderId|paymentId")
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
+    // Cryptographically compute HMAC digest using SHA-256 algorithm and the Razorpay key secret
     const expectedSignature = crypto
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
       .update(body.toString())
       .digest('hex');
 
+    // Confirm computed signature matches Razorpay signature header payload to verify authenticity
     const isAuthentic = expectedSignature === razorpay_signature;
 
     if (isAuthentic) {
       await connectDB();
       
+      // Update MongoDB order record status to "Paid"
       const updatedOrder = await Order.findByIdAndUpdate(order_id, {
         paymentStatus: 'Paid',
         razorpayPaymentId: razorpay_payment_id,
         razorpaySignature: razorpay_signature,
       }).populate('user');
 
-      // 2. Automatically reduce product inventory stock
+      // 2. Loop through order items and deduct quantities from stock collections (safe decrement)
       try {
         if (updatedOrder && updatedOrder.items) {
-          const Product = (await import('@/models/Product')).default;
+          const Product = (await import('@/models/Product')).default; // Dynamic import to prevent model circular references
           for (const item of updatedOrder.items) {
             const productDoc = await Product.findById(item.product);
             if (productDoc) {
               const currentStock = productDoc.stock || 0;
               const quantityPurchased = item.quantity || 1;
+              // Ensure stock counts never decrement below 0
               productDoc.stock = Math.max(0, currentStock - quantityPurchased);
               await productDoc.save();
             }
@@ -43,7 +49,7 @@ export async function POST(req: Request) {
         console.error("Failed to automatically deduct product stock:", stockErr);
       }
 
-      // Trigger Email Notification (Non-blocking)
+      // 3. Trigger Email Invoice Notification endpoint asynchronously (non-blocking)
       try {
         const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
         fetch(`${baseUrl}/api/send-email`, {
@@ -69,3 +75,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

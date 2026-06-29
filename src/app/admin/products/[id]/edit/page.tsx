@@ -1,25 +1,32 @@
-'use client';
+'use client'; // Flags this file as a client component to handle local form states, dynamic param hooks, file selections, and browser fetches
 
+// Import React and hooks (including the use hook for resolving parameter promises)
 import React, { useState, useEffect, use } from 'react';
+// Import router redirects helper
 import { useRouter } from 'next/navigation';
+// Import UI vector graphics icons
 import { Upload, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
+// Import hot toast notification helper
 import toast from 'react-hot-toast';
+// Import Link for page transitions
 import Link from 'next/link';
 
+// Category interface mapping
 interface Category {
   _id: string;
   name: string;
 }
 
+// Router props interface mapping URL dynamic arguments
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>; // asynchronous params object promise
 }
 
 export default function EditProductPage({ params }: PageProps) {
-  const router = useRouter();
-  const { id } = use(params);
+  const router = useRouter(); // Initialize router redirects
+  const { id } = use(params); // Resolve parameter promise using React's use() hook
   
-  // Product state
+  // Product state fields bindings
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
@@ -38,28 +45,31 @@ export default function EditProductPage({ params }: PageProps) {
   const [waist, setWaist] = useState('');
   const [tags, setTags] = useState('');
 
-  // UI state
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  // UI status trackers
+  const [categories, setCategories] = useState<Category[]>([]); // Categories list for selection options
+  const [isUploading, setIsUploading] = useState(false); // Spinner tracker for file uploads
+  const [isSubmitting, setIsSubmitting] = useState(false); // Spinner tracker for form submissions
+  const [isLoading, setIsLoading] = useState(true); // Spinner tracker for product retrieval on load
 
+  // Predefined sizing options lists mapping
   const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '28', '30', '32', '34', '36', 'Free Size'];
 
+  // Hydrate categories selection list and current product values from database on mounts
   const fetchCategoriesAndProduct = async () => {
     try {
       // 1. Fetch categories
       const catRes = await fetch('/api/categories');
       const catData = await catRes.json();
       if (catRes.ok) {
-        setCategories(catData);
+        setCategories(catData); // Hydrate categories selection list
       }
 
-      // 2. Fetch product
+      // 2. Fetch product details
       const prodRes = await fetch(`/api/products/${id}`);
       const prodData = await prodRes.json();
       
       if (prodRes.ok) {
+        // Hydrate product states
         setName(prodData.name);
         setSlug(prodData.slug);
         setDescription(prodData.description);
@@ -76,7 +86,7 @@ export default function EditProductPage({ params }: PageProps) {
         setPitToPit(prodData.measurements?.pitToPit || '');
         setLength(prodData.measurements?.length || '');
         setWaist(prodData.measurements?.waist || '');
-        setTags(prodData.tags ? prodData.tags.join(', ') : '');
+        setTags(prodData.tags ? prodData.tags.join(', ') : ''); // Map array to comma-separated string
       } else {
         toast.error('Product not found');
         router.push('/admin/products');
@@ -84,7 +94,7 @@ export default function EditProductPage({ params }: PageProps) {
     } catch {
       toast.error('Failed to load data');
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Stop loading layout
     }
   };
 
@@ -92,11 +102,13 @@ export default function EditProductPage({ params }: PageProps) {
     fetchCategoriesAndProduct();
   }, [id]);
 
+  // Update slug state on changes to product name (converts name to URL slug characters)
   const handleNameChange = (val: string) => {
     setName(val);
     setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
   };
 
+  // Upload loop uploading multiple selected images to Cloudinary via upload APIs
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -105,24 +117,26 @@ export default function EditProductPage({ params }: PageProps) {
     const uploadedUrls: string[] = [];
 
     try {
+      // Loop through all selected image files sequentially
       for (let i = 0; i < files.length; i++) {
         const formData = new FormData();
-        formData.append('file', files[i]);
+        formData.append('file', files[i]); // Bind binary file
         
+        // Execute POST request to upload endpoint
         const res = await fetch('/api/upload', {
           method: 'POST',
           body: formData,
         });
         const data = await res.json();
         if (res.ok) {
-          uploadedUrls.push(data.url);
+          uploadedUrls.push(data.url); // Append returned Cloudinary asset URL
         } else {
           toast.error(`Failed to upload ${files[i].name}: ${data.error}`);
         }
       }
       
       if (uploadedUrls.length > 0) {
-        setImages((prev) => [...prev, ...uploadedUrls]);
+        setImages((prev) => [...prev, ...uploadedUrls]); // Hydrate upload URLs list
         toast.success(`Uploaded ${uploadedUrls.length} images!`);
       }
     } catch {
@@ -132,19 +146,23 @@ export default function EditProductPage({ params }: PageProps) {
     }
   };
 
+  // Delete image from state array
   const removeImage = (indexToRemove: number) => {
     setImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
+  // Toggle selected sizing tag options in state lists
   const toggleSize = (size: string) => {
     setSelectedSizes((prev) =>
       prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
     );
   };
 
+  // Submit product detailed updates data to DB catalog APIs via PUT requests
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Required fields check validation
     if (!name || !slug || !description || !price || !category || images.length === 0) {
       toast.error('Please fill in all required fields and upload at least one image');
       return;
@@ -152,6 +170,7 @@ export default function EditProductPage({ params }: PageProps) {
 
     setIsSubmitting(true);
 
+    // Format fields parameter values
     const productData = {
       name,
       slug,
@@ -171,19 +190,19 @@ export default function EditProductPage({ params }: PageProps) {
         length: length || null,
         waist: waist || null,
       },
-      tags: tags ? tags.split(',').map((t) => t.trim()) : [],
+      tags: tags ? tags.split(',').map((t) => t.trim()) : [], // Convert comma-separated string to tag arrays
     };
 
     try {
       const res = await fetch(`/api/products/${id}`, {
-        method: 'PUT',
+        method: 'PUT', // Fire PUT method
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(productData),
       });
 
       if (res.ok) {
         toast.success('Archive catalog updated!');
-        router.push('/admin/products');
+        router.push('/admin/products'); // Redirect back to list
       } else {
         const errData = await res.json();
         toast.error(errData.error || 'Failed to update catalog');
@@ -196,6 +215,7 @@ export default function EditProductPage({ params }: PageProps) {
   };
 
   if (isLoading) {
+    // Spinner screen
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-xs font-black uppercase tracking-widest text-text gap-4">
         <Loader2 className="w-8 h-8 animate-spin text-terracotta" />
@@ -206,6 +226,7 @@ export default function EditProductPage({ params }: PageProps) {
 
   return (
     <div className="space-y-8 max-w-5xl">
+      {/* Back button and page headers */}
       <div className="flex items-center gap-4 border-b border-border pb-4">
         <Link href="/admin/products" className="text-muted hover:text-text transition-colors">
           <ArrowLeft size={20} />
@@ -216,7 +237,7 @@ export default function EditProductPage({ params }: PageProps) {
       </div>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Left column - main fields */}
+        {/* Left column - main inputs */}
         <div className="lg:col-span-2 space-y-6">
           <div className="space-y-4">
             <div className="space-y-1">
@@ -224,7 +245,7 @@ export default function EditProductPage({ params }: PageProps) {
               <input
                 type="text"
                 value={name}
-                onChange={(e) => handleNameChange(e.target.value)}
+                onChange={(e) => handleNameChange(e.target.value)} // Generate slug on change
                 placeholder="e.g., 90s Carhartt Active Jacket"
                 className="w-full bg-card border border-border px-4 py-3 text-xs font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
                 required
@@ -279,7 +300,7 @@ export default function EditProductPage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* Sizes Checkboxes */}
+            {/* Sizing selection checkboxes */}
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-muted block">Available Sizes *</label>
               <div className="flex flex-wrap gap-2">
@@ -300,7 +321,7 @@ export default function EditProductPage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* Measurements */}
+            {/* Vintage garment measurements */}
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-muted block">Measurements (Optional)</label>
               <div className="grid grid-cols-3 gap-4">
@@ -339,7 +360,7 @@ export default function EditProductPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Right column - details + image uploads */}
+        {/* Right column - image uploads + administrative details */}
         <div className="space-y-6">
           <h2 className="text-xs font-black uppercase tracking-[0.2em] border-b border-border pb-2">
             Collection Details
@@ -421,6 +442,7 @@ export default function EditProductPage({ params }: PageProps) {
               />
             </div>
 
+            {/* Homepage feature checkbox */}
             <div className="flex items-center gap-3 py-2 border-y border-border">
               <input
                 type="checkbox"
@@ -449,12 +471,14 @@ export default function EditProductPage({ params }: PageProps) {
                     >
                       <Trash2 size={16} />
                     </button>
+                    {/* Visual cover label indicating cover photos */}
                     <div className="absolute bottom-1 left-1 bg-text text-bg text-[8px] font-bold px-1 py-0.5">
                       {idx === 0 ? 'COVER' : idx + 1}
                     </div>
                   </div>
                 ))}
 
+                {/* Upload drag input zone box */}
                 <label className="border border-dashed border-border aspect-[3/4] flex flex-col items-center justify-center cursor-pointer hover:border-text transition-colors group">
                   <input
                     type="file"
@@ -471,6 +495,7 @@ export default function EditProductPage({ params }: PageProps) {
               </div>
             </div>
 
+            {/* Action buttons */}
             <button
               type="submit"
               disabled={isSubmitting || isUploading}
@@ -484,3 +509,4 @@ export default function EditProductPage({ params }: PageProps) {
     </div>
   );
 }
+

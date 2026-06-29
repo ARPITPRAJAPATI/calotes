@@ -1,11 +1,17 @@
-"use client";
+"use client"; // Flags this file as a client component (uses browser state, session providers, and API requests)
 
+// Import session hook and signOut callbacks from NextAuth
 import { useSession, signOut } from "next-auth/react";
+// Import state and lifecycle hooks
 import { useEffect, useState } from "react";
+// Import router hook redirects
 import { useRouter } from "next/navigation";
+// Import UI vector icons
 import { Loader2, Package, LogOut, ArrowRight, ArrowUpRight, Calendar, Tag, Truck } from "lucide-react";
+// Import Link for page transitions
 import Link from "next/link";
 
+// Struct mapping order list items
 interface OrderItem {
   product: string;
   name: string;
@@ -16,6 +22,7 @@ interface OrderItem {
   _id: string;
 }
 
+// Struct layout of Orders returned from database API routes
 interface UserOrder {
   _id: string;
   items: OrderItem[];
@@ -26,35 +33,41 @@ interface UserOrder {
 }
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-  const [orders, setOrders] = useState<UserOrder[]>([]);
-  const [loadingOrders, setLoadingOrders] = useState(true);
+  const { data: session, status } = useSession(); // Access NextAuth session credentials
+  const router = useRouter(); // Initialize router redirects
+  const [orders, setOrders] = useState<UserOrder[]>([]); // Holds list of user order items
+  const [loadingOrders, setLoadingOrders] = useState(true); // Tracks fetch progress loaders
 
+  // Redirect users to Login if session status is unauthenticated
   useEffect(() => {
-    if (status === "unauthenticated") router.push("/login?callbackUrl=/profile");
+    if (status === "unauthenticated") {
+      router.push("/login?callbackUrl=/profile"); // Append callback parameter to return after successful login
+    }
   }, [status, router]);
 
+  // Fetch orders from database after session authentication finishes successfully
   useEffect(() => {
     if (status === "authenticated") {
       fetchOrders();
     }
   }, [status]);
 
+  // Query order history API endpoints to fetch items matching authenticated user email
   const fetchOrders = async () => {
     try {
       const res = await fetch("/api/orders/user");
       if (res.ok) {
         const data = await res.json();
-        setOrders(data);
+        setOrders(data); // Hydrate order state lists
       }
     } catch (err) {
       console.error("Failed to load user orders", err);
     } finally {
-      setLoadingOrders(false);
+      setLoadingOrders(false); // Stop loading indicator spinners
     }
   };
 
+  // Render full screen loader while NextAuth resolves user session
   if (status === "loading" || status === "unauthenticated") return (
     <div className="h-[70vh] flex items-center justify-center">
       <Loader2 className="animate-spin text-accent" />
@@ -63,10 +76,11 @@ export default function ProfilePage() {
 
   return (
     <div className="w-full pt-32 pb-24 flex-1">
+      {/* HUD Header Bar */}
       <div className="px-6 md:px-12 max-w-[1800px] mx-auto border-b border-border pb-8 mb-16 flex justify-between items-center">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accent">The Vault — Account</p>
         <button 
-          onClick={() => router.back()}
+          onClick={() => router.back()} // Go back to last page
           className="text-[10px] font-black uppercase tracking-[0.2em] text-muted hover:text-text transition-colors"
         >
           Back
@@ -75,11 +89,12 @@ export default function ProfilePage() {
 
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
-          {/* Sidebar */}
+          
+          {/* Left Column: Account Profile Details Sidebar */}
           <aside className="lg:col-span-3 space-y-12">
             <div>
               <h1 className="font-display font-black text-4xl uppercase tracking-tighter mb-2">
-                {session?.user?.name?.split(' ')[0]}
+                {session?.user?.name?.split(' ')[0]} {/* Display first name */}
               </h1>
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted">{session?.user?.email}</p>
             </div>
@@ -89,7 +104,7 @@ export default function ProfilePage() {
                 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-accent" /> Continue Shopping
               </Link>
               <button
-                onClick={() => signOut({ callbackUrl: '/' })}
+                onClick={() => signOut({ callbackUrl: '/' })} // Terminate session and redirect to homepage
                 className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-muted hover:text-accent transition-colors"
               >
                 <LogOut size={14} /> Sign Out
@@ -97,15 +112,17 @@ export default function ProfilePage() {
             </nav>
           </aside>
 
-          {/* Orders */}
+          {/* Right Column: Interactive Order History List */}
           <div className="lg:col-span-9">
             <div className="flex justify-between items-end border-b border-border pb-4 mb-12">
               <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted">Order History</h2>
             </div>
 
             {loadingOrders ? (
+              // Loader progress spinner
               <div className="py-12 flex justify-center"><Loader2 className="animate-spin text-accent" /></div>
             ) : orders.length === 0 ? (
+              // Fallback empty orders state
               <div className="py-24 flex flex-col items-center gap-8 text-center bg-card border border-border/50">
                 <Package size={48} strokeWidth={0.8} className="text-muted" />
                 <div>
@@ -117,10 +134,11 @@ export default function ProfilePage() {
                 </Link>
               </div>
             ) : (
+              // Render list history items
               <div className="space-y-6">
                 {orders.map((order) => (
                   <div key={order._id} className="bg-card border border-border p-6 md:p-8 font-bold uppercase tracking-widest text-[9px] space-y-6">
-                    {/* Header */}
+                    {/* Item parameters header info */}
                     <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-border/40 pb-4 gap-4">
                       <div className="space-y-1">
                         <span className="text-[8px] text-muted block">ORDER REFERENCE</span>
@@ -152,7 +170,7 @@ export default function ProfilePage() {
                       </div>
                     </div>
 
-                    {/* Garments grid */}
+                    {/* Purchased garments list */}
                     <div className="divide-y divide-border/20">
                       {order.items.map((item) => (
                         <div key={item._id} className="flex gap-4 py-4 first:pt-0 last:pb-0 items-center">
@@ -179,3 +197,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+

@@ -1,30 +1,41 @@
-"use client";
+"use client"; // Flags this file as a client component to support browser state variables, forms, and client transitions
 
+// Import state hooks
 import { useState } from "react";
+// Import router redirect hooks
 import { useRouter } from "next/navigation";
+// Import Link for page transitions
 import Link from "next/link";
+// Import Framer Motion
 import { motion } from "framer-motion";
+// Import UI vector icon components
 import { ArrowLeft, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
+// Import NextAuth helper to auto-login on successful registration
 import { signIn } from "next-auth/react";
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const router = useRouter(); // Initialize router redirects
+  
+  // Component states
+  const [loading, setLoading] = useState(false); // Submit button loader tracker
+  const [error, setError] = useState("");         // Binds registration server error alerts
+  const [success, setSuccess] = useState(false); // Controls success card presentation
 
+  // Input states
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
 
+  // Submit handler executing user record creation API requests
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
+      // 1. Submit POST requests to registration route endpoint
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -36,8 +47,8 @@ export default function RegisterPage() {
       if (!res.ok) {
         setError(data.message || "Something went wrong");
       } else {
-        setSuccess(true);
-        // Automatically sign in after registration
+        setSuccess(true); // Toggle success view
+        // 2. Automatically sign user in after successful registration finishes
         setTimeout(async () => {
           await signIn("credentials", {
             email: formData.email,
@@ -45,7 +56,7 @@ export default function RegisterPage() {
             redirect: false,
             callbackUrl: "/",
           });
-          window.location.href = "/";
+          window.location.href = "/"; // Direct to homepage
         }, 1500);
       }
     } catch (err) {
@@ -63,6 +74,7 @@ export default function RegisterPage() {
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="w-full max-w-md"
       >
+        {/* Branding header */}
         <div className="mb-12 flex justify-between items-end">
           <div>
             <Link href="/" className="inline-block">
@@ -75,14 +87,16 @@ export default function RegisterPage() {
             </p>
           </div>
           <button 
-            onClick={() => router.back()}
+            onClick={() => router.back()} // Go back
             className="text-[10px] font-black uppercase tracking-[0.2em] text-muted hover:text-text transition-colors flex items-center gap-2 mb-1"
           >
             <ArrowLeft size={12} /> Back
           </button>
         </div>
 
+        {/* Form Container */}
         <div className="bg-card border border-border p-8 relative overflow-hidden group">
+          {/* Accent graphics */}
           <div className="absolute top-0 right-0 w-16 h-16 bg-accent/10 -mr-8 -mt-8 rotate-45 transition-all duration-500 group-hover:bg-accent/20" />
           
           <h2 className="text-2xl font-display font-bold uppercase mb-8 tracking-tight border-b border-border pb-4">
@@ -90,6 +104,7 @@ export default function RegisterPage() {
           </h2>
 
           {success ? (
+            // Success Card layout
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -107,6 +122,7 @@ export default function RegisterPage() {
               </div>
             </motion.div>
           ) : (
+            // Inputs form
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
                 <div className="bg-terracotta/10 text-terracotta text-sm p-4 border border-terracotta/20 font-medium">
@@ -180,10 +196,11 @@ export default function RegisterPage() {
             </div>
           )}
 
+          {/* Google OAuth signup option */}
           {!success && (
             <div className="mt-6">
               <button
-                onClick={() => signIn("google", { callbackUrl: "/" })}
+                onClick={() => signIn("google", { callbackUrl: "/" })} // Launch Google OAuth flow
                 className="btn-outline w-full justify-center py-5"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -222,3 +239,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+

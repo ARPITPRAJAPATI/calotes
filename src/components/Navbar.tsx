@@ -1,15 +1,24 @@
-"use client";
+"use client"; // Flags this component as a client component to allow browser interactions (hooks, theme manipulation)
 
+// Import React hooks for managing state variables, side effect triggers, and ref persistence
 import { useState, useEffect, useRef } from "react";
+// Import Link for page transitions
 import Link from "next/link";
+// Import hook to watch path location
 import { usePathname } from "next/navigation";
+// Import session provider hooks to monitor user account login status
 import { useSession } from "next-auth/react";
+// Import custom hooks to control bag and wishlist drawers
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+// Import UI vector icon components
 import { ShoppingBag, Menu, X, ChevronDown, Sparkles, Heart, Sun, Moon, User, MoreHorizontal } from "lucide-react";
+// Import Framer Motion animations
 import { motion, AnimatePresence } from "framer-motion";
+// Import Branding logo component
 import Logo from "./Logo";
 
+// Config navigation links mapping categories filter search queries
 const CATEGORIES = [
   { name: "All Items", href: "/shop" },
   { name: "Denim", href: "/shop?category=denim" },
@@ -20,23 +29,24 @@ const CATEGORIES = [
 ];
 
 export default function Navbar() {
-  const { data: session } = useSession();
-  const { setIsCartOpen, cartCount } = useCart();
-  const { setIsOpen: setIsWishlistOpen, count: wishlistCount } = useWishlist();
-  const pathname = usePathname();
+  const { data: session } = useSession(); // Access user profile session data
+  const { setIsCartOpen, cartCount } = useCart(); // Extract cart count and drawer trigger controls
+  const { setIsOpen: setIsWishlistOpen, count: wishlistCount } = useWishlist(); // Extract wishlist count and drawer controls
+  const pathname = usePathname(); // Track active route path
 
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  // Component states
+  const [scrolled, setScrolled] = useState(false); // Tracks if page scroll position is > 40px (adjusts navbar background styling)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Controls mobile full-screen slide menu visibility
+  const [dropdownOpen, setDropdownOpen] = useState(false); // Controls desktop categories dropdown modal visibility
+  const [theme, setTheme] = useState<"light" | "dark">("light"); // Tracks dark/light mode preference
 
-  // Read theme on mount
+  // Hydrate theme settings from browser storage on initial page load
   useEffect(() => {
     const stored = localStorage.getItem("theme");
     if (stored === "dark") {
-      document.documentElement.classList.add("dark");
+      document.documentElement.classList.add("dark"); // Inject tailwind selector class to root html element
       requestAnimationFrame(() => {
-        setTheme("dark");
+        setTheme("dark"); // Update theme state variables
       });
     } else {
       document.documentElement.classList.remove("dark");
@@ -46,6 +56,7 @@ export default function Navbar() {
     }
   }, []);
 
+  // Callback to toggle dark/light theme options and persist preference
   const toggleTheme = () => {
     if (theme === "light") {
       setTheme("dark");
@@ -58,33 +69,35 @@ export default function Navbar() {
     }
   };
 
+  // Add scroll event listener to dynamically apply blur/border styling to sticky header on page scroll
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll); // Clean up scroll listeners on unmount
   }, []);
 
-  const lastPathname = useRef(pathname);
+  const lastPathname = useRef(pathname); // Persist reference to previous route path name
 
-  // Close menu on navigation
+  // Auto-close mobile dropdown menus whenever a user clicks navigation links and routes update
   useEffect(() => {
     if (lastPathname.current !== pathname) {
       lastPathname.current = pathname;
       if (mobileMenuOpen) {
         requestAnimationFrame(() => {
-          setMobileMenuOpen(false);
+          setMobileMenuOpen(false); // Close sliding mobile menu
         });
       }
     }
   }, [pathname, mobileMenuOpen]);
 
-  // Hide Navbar on administrative dashboard routes after executing all hooks unconditionally
+  // Hide Navbar completely on administrative dashboard panel layout views
   if (pathname?.startsWith("/admin")) {
-    return null;
+    return null; // Stop rendering
   }
 
   return (
     <>
+      {/* Sticky header container */}
       <header
         className={`sticky top-0 w-full z-50 transition-all duration-700 ${scrolled
             ? "bg-bg/95 backdrop-blur-md border-b border-border py-3"
@@ -93,12 +106,12 @@ export default function Navbar() {
       >
         {/* ─── DESKTOP HEADER LAYOUT ─── */}
         <div className="hidden lg:flex max-w-[1800px] mx-auto px-10 items-center justify-between relative w-full">
-          {/* Left nav */}
+          {/* Left Navigation Links */}
           <nav className="flex items-center gap-8 xl:gap-10">
             <Link href="/shop" className="section-label underline-hover">Shop</Link>
             <Link href="/canvas" className="section-label underline-hover text-terracotta flex items-center gap-1"><Sparkles size={12} /> Studio</Link>
 
-            {/* Categories dropdown */}
+            {/* Desktop Categories Dropdown trigger */}
             <div
               className="relative"
               onMouseEnter={() => setDropdownOpen(true)}
@@ -108,6 +121,7 @@ export default function Navbar() {
                 Categories <ChevronDown size={10} className="mt-0.5" />
               </button>
 
+              {/* Animate list items on hover status */}
               <AnimatePresence>
                 {dropdownOpen && (
                   <motion.div
@@ -117,6 +131,7 @@ export default function Navbar() {
                     transition={{ duration: 0.2 }}
                     className="absolute top-full left-0 mt-3 w-44 bg-bg-warm border border-border-warm shadow-2xl p-4 flex flex-col gap-3"
                   >
+                    {/* Render category listings */}
                     {CATEGORIES.map(cat => (
                       <Link
                         key={cat.href}
@@ -136,7 +151,7 @@ export default function Navbar() {
             <Link href="/about" className="section-label underline-hover">About</Link>
           </nav>
 
-          {/* Center logo (Desktop) */}
+          {/* Center Logo branding (Desktop view) */}
           <Link
             href="/"
             className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center z-10 hover:opacity-80 transition-opacity"
@@ -144,8 +159,9 @@ export default function Navbar() {
             <Logo className="w-20 h-20 md:w-24 md:h-24" />
           </Link>
 
-          {/* Right actions (Desktop) */}
+          {/* Right Action button group (Desktop view) */}
           <div className="flex items-center gap-5 md:gap-7">
+            {/* Account Profile / Login redirect Link */}
             <Link
               href={session ? "/profile" : "/login"}
               className="flex items-center gap-2 section-label hover:text-terracotta transition-colors"
@@ -158,7 +174,7 @@ export default function Navbar() {
               </span>
             </Link>
 
-            {/* Cart button */}
+            {/* Shopping Bag trigger button */}
             <button
               onClick={() => setIsCartOpen(true)}
               className="relative flex items-center gap-2 section-label hover:text-terracotta transition-colors"
@@ -173,7 +189,7 @@ export default function Navbar() {
               )}
             </button>
 
-            {/* Wishlist button */}
+            {/* Saved Wishlist trigger button */}
             <button
               onClick={() => setIsWishlistOpen(true)}
               className="relative flex items-center gap-2 section-label hover:text-terracotta transition-colors"
@@ -183,7 +199,7 @@ export default function Navbar() {
               <span className="hidden sm:block">Wishlist</span>
             </button>
 
-            {/* Theme Toggle Button */}
+            {/* Light/Dark mode theme switch trigger button */}
             <button
               onClick={toggleTheme}
               className="relative flex items-center gap-2 section-label hover:text-terracotta transition-colors"
@@ -198,9 +214,9 @@ export default function Navbar() {
 
         {/* ─── MOBILE & TABLET HEADER LAYOUT (pure icons without circles) ─── */}
         <div className="lg:hidden w-full px-4 flex items-center justify-between relative">
-          {/* Left actions: Three dots (Menu) + Profile */}
+          {/* Left actions: Menu + Profile */}
           <div className="flex items-center gap-1.5 xs:gap-2 z-10">
-            {/* Menu trigger (pure three-dots icon button) */}
+            {/* Menu trigger button */}
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
@@ -210,7 +226,7 @@ export default function Navbar() {
               <MoreHorizontal size={18} strokeWidth={2} />
             </button>
 
-            {/* Profile trigger (pure User icon button) */}
+            {/* Profile / Account Login Link */}
             <Link
               href={session ? "/profile" : "/login"}
               className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
@@ -221,7 +237,7 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Center logo (absolute position for perfect alignment, responsive size to prevent collision) */}
+          {/* Center Logo branding */}
           <Link
             href="/"
             className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center justify-center leading-none z-10 hover:opacity-80 transition-opacity"
@@ -269,9 +285,7 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* ────────────────────────────────────────────────────
-          Mobile Full-Screen Menu
-      ─────────────────────────────────────────────────── */}
+      {/* ─── MOBILE FULL-SCREEN NAVIGATION MODAL DRAWER ─── */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -281,7 +295,7 @@ export default function Navbar() {
             transition={{ duration: 0.3 }}
             className="fixed inset-0 z-[100] bg-bg flex flex-col overflow-hidden"
           >
-            {/* Header */}
+            {/* Header section with brand logo and modal dismiss button */}
             <div className="flex justify-between items-center px-6 py-5 border-b border-border">
               <Link href="/" className="flex items-center justify-center hover:opacity-80 transition-opacity">
                 <Logo className="w-14 h-14" />
@@ -300,7 +314,7 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Navigation links */}
+            {/* Scrollable list of navigation page routes */}
             <nav className="flex-1 overflow-y-auto px-6 py-10 flex flex-col gap-2">
               {[
                 { label: "Items", href: "/shop" },
@@ -312,6 +326,7 @@ export default function Navbar() {
                   key={item.href}
                   initial={{ x: 30, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
+                  // Cascade delay calculations based on index listing positions
                   transition={{ delay: 0.05 * i, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <Link
@@ -323,7 +338,7 @@ export default function Navbar() {
                 </motion.div>
               ))}
 
-              {/* Category pills */}
+              {/* Horizontal filter category pills */}
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -345,7 +360,7 @@ export default function Navbar() {
               </motion.div>
             </nav>
 
-            {/* Footer actions */}
+            {/* Bottom action redirects and social media links */}
             <div className="px-6 py-6 border-t border-border bg-bg-warm space-y-3">
               <Link
                 href={session ? "/profile" : "/login"}
@@ -364,3 +379,4 @@ export default function Navbar() {
     </>
   );
 }
+

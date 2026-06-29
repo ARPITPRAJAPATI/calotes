@@ -1,3 +1,4 @@
+// Import Schema builder, model compilation, and models cache directory from mongoose library
 import { model, models, Schema } from 'mongoose';
 
 /**
@@ -7,19 +8,25 @@ import { model, models, Schema } from 'mongoose';
  */
 const CutoutSchema = new Schema(
   {
+    // The specific Product identifier this cutout belongs to (typed as String for simple API index key lookups)
     productId: {
       type: String,
       required: true,
-      unique: true,
-      index: true,
+      unique: true, // One cutout record per unique product
+      index: true,  // Indexed to ensure high-speed API retrieval matching
     },
-    // Original product image URL (for reference)
+    // The original product image URL used as the source for background extraction reference
     originalUrl: { type: String, required: true },
-    // Cloudinary URL of the AI-extracted transparent PNG
+    // Cloudinary URL pointing to the transparent background PNG cutout asset
     cutoutUrl: { type: String, required: true },
   },
+  // Automatically track creation and modification dates of cutouts
   { timestamps: true }
 );
 
+// Cache compiled model instance or compile a new model matching 'Cutout' key
 const Cutout = models.Cutout || model('Cutout', CutoutSchema);
+
+// Export compiled Cutout model
 export default Cutout;
+

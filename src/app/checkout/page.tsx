@@ -1,34 +1,48 @@
-"use client";
+"use client"; // Flags this file as a client component to support browser API scripts (Razorpay), user forms, and alerts
 
+// Import React state and lifecycle hooks
 import { useState, useEffect } from "react";
+// Import cart drawer context providers
 import { useCart } from "@/context/CartContext";
+// Import NextAuth user hooks to track session logins
 import { useSession } from "next-auth/react";
+// Import Next.js routing hook
 import { useRouter } from "next/navigation";
+// Import vector icons
 import { ArrowLeft, Lock, ShieldCheck, Loader2, Tag, Heart } from "lucide-react";
+// Import Link for page transitions
 import Link from "next/link";
+// Import toast component alerts
 import toast from "react-hot-toast";
+// Import wishlist context manager hooks
 import { useWishlist } from "@/context/WishlistContext";
 
 export default function CheckoutPage() {
-  const { items, cartTotal, clearCart } = useCart();
-  const { data: session, status } = useSession();
-  const { toggleWishlist, isInWishlist } = useWishlist();
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const { items, cartTotal, clearCart } = useCart(); // Extract cart state parameters
+  const { data: session, status } = useSession(); // Access user profile session credentials
+  const { toggleWishlist, isInWishlist } = useWishlist(); // Extract wishlist toggle controls
+  const router = useRouter(); // Initialize page router redirects
+
+  // UI state variables
+  const [loading, setLoading] = useState(false); // Controls form submit progress spinners
   const [address, setAddress] = useState({
     fullName: "", street: "", city: "", state: "", postalCode: "", country: "India", phone: "",
-  });
+  }); // Address fields binding
 
-  // Promo code states
-  const [couponCode, setCouponCode] = useState("");
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const [appliedCoupon, setAppliedCoupon] = useState("");
-  const [validatingCoupon, setValidatingCoupon] = useState(false);
+  // Discount states
+  const [couponCode, setCouponCode] = useState("");      // User inputted code string
+  const [discountAmount, setDiscountAmount] = useState(0); // Deducted monetary value
+  const [appliedCoupon, setAppliedCoupon] = useState("");   // Checked, valid promo label
+  const [validatingCoupon, setValidatingCoupon] = useState(false); // Tracks promo verification spinner
 
+  // Redirect users to Login panel if session authentication checks fail
   useEffect(() => {
-    if (status === "unauthenticated") router.push("/login?callbackUrl=/checkout");
+    if (status === "unauthenticated") {
+      router.push("/login?callbackUrl=/checkout"); // Append callback parameter to return after successful login
+    }
   }, [status, router]);
 
+  // Method dynamically appending the official Razorpay JS library script block to head
   const loadRazorpay = () => new Promise((resolve) => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -37,6 +51,7 @@ export default function CheckoutPage() {
     document.body.appendChild(script);
   });
 
+  // Query promo validate API endpoints to verify coupon eligibility
   const handleValidateCoupon = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!couponCode.trim()) return;
@@ -51,8 +66,8 @@ export default function CheckoutPage() {
       const data = await res.json();
 
       if (res.ok) {
-        setDiscountAmount(data.discountAmount);
-        setAppliedCoupon(data.code);
+        setDiscountAmount(data.discountAmount); // Set discount amount state
+        setAppliedCoupon(data.code); // Set verified coupon name
         toast.success(`Coupon "${data.code}" applied! Saved ₹${data.discountAmount.toLocaleString("en-IN")}`);
       } else {
         toast.error(data.error || "Failed to validate coupon");
@@ -64,30 +79,44 @@ export default function CheckoutPage() {
     }
   };
 
+  // Triggers order creation API routes and launches Razorpay checkout panel overlay
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!items.length) return;
     setLoading(true);
     try {
+      // Dynamic loading Razorpay check
       if (!await loadRazorpay()) throw new Error("Razorpay SDK failed to load.");
       const finalAmount = cartTotal - discountAmount;
+      
+      // 1. Create order record on MongoDB and secure Razorpay order token ID
       const orderData = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items, totalAmount: finalAmount, shippingAddress: address }),
       }).then((t) => t.json());
       if (orderData.error) throw new Error(orderData.error);
+      
+      // 2. Configure payment gateway parameters mapping Razorpay expectations
       const options = {
-        key: orderData.keyId, amount: orderData.amount, currency: orderData.currency,
-        name: "Calotes Vintage", description: "Archive Collection Purchase",
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "Calotes Vintage",
+        description: "Archive Collection Purchase",
         order_id: orderData.razorpayOrderId,
+        // On successful payment collection: send transaction token to verification endpoints
         handler: async (response: any) => {
           const verify = await fetch("/api/orders/verify", {
             method: "POST", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ ...response, order_id: orderData.orderId }),
           }).then((t) => t.json());
-          if (verify.success) { clearCart(); router.push(`/checkout/success?order=${orderData.orderId}`); }
-          else alert("Payment verification failed.");
+          if (verify.success) {
+            clearCart(); // Flush item list
+            router.push(`/checkout/success?order=${orderData.orderId}`); // Success redirect
+          } else {
+            alert("Payment verification failed.");
+          }
         },
         prefill: { name: address.fullName },
         theme: { color: "#0F0F0F" },
@@ -109,14 +138,20 @@ export default function CheckoutPage() {
           },
         },
       };
+      // Instantiate and open standard gateway screen
       new (window as any).Razorpay(options).open();
-    } catch (err: any) { alert(err.message); }
-    finally { setLoading(false); }
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // Syncs typed address values to state hooks
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setAddress({ ...address, [e.target.name]: e.target.value });
 
+  // Render blank spinner while NextAuth confirms user credentials session load
   if (status === "loading" || status === "unauthenticated") return (
     <div className="h-[70vh] flex items-center justify-center">
       <Loader2 className="animate-spin text-terracotta" />
@@ -125,7 +160,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="w-full pt-32 pb-24 flex-1">
-      {/* Header */}
+      {/* Back button Link header */}
       <div className="px-6 md:px-12 max-w-[1800px] mx-auto border-b border-border/40 py-10 mb-16">
         <Link href="/shop" className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-muted hover:text-text transition-all duration-300">
           <div className="w-8 h-px bg-muted group-hover:w-12 group-hover:bg-text transition-all duration-500" />
@@ -139,7 +174,7 @@ export default function CheckoutPage() {
         </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
-          {/* Form */}
+          {/* Shipping Form block */}
           <div className="lg:col-span-7">
             <form id="checkout-form" onSubmit={handlePayment} className="space-y-16">
               <div>
@@ -176,10 +211,11 @@ export default function CheckoutPage() {
             </form>
           </div>
 
-          {/* Summary */}
+          {/* Checkout Summary panel */}
           <div className="lg:col-span-5">
             <div className="sticky top-32 space-y-6 bg-bg-warm border border-border p-8">
               <h2 className="section-label mb-6">Order Summary</h2>
+              {/* Product items scrolling layout list */}
               <div className="space-y-6 max-h-[40vh] overflow-y-auto pr-4">
                 {items.map((item) => (
                   <div key={`${item.productId}-${item.size}`} className="flex gap-4 border-b border-border/50 pb-6 items-center">
@@ -191,6 +227,7 @@ export default function CheckoutPage() {
                       <p className="text-[10px] text-muted font-bold uppercase mt-1">Size: {item.size} · Qty: {item.quantity}</p>
                       <p className="text-xs font-black mt-2 text-text">₹{item.price * item.quantity}</p>
                     </div>
+                    {/* Add back to wishlist toggle options */}
                     <button
                       onClick={() => toggleWishlist({
                         productId: item.productId,
@@ -209,7 +246,7 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              {/* Promo code block */}
+              {/* Promo code checking block */}
               <div className="border-t border-border/50 pt-6 space-y-2">
                 <div className="flex gap-2">
                   <input
@@ -247,6 +284,7 @@ export default function CheckoutPage() {
                 )}
               </div>
 
+              {/* Cost breakdown list */}
               <div className="border-t border-border pt-6 space-y-4">
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-text">
                   <span className="text-muted">Subtotal</span><span>₹{cartTotal}</span>
@@ -264,13 +302,14 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
+              {/* Submit Buttons */}
               <div className="pt-6 space-y-4">
                 <button type="submit" form="checkout-form" disabled={loading || !items.length}
                   className="btn-primary w-full justify-center py-5 flex items-center gap-3 disabled:opacity-40"
                 >
                   {loading ? <Loader2 className="animate-spin" size={16} /> : <><Lock size={13} /> Secure Payment</>}
                 </button>
-                {/* Save entire order to wishlist */}
+                {/* Save complete order list to wishlist */}
                 <button
                   type="button"
                   onClick={() => {
@@ -301,3 +340,4 @@ export default function CheckoutPage() {
     </div>
   );
 }
+

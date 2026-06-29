@@ -1,11 +1,17 @@
-"use client";
+"use client"; // Flags this component for client rendering (manages local states, parses query parameters, and performs fetches)
 
+// Import hook to watch URL parameters and initialize page redirects
 import { useSearchParams, useRouter } from "next/navigation";
+// Import UI vector icon components
 import { CheckCircle2, ArrowRight, Loader2, Package, Truck, Phone, Tag } from "lucide-react";
+// Import Link for page transitions
 import Link from "next/link";
+// Import Suspense boundary wrapper and React state hook
 import { Suspense, useState, useEffect } from "react";
+// Import Framer Motion
 import { motion } from "framer-motion";
 
+// Struct representing mapped order list items
 interface OrderItem {
   product: string;
   name: string;
@@ -16,6 +22,7 @@ interface OrderItem {
   _id: string;
 }
 
+// Struct layout of Order Details database record schema
 interface OrderDetails {
   _id: string;
   items: OrderItem[];
@@ -35,13 +42,15 @@ interface OrderDetails {
 }
 
 function SuccessContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const orderId = searchParams.get("order");
+  const router = useRouter(); // Initialize router redirects
+  const searchParams = useSearchParams(); // Track URL search properties (requires Suspense wrapping)
+  const orderId = searchParams.get("order"); // Extract order database ID
 
-  const [order, setOrder] = useState<OrderDetails | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Component states
+  const [order, setOrder] = useState<OrderDetails | null>(null); // Holds hydrated order details
+  const [loading, setLoading] = useState(true);                  // Spinner progress check
 
+  // Hydrate order details by query mapping on component mounts
   useEffect(() => {
     if (!orderId) {
       setLoading(false);
@@ -50,10 +59,10 @@ function SuccessContent() {
 
     async function loadOrder() {
       try {
-        const res = await fetch(`/api/orders/${orderId}`);
+        const res = await fetch(`/api/orders/${orderId}`); // Retrieve order details
         if (res.ok) {
           const data = await res.json();
-          setOrder(data);
+          setOrder(data); // Bind order data
         }
       } catch (err) {
         console.error("Failed to load order details for success screen", err);
@@ -72,12 +81,12 @@ function SuccessContent() {
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="space-y-12 max-w-2xl w-full text-center"
       >
-        {/* Checked Badge */}
+        {/* Confirmed green check icon badge */}
         <div className="w-20 h-20 border border-accent flex items-center justify-center mx-auto bg-card">
           <CheckCircle2 size={40} strokeWidth={0.8} className="text-accent animate-pulse" />
         </div>
 
-        {/* Title */}
+        {/* Brand headers */}
         <div>
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-accent mb-4">Order Confirmed</p>
           <h1 className="font-display font-black text-5xl md:text-7xl uppercase tracking-tighter leading-[0.9]">
@@ -87,14 +96,15 @@ function SuccessContent() {
         </div>
 
         {loading ? (
+          // Loader spinner
           <div className="flex flex-col items-center justify-center p-8 text-xs font-black uppercase tracking-widest text-muted gap-2">
             <Loader2 className="w-6 h-6 animate-spin text-accent" />
             Fetching Order Details...
           </div>
         ) : order ? (
-          /* Order Details Card */
+          /* Order details layout frame */
           <div className="bg-card border border-border text-left p-6 md:p-8 space-y-8 font-bold uppercase tracking-widest text-[10px]">
-            {/* Header */}
+            {/* ID & payment callback properties */}
             <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-border/50 pb-4 gap-2">
               <div>
                 <span className="text-muted block text-[9px] mb-1">ORDER ID</span>
@@ -108,7 +118,7 @@ function SuccessContent() {
               </div>
             </div>
 
-            {/* Items */}
+            {/* List purchased items */}
             <div className="space-y-4">
               <span className="text-muted block text-[9px]">YOUR GARMENTS</span>
               <div className="divide-y divide-border/30">
@@ -129,7 +139,7 @@ function SuccessContent() {
               </div>
             </div>
 
-            {/* Delivery address */}
+            {/* Address & price totals */}
             <div className="border-t border-border/50 pt-4 grid grid-cols-1 sm:grid-cols-2 gap-6 text-[9px]">
               <div className="space-y-2">
                 <span className="text-muted block flex items-center gap-1">
@@ -161,6 +171,7 @@ function SuccessContent() {
           </div>
         ) : (
           orderId && (
+            // Reference backup if API fetch errors
             <div className="border-y border-border py-6 bg-card">
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted">
                 Order Reference: <span className="text-text ml-2">{orderId.slice(-8).toUpperCase()}</span>
@@ -189,8 +200,10 @@ function SuccessContent() {
 
 export default function CheckoutSuccessPage() {
   return (
+    // Wrap component in Suspense boundary to prevent compilation SSR errors from useSearchParams hooks
     <Suspense fallback={<div className="h-[70vh] flex items-center justify-center" />}>
       <SuccessContent />
     </Suspense>
   );
 }
+

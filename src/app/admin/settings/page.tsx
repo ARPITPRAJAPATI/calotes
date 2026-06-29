@@ -1,10 +1,14 @@
-'use client';
+'use client'; // Flags this file as a client component to handle form controls, live presets color binding, files uploads, and client toasts
 
+// Import React hooks
 import { useState, useEffect } from 'react';
+// Import hot toast notification alerts
 import toast from 'react-hot-toast';
+// Import UI vector graphics icons
 import { Loader2, Save, Upload } from 'lucide-react';
 
 export default function AdminSettingsPage() {
+  // Bind form configurations to individual state hooks
   const [heroHeadline, setHeroHeadline] = useState('');
   const [heroSubtext, setHeroSubtext] = useState('');
   const [announcementText, setAnnouncementText] = useState('');
@@ -14,10 +18,12 @@ export default function AdminSettingsPage() {
   const [heroImageUrl, setHeroImageUrl] = useState('');
   const [accentColor, setAccentColor] = useState('#C85a32');
 
+  // Loading state trackers
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
+  // Preset accent configurations matching brand palettes
   const presets = [
     { name: 'Terracotta', color: '#C85a32' },
     { name: 'Emerald', color: '#0F5132' },
@@ -26,6 +32,7 @@ export default function AdminSettingsPage() {
     { name: 'Monochrome', color: '#000000' },
   ];
 
+  // Fetch settings from database configurations on mounts
   const fetchSettings = async () => {
     try {
       const res = await fetch('/api/settings');
@@ -53,13 +60,14 @@ export default function AdminSettingsPage() {
     fetchSettings();
   }, []);
 
+  // Upload hero banner image using multipart/form-data POST endpoints
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setIsUploading(true);
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', file); // Append binary file
 
     try {
       const res = await fetch('/api/upload', {
@@ -68,7 +76,7 @@ export default function AdminSettingsPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        setHeroImageUrl(data.url);
+        setHeroImageUrl(data.url); // Bind returned Cloudinary URL
         toast.success('Hero image uploaded successfully!');
       } else {
         toast.error(data.error || 'Failed to upload image');
@@ -80,6 +88,7 @@ export default function AdminSettingsPage() {
     }
   };
 
+  // Submit form values to updates setting API routes
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -116,6 +125,7 @@ export default function AdminSettingsPage() {
   };
 
   if (loading) {
+    // Spinner screen
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-xs font-black uppercase tracking-widest text-text gap-4">
         <Loader2 className="w-8 h-8 animate-spin text-terracotta" />
@@ -126,6 +136,7 @@ export default function AdminSettingsPage() {
 
   return (
     <div className="space-y-12 max-w-4xl">
+      {/* Page Header info */}
       <div className="border-b border-border pb-4">
         <h1 className="text-4xl font-display font-black uppercase tracking-tighter">
           Store Configuration
@@ -136,7 +147,8 @@ export default function AdminSettingsPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Section 1: Hero Settings */}
+        
+        {/* Section 1: Hero branding parameters */}
         <div className="bg-card border border-border p-8 space-y-6">
           <h2 className="text-xs font-black uppercase tracking-[0.2em] border-b border-border pb-2 text-text">
             Landing Hero & Branding
@@ -170,13 +182,14 @@ export default function AdminSettingsPage() {
             />
           </div>
 
-          {/* Cloudinary Hero Banner Image */}
+          {/* Banner configuration settings */}
           <div className="space-y-4 pt-4 border-t border-border/50">
             <label className="text-[10px] font-black uppercase tracking-widest text-muted block">
               Hero Background Image
             </label>
 
             {heroImageUrl && (
+              // Live image preview
               <div className="relative aspect-video max-w-md overflow-hidden bg-bg border border-border">
                 <img
                   src={heroImageUrl}
@@ -210,7 +223,7 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        {/* Section 2: Website Theme & Color Branding */}
+        {/* Section 2: Accent palette configurations */}
         <div className="bg-card border border-border p-8 space-y-6">
           <h2 className="text-xs font-black uppercase tracking-[0.2em] border-b border-border pb-2 text-text">
             Branding Palette & Aesthetics
@@ -222,7 +235,7 @@ export default function AdminSettingsPage() {
             </label>
 
             <div className="flex flex-wrap gap-4 items-center">
-              {/* Color Picker */}
+              {/* Color Picker input */}
               <div className="flex items-center gap-3 border border-border p-3 bg-bg">
                 <input
                   type="color"
@@ -233,13 +246,13 @@ export default function AdminSettingsPage() {
                 <span className="text-xs font-mono font-bold uppercase">{accentColor}</span>
               </div>
 
-              {/* Presets */}
+              {/* Preset Buttons loop list */}
               <div className="flex flex-wrap gap-2">
                 {presets.map((preset) => (
                   <button
                     key={preset.name}
                     type="button"
-                    onClick={() => setAccentColor(preset.color)}
+                    onClick={() => setAccentColor(preset.color)} // Override color selection
                     className="flex items-center gap-2 border border-border px-3 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-bg transition-colors"
                   >
                     <span
@@ -254,7 +267,7 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        {/* Section 3: Storewide Tickers & Announcements */}
+        {/* Section 3: Tickers & Announcements */}
         <div className="bg-card border border-border p-8 space-y-6">
           <h2 className="text-xs font-black uppercase tracking-[0.2em] border-b border-border pb-2 text-text">
             Announcements & Promotion
@@ -275,7 +288,7 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        {/* Section 4: Contact & Links */}
+        {/* Section 4: Contact links */}
         <div className="bg-card border border-border p-8 space-y-6">
           <h2 className="text-xs font-black uppercase tracking-[0.2em] border-b border-border pb-2 text-text">
             Support & Community Links
@@ -311,7 +324,7 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        {/* Section 5: Shipping Rules */}
+        {/* Section 5: Shipping fees */}
         <div className="bg-card border border-border p-8 space-y-6">
           <h2 className="text-xs font-black uppercase tracking-[0.2em] border-b border-border pb-2 text-text">
             Fulfillment & Shipping Rules
@@ -332,6 +345,7 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
+        {/* Submit Save changes buttons */}
         <button
           type="submit"
           disabled={saving}
@@ -344,3 +358,4 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+
