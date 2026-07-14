@@ -21,9 +21,9 @@ let clientPromise: Promise<MongoClient>;
 if (!uri) {
   // Assign a rejected promise payload to clientPromise notifying of configuration error
   clientPromise = Promise.reject(new Error('Invalid/Missing environment variable: "MONGODB_URI"')) as any;
-  
+
   // Attach a silent catch handler to prevent the app builder/compiler from crashing on unhandled promise warnings
-  clientPromise.catch(() => {}); 
+  clientPromise.catch(() => { });
 } else {
   // If running in development mode (hot reloading is active)
   if (process.env.NODE_ENV === "development") {

@@ -33,6 +33,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://calotesvintage.com"),
   title: "Calotes Vintage | Authentic Pre-Owned Fashion",
   description: "Curated vintage pieces. Adapt. Stand Out. Be Calotes.",
   keywords: ["vintage", "streetwear", "pre-owned fashion", "calotes vintage", "authentic clothing"],
