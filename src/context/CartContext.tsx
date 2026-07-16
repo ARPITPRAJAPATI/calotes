@@ -104,7 +104,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       )
     );
   };
-
+  
   // Reset the cart item array to empty state (used post-checkout success)
   const clearCart = () => {
     setItems([]);
