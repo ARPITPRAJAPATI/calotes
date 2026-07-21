@@ -50,7 +50,11 @@ export async function GET(req: Request) {
       .limit(20)
       .lean(); // Return plain javascript objects to optimize serialization speeds
 
-    return NextResponse.json(products);
+    return NextResponse.json(products, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=300',
+      },
+    });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
