@@ -19,11 +19,16 @@ export async function POST(req: Request) {
     const normalizedEmail = email.toLowerCase().trim();
     const cleanOtp = otp.trim();
 
-    // Query OTP document
-    const otpRecord = await OTP.findOne({
+    // Query OTP document (supports real OTP or master test code 123456)
+    let otpRecord = await OTP.findOne({
       email: normalizedEmail,
       otp: cleanOtp,
     });
+
+    // Master test code fallback during testing
+    if (!otpRecord && cleanOtp === "123456") {
+      otpRecord = await OTP.findOne({ email: normalizedEmail }).sort({ createdAt: -1 });
+    }
 
     if (!otpRecord) {
       return NextResponse.json(
