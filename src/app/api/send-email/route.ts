@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
     // Call Resend email send method
     const data = await resend.emails.send({
-      from: 'Calotes Vintage <orders@calotesvintage.com>', // Verified sender domain
+      from: process.env.RESEND_FROM_EMAIL || 'Calotes Vintage <onboarding@resend.dev>', // Fallback to onboarding@resend.dev if domain not verified
       to: [to], // Receiver email
       subject: subject || 'Order Confirmation - Calotes Vintage',
       // Inline styling HTML email template
