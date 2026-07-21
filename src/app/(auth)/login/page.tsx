@@ -64,9 +64,22 @@ function LoginFormInner() {
         </button>
       </div>
 
+      {/* Tab Toggle Navigation (Sign In / Register) */}
+      <div className="grid grid-cols-2 bg-card border border-border mb-8 p-1 rounded-lg">
+        <div className="py-2.5 text-center text-xs font-bold uppercase tracking-widest bg-terracotta text-bg rounded-md shadow-sm">
+          Sign In
+        </div>
+        <Link
+          href="/register"
+          className="py-2.5 text-center text-xs font-bold uppercase tracking-widest text-muted hover:text-text transition-colors rounded-md"
+        >
+          Register
+        </Link>
+      </div>
+
       {/* Main Headers */}
-      <div className="mb-10">
-        <h1 className="font-display font-black text-4xl uppercase tracking-tighter mb-2">Welcome Back</h1>
+      <div className="mb-8">
+        <h1 className="font-display font-black text-3xl uppercase tracking-tighter mb-1">Welcome Back</h1>
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Sign in to access your items.</p>
       </div>
 
