@@ -7,9 +7,9 @@ const uri = process.env.MONGODB_URI;
 // Define connection configuration options for MongoClient instantiation
 const options = {
   serverApi: {
-    version: ServerApiVersion.v1, // Configure driver to run under stable API Version 1 guarantees
-    strict: true,                  // Enforce strict compliance check on API version features
-    deprecationErrors: true,       // Raise errors if deprecated features/operations are invoked
+    version: ServerApiVersion.v1,
+    strict: false,
+    deprecationErrors: true,
   },
 };
 

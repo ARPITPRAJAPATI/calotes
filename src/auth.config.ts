@@ -9,6 +9,8 @@ import Credentials from "next-auth/providers/credentials";
 
 // Export the edge-compatible NextAuth configuration object
 export const authConfig = {
+  trustHost: true,
+  secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
   // Define active authentication providers
   providers: [
     // Configure standard Google Sign-In provider using environment credentials
