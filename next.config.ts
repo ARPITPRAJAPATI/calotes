@@ -19,6 +19,7 @@ const withPWA = require('next-pwa')({
 
 const nextConfig: NextConfig = {
   compress: true,
+  turbopack: {},
   images: {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60,
