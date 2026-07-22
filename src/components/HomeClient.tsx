@@ -142,12 +142,8 @@ export default function HomeClient({
 
         <div className="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory pl-6 md:pl-12 pr-6">
           {arrivalsList.map((item, i) => (
-            <motion.div
+            <div
               key={i}
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.07, duration: 0.7, ease: [0.16,1,0.3,1] }}
               className="product-card group snap-start shrink-0 w-[48vw] sm:w-[36vw] md:w-[26vw] lg:w-[20vw] xl:w-[17vw]"
             >
               <Link href={item.href}>
@@ -189,7 +185,7 @@ export default function HomeClient({
                   <p className="text-[9px] md:text-[10px] font-black text-terracotta shrink-0">{item.priceFormatted}</p>
                 </div>
               </Link>
-            </motion.div>
+            </div>
           ))}
           <div className="snap-start shrink-0 w-[48vw] sm:w-[36vw] md:w-[26vw] lg:w-[20vw] xl:w-[17vw] aspect-[3/4] bg-bg-warm border border-border flex flex-col items-center justify-center gap-4 group hover:border-terracotta transition-colors cursor-pointer">
             <Link href="/shop" className="flex flex-col items-center gap-4">
@@ -215,13 +211,7 @@ export default function HomeClient({
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {categoriesList.map((cat, i) => (
-              <motion.div
-                key={cat.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.7, ease: [0.16,1,0.3,1] }}
-              >
+              <div key={cat.title}>
                 <Link href={cat.href} className="relative block aspect-[3/4] group overflow-hidden bg-bg border border-border">
                   <Image src={cat.img} alt={cat.title} fill sizes="(max-width: 640px) 48vw, (max-width: 768px) 36vw, (max-width: 1024px) 25vw, 20vw" className="object-cover transition-transform duration-[1.6s] group-hover:scale-108" />
                   <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-bg/20 to-transparent" />
@@ -233,7 +223,7 @@ export default function HomeClient({
                     </div>
                   </div>
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
           <div className="mt-8 flex justify-center">
@@ -247,13 +237,7 @@ export default function HomeClient({
       ══════════════════════════════════════════════════ */}
       <section className="py-12 md:py-20 px-6 md:px-12 max-w-[1800px] mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.9, ease: [0.16,1,0.3,1] }}
-            className="relative aspect-[4/5] overflow-hidden bg-bg-warm group"
-          >
+          <div className="relative aspect-[4/5] overflow-hidden bg-bg-warm group">
             <Image
               src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=70&w=600&auto=format"
               alt="Vintage Philosophy"
@@ -266,14 +250,8 @@ export default function HomeClient({
               <p className="font-display font-black text-2xl uppercase tracking-tight leading-none">100%</p>
               <p className="text-[8px] text-muted font-bold tracking-[0.3em] uppercase mt-1">Authentic</p>
             </div>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: [0.16,1,0.3,1] }}
-            className="flex flex-col gap-8 md:gap-12"
-          >
+          </div>
+          <div className="flex flex-col gap-8 md:gap-12">
             <div>
               <p className="section-label mb-5">The Philosophy</p>
               <h2 className="font-display font-black text-5xl md:text-7xl uppercase tracking-tighter leading-[0.85]">
@@ -292,7 +270,7 @@ export default function HomeClient({
               <Link href="/about" className="btn-primary">Our Story</Link>
               <Link href="/lookbook" className="btn-outline">Lookbook</Link>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 

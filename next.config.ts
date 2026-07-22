@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
   compress: true,
   turbopack: {},
   experimental: {
-    optimizePackageImports: ['lucide-react', 'framer-motion'],
+    optimizePackageImports: ['lucide-react'],
   },
   images: {
     formats: ['image/avif', 'image/webp'],
