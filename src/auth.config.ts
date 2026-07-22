@@ -17,6 +17,7 @@ export const authConfig = {
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,         // Read Google Client ID from environment variables
       clientSecret: process.env.GOOGLE_CLIENT_SECRET, // Read Google Client Secret from environment variables
+      allowDangerousEmailAccountLinking: true,       // Allow linking Google OAuth accounts with existing email user records
     }),
     
     // Register credentials provider stub here (Edge middleware doesn't support direct Node.js DB connections, so the logic is in full auth.ts)
@@ -32,7 +33,7 @@ export const authConfig = {
     async jwt({ token, user }) {
       // If user object exists (this block executes only during the initial sign-in phase)
       if (user) {
-        token.id = user.id;                           // Persist the custom database user ID inside the encrypted JWT token
+        token.id = user.id || (user as any)._id?.toString(); // Persist the custom database user ID inside the encrypted JWT token
         token.role = (user as any).role || "customer"; // Persist the user role (customer/admin) in the JWT token
       }
       return token;                                   // Return the updated token object

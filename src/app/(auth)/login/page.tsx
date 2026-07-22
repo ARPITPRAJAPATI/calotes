@@ -1,7 +1,7 @@
 "use client"; // Flags this file as a client component to handle browser inputs, NextAuth oauth redirects, and client validations
 
 // Import React hooks and Suspense wrappers
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 // Import NextAuth client helper to trigger sign-in procedures
 import { signIn } from "next-auth/react";
 // Import routing hooks
@@ -17,11 +17,24 @@ function LoginFormInner() {
   const router = useRouter(); // Initialize router redirects
   const searchParams = useSearchParams(); // Read search parameters (requires Suspense parent container wrapper)
   const callbackUrl = searchParams.get("callbackUrl") || "/"; // Extract target redirect URL on successful login
+  const urlError = searchParams.get("error"); // Extract potential auth error redirect code
   
   // Form states
   const [loading, setLoading] = useState(false); // Tracks submit progress indicator
   const [error, setError] = useState("");         // Binds authentication failure alerts
   const [formData, setFormData] = useState({ email: "", password: "" }); // Input values object
+
+  useEffect(() => {
+    if (urlError) {
+      if (urlError === "OAuthAccountNotLinked") {
+        setError("An account with this email already exists under a different sign-in method.");
+      } else if (urlError === "OAuthCallback" || urlError === "Callback") {
+        setError("Google authentication failed. Please try signing in again.");
+      } else {
+        setError("Authentication error. Please try again.");
+      }
+    }
+  }, [urlError]);
 
   // Handles Credentials login submissions
   const handleSubmit = async (e: React.FormEvent) => {
