@@ -115,7 +115,7 @@ export default function Footer() {
         {/* Bottom copyright and legal page links */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-[8px] font-bold uppercase tracking-[0.3em] text-muted">
           <p>© {new Date().getFullYear()} Calotes Vintage. Curated in India.</p>
-          <p className="font-serif italic lowercase text-sm tracking-normal normal-case font-light text-muted/60">
+          <p className="font-serif italic lowercase text-sm tracking-normal normal-case font-light text-muted">
             {"\"Adapt. Stand Out. Be Calotes.\""}
           </p>
           <div className="flex gap-6">

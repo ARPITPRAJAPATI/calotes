@@ -147,6 +147,8 @@ export default function Home() {
               alt="Calotes Vintage Desktop Hero"
               fill
               priority
+              fetchPriority="high"
+              quality={90}
               sizes="100vw"
               className="object-cover object-center"
             />
@@ -159,6 +161,8 @@ export default function Home() {
               alt="Calotes Vintage Mobile Hero"
               fill
               priority
+              fetchPriority="high"
+              quality={90}
               sizes="100vw"
               className="object-cover object-top"
             />
@@ -289,9 +293,10 @@ export default function Home() {
                         category: item.tag,
                       });
                     }}
-                    className="absolute top-2.5 right-2.5 z-20 p-1 text-text hover:text-terracotta hover:scale-110 transition-all duration-300 cursor-pointer"
+                    className="absolute top-1 right-1 z-20 w-11 h-11 flex items-center justify-center text-text hover:text-terracotta hover:scale-110 transition-all duration-300 cursor-pointer min-w-[44px] min-h-[44px]"
                     style={{ border: 'none', background: 'transparent', outline: 'none', boxShadow: 'none' }}
                     title={isInWishlist(item.productId) ? "Remove from Wishlist" : "Add to Wishlist"}
+                    aria-label={isInWishlist(item.productId) ? "Remove from Wishlist" : "Add to Wishlist"}
                   >
                     <Heart 
                       size={15} 
