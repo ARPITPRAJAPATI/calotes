@@ -17,9 +17,9 @@ const SettingsSchema = new Schema(
     // Shipping cost applied to checkout order totals (0 represents free shipping)
     shippingRate: { type: Number, default: 0 },
     // Main image file URL displayed as the homepage background on desktop/PC
-    heroImageUrl: { type: String, default: "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=1600" },
+    heroImageUrl: { type: String, default: "/images/hero-pc.png" },
     // Image file URL displayed as the homepage background on mobile devices
-    heroImageMobileUrl: { type: String, default: "" },
+    heroImageMobileUrl: { type: String, default: "/images/hero-mobile.jpg" },
     // Hex code string variable used to style UI components dynamically (defaults to terracotta orange)
     accentColor: { type: String, default: "#C85a32" },
   },

@@ -16,8 +16,8 @@ export default function AdminSettingsPage() {
   const [contactEmail, setContactEmail] = useState('');
   const [instagramUrl, setInstagramUrl] = useState('');
   const [shippingRate, setShippingRate] = useState('0');
-  const [heroImageUrl, setHeroImageUrl] = useState('');
-  const [heroImageMobileUrl, setHeroImageMobileUrl] = useState('');
+  const [heroImageUrl, setHeroImageUrl] = useState('/images/hero-pc.png');
+  const [heroImageMobileUrl, setHeroImageMobileUrl] = useState('/images/hero-mobile.jpg');
   const [accentColor, setAccentColor] = useState('#C85a32');
 
   // Loading state trackers
@@ -51,8 +51,8 @@ export default function AdminSettingsPage() {
         setContactEmail(data.contactEmail || '');
         setInstagramUrl(data.instagramUrl || '');
         setShippingRate(data.shippingRate !== undefined ? data.shippingRate.toString() : '0');
-        setHeroImageUrl(data.heroImageUrl || '');
-        setHeroImageMobileUrl(data.heroImageMobileUrl || '');
+        setHeroImageUrl(data.heroImageUrl || '/images/hero-pc.png');
+        setHeroImageMobileUrl(data.heroImageMobileUrl || '/images/hero-mobile.jpg');
         setAccentColor(data.accentColor || '#C85a32');
       } else {
         toast.error('Failed to load settings');

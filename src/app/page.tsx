@@ -57,8 +57,8 @@ export default function Home() {
   const [dbCategories, setDbCategories] = useState<any[]>([]); // Holds category listing taxonomy
   const [heroHeadline, setHeroHeadline] = useState("Adapt. Stand Out. Be Calotes."); // Configured landing headline text
   const [heroSubtext, setHeroSubtext] = useState("Hand-picked vintage & streetwear.\nFor the Indian modern icon.");
-  const [heroImageUrl, setHeroImageUrl] = useState("https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=1600"); // Landing hero background image URL
-  const [heroImageMobileUrl, setHeroImageMobileUrl] = useState(""); // Mobile hero background image URL
+  const [heroImageUrl, setHeroImageUrl] = useState("/images/hero-pc.png"); // Landing hero background image URL (Desktop)
+  const [heroImageMobileUrl, setHeroImageMobileUrl] = useState("/images/hero-mobile.jpg"); // Mobile hero background image URL
 
   // Fetch landing page and collection data concurrently on component mount
   useEffect(() => {
