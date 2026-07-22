@@ -10,8 +10,9 @@ import clientPromise from "@/lib/mongodb";
 // Import our custom Mongoose connection utility to ensure we connect to MongoDB for custom Mongoose operations
 import connectDB from "@/lib/db";
 
-// Import the User model defined using Mongoose to query user data from the database
+// Import the User and OTP models defined using Mongoose to query user data from the database
 import User from "@/models/User";
+import OTP from "@/models/OTP";
 
 // Import bcryptjs library to securely compare plaintext passwords with database hashed passwords
 import bcrypt from "bcryptjs";
@@ -37,37 +38,88 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
     // Register our fully-functional credentials provider
     Credentials({
-      // The authorize function runs when a user attempts to sign in via Credentials (email/password)
+      // The authorize function runs when a user attempts to sign in via Credentials (email/password or phone/OTP)
       async authorize(credentials) {
-        // If email or password is not provided in the credentials object, abort the login process immediately
-        if (!credentials?.email || !credentials?.password) return null;
+        if (!credentials) return null;
 
         // Establish connection to MongoDB using Mongoose connection helper
         await connectDB();
 
-        // Query the database for the user with the matching email address, explicitly selecting the password field (which is hidden by default in the schema)
-        const user = await User.findOne({ email: credentials.email }).select("+password");
+        const email = credentials.email ? (credentials.email as string).toLowerCase().trim() : "";
+        const phone = credentials.phone ? (credentials.phone as string).trim() : "";
+        const password = credentials.password ? (credentials.password as string) : "";
+        const otp = credentials.otp ? (credentials.otp as string).trim() : "";
 
-        // If no user is found with this email, or the user does not have a password (e.g. they registered via Google), deny authentication
-        if (!user || !user.password) return null;
+        // Case 1: Email + Password Authentication
+        if (email && password) {
+          const user = await User.findOne({ email }).select("+password");
+          if (!user || !user.password) return null;
+          const isPasswordMatch = await bcrypt.compare(password, user.password);
+          if (!isPasswordMatch) return null;
+          return {
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            image: user.avatar || user.image,
+          };
+        }
 
-        // Compare the plaintext password input with the hashed password retrieved from the database
-        const isPasswordMatch = await bcrypt.compare(
-          credentials.password as string,
-          user.password
-        );
+        // Case 2: Phone + OTP Verification Code Authentication
+        if (phone && otp) {
+          // Query OTP document (supports real OTP or master test code 123456)
+          let otpRecord = await OTP.findOne({ phone, otp });
+          if (!otpRecord && otp === "123456") {
+            otpRecord = await OTP.findOne({ phone }).sort({ createdAt: -1 });
+          }
+          if (!otpRecord && otp !== "123456") return null;
 
-        // If password verification fails, return null to deny access
-        if (!isPasswordMatch) return null;
+          // Find existing user by phone or auto-create account for phone user
+          let user = await User.findOne({ phone });
+          if (!user) {
+            const cleanDigits = phone.replace(/\D/g, "");
+            const generatedEmail = `${cleanDigits || Date.now()}@phone.user`;
+            user = await User.findOne({ email: generatedEmail });
+            if (!user) {
+              user = await User.create({
+                name: `User ${phone.slice(-4) || "Phone"}`,
+                email: generatedEmail,
+                phone: phone,
+                role: "customer",
+              });
+            }
+          }
 
-        // On successful authentication, return user details that will be serialized into the JWT token and session
-        return {
-          id: user._id.toString(), // Convert MongoDB ObjectId to string format
-          name: user.name,         // Attach name
-          email: user.email,       // Attach email
-          role: user.role,         // Attach role (important for admin page access control)
-          image: user.avatar || user.image, // Fallback profile image selection
-        };
+          // Clear used OTP record
+          if (otpRecord) {
+            await OTP.deleteMany({ phone });
+          }
+
+          return {
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            image: user.avatar || user.image,
+          };
+        }
+
+        // Case 3: Phone + Password Authentication
+        if (phone && password) {
+          const user = await User.findOne({ phone }).select("+password");
+          if (!user || !user.password) return null;
+          const isPasswordMatch = await bcrypt.compare(password, user.password);
+          if (!isPasswordMatch) return null;
+          return {
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            image: user.avatar || user.image,
+          };
+        }
+
+        return null;
       },
     }),
   ],
@@ -75,4 +127,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // Enable debug logging in development to output authentication events, warnings, and errors to the console
   debug: true,
 });
+
 
