@@ -58,6 +58,7 @@ export default function Home() {
   const [heroHeadline, setHeroHeadline] = useState("Adapt. Stand Out. Be Calotes."); // Configured landing headline text
   const [heroSubtext, setHeroSubtext] = useState("Hand-picked vintage & streetwear.\nFor the Indian modern icon.");
   const [heroImageUrl, setHeroImageUrl] = useState("https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=1600"); // Landing hero background image URL
+  const [heroImageMobileUrl, setHeroImageMobileUrl] = useState(""); // Mobile hero background image URL
 
   // Fetch landing page and collection data concurrently on component mount
   useEffect(() => {
@@ -86,6 +87,7 @@ export default function Home() {
             if (data.heroHeadline) setHeroHeadline(data.heroHeadline);
             if (data.heroSubtext) setHeroSubtext(data.heroSubtext);
             if (data.heroImageUrl) setHeroImageUrl(data.heroImageUrl);
+            if (data.heroImageMobileUrl) setHeroImageMobileUrl(data.heroImageMobileUrl);
           }
         }
       } catch (err) {
@@ -138,14 +140,30 @@ export default function Home() {
       <section ref={heroRef} className="relative w-full h-[100svh] min-h-[600px] overflow-hidden flex flex-col">
         {/* Background image applying parallax transform scale coordinates */}
         <motion.div className="absolute inset-0" style={{ y: heroY }}>
-          <Image
-            src={heroImageUrl}
-            alt="Calotes Vintage Hero"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-top"
-          />
+          {/* Desktop / PC Widescreen Hero Image */}
+          <div className="hidden md:block absolute inset-0">
+            <Image
+              src={heroImageUrl}
+              alt="Calotes Vintage Desktop Hero"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center"
+            />
+          </div>
+
+          {/* Mobile Devices Portrait Hero Image (falls back to desktop image if mobile image not set) */}
+          <div className="block md:hidden absolute inset-0">
+            <Image
+              src={heroImageMobileUrl || heroImageUrl}
+              alt="Calotes Vintage Mobile Hero"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-top"
+            />
+          </div>
+
           {/* Warm dark visual gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-b from-bg/70 via-bg/40 to-bg/80" />
         </motion.div>

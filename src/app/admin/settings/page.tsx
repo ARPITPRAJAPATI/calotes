@@ -17,6 +17,7 @@ export default function AdminSettingsPage() {
   const [instagramUrl, setInstagramUrl] = useState('');
   const [shippingRate, setShippingRate] = useState('0');
   const [heroImageUrl, setHeroImageUrl] = useState('');
+  const [heroImageMobileUrl, setHeroImageMobileUrl] = useState('');
   const [accentColor, setAccentColor] = useState('#C85a32');
 
   // Loading state trackers
@@ -26,6 +27,7 @@ export default function AdminSettingsPage() {
 
   // Image Cropper State
   const [cropperFile, setCropperFile] = useState<File | null>(null);
+  const [cropTarget, setCropTarget] = useState<'desktop' | 'mobile'>('desktop');
   const [isCropperOpen, setIsCropperOpen] = useState<boolean>(false);
 
   // Preset accent configurations matching brand palettes
@@ -50,6 +52,7 @@ export default function AdminSettingsPage() {
         setInstagramUrl(data.instagramUrl || '');
         setShippingRate(data.shippingRate !== undefined ? data.shippingRate.toString() : '0');
         setHeroImageUrl(data.heroImageUrl || '');
+        setHeroImageMobileUrl(data.heroImageMobileUrl || '');
         setAccentColor(data.accentColor || '#C85a32');
       } else {
         toast.error('Failed to load settings');
@@ -65,10 +68,11 @@ export default function AdminSettingsPage() {
     fetchSettings();
   }, []);
 
-  // Intercept file selection and open Cropper Modal
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Intercept file selection for Desktop or Mobile
+  const handleFileSelect = (target: 'desktop' | 'mobile', e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setCropTarget(target);
     setCropperFile(file);
     setIsCropperOpen(true);
     e.target.value = '';
@@ -87,9 +91,14 @@ export default function AdminSettingsPage() {
         body: formData,
       });
       const data = await res.json();
-      if (res.ok) {
-        setHeroImageUrl(data.url); // Bind returned Cloudinary URL
-        toast.success('Hero image uploaded successfully!');
+      if (res.ok && data.url) {
+        if (cropTarget === 'desktop') {
+          setHeroImageUrl(data.url);
+          toast.success('Desktop Hero image uploaded successfully!');
+        } else {
+          setHeroImageMobileUrl(data.url);
+          toast.success('Mobile Hero image uploaded successfully!');
+        }
       } else {
         toast.error(data.error || 'Failed to upload image');
       }
@@ -113,6 +122,7 @@ export default function AdminSettingsPage() {
       instagramUrl,
       shippingRate: parseFloat(shippingRate) || 0,
       heroImageUrl,
+      heroImageMobileUrl,
       accentColor,
     };
 
@@ -194,43 +204,104 @@ export default function AdminSettingsPage() {
             />
           </div>
 
-          {/* Banner configuration settings */}
-          <div className="space-y-4 pt-4 border-t border-border/50">
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted block">
-              Hero Background Image
-            </label>
+          {/* Banner configuration settings - Dual Desktop & Mobile Uploads */}
+          <div className="space-y-6 pt-6 border-t border-border/50">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-terracotta">
+              Hero Banner Assets (PC vs Mobile Devices)
+            </h3>
 
-            {heroImageUrl && (
-              // Live image preview
-              <div className="relative aspect-video max-w-md overflow-hidden bg-bg border border-border">
-                <img
-                  src={heroImageUrl}
-                  alt="Hero preview"
-                  className="w-full h-full object-cover"
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Desktop / PC Banner Upload */}
+              <div className="space-y-3 bg-bg border border-border p-4 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-text block">
+                    Desktop / PC Banner (16:9 Widescreen)
+                  </label>
+                  <span className="text-[9px] font-mono text-muted uppercase">Recommended: 1920x1080</span>
+                </div>
+
+                {heroImageUrl ? (
+                  <div className="relative aspect-video w-full overflow-hidden bg-black border border-border rounded">
+                    <img
+                      src={heroImageUrl}
+                      alt="Desktop Hero preview"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="aspect-video w-full border border-dashed border-border flex items-center justify-center text-[10px] font-black uppercase tracking-widest text-muted">
+                    No Desktop Banner Uploaded
+                  </div>
+                )}
+
+                <div className="flex gap-2 items-center">
+                  <label className="flex items-center gap-2 border border-border px-3 py-2.5 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-card transition-colors shrink-0">
+                    <Upload size={13} />
+                    {isUploading && cropTarget === 'desktop' ? 'Uploading...' : 'Upload PC Image'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleFileSelect('desktop', e)}
+                      className="hidden"
+                      disabled={isUploading}
+                    />
+                  </label>
+
+                  <input
+                    type="text"
+                    value={heroImageUrl}
+                    onChange={(e) => setHeroImageUrl(e.target.value)}
+                    placeholder="Or paste PC image URL..."
+                    className="flex-1 bg-card border border-border px-3 py-2.5 text-[11px] font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
+                  />
+                </div>
               </div>
-            )}
 
-            <div className="flex gap-4 items-center">
-              <label className="flex items-center gap-2 border border-border px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-bg transition-colors">
-                <Upload size={14} />
-                {isUploading ? 'Uploading Banner...' : 'Upload Image'}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                  disabled={isUploading}
-                />
-              </label>
+              {/* Mobile Device Banner Upload */}
+              <div className="space-y-3 bg-bg border border-border p-4 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-text block">
+                    Mobile Device Banner (3:4 Vertical Portrait)
+                  </label>
+                  <span className="text-[9px] font-mono text-muted uppercase">Recommended: 900x1200</span>
+                </div>
 
-              <input
-                type="text"
-                value={heroImageUrl}
-                onChange={(e) => setHeroImageUrl(e.target.value)}
-                placeholder="Or paste hero image URL here..."
-                className="flex-1 bg-bg border border-border px-4 py-3 text-xs font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
-              />
+                {heroImageMobileUrl ? (
+                  <div className="relative aspect-video w-full overflow-hidden bg-black border border-border rounded">
+                    <img
+                      src={heroImageMobileUrl}
+                      alt="Mobile Hero preview"
+                      className="w-full h-full object-cover object-top"
+                    />
+                  </div>
+                ) : (
+                  <div className="aspect-video w-full border border-dashed border-border flex items-center justify-center text-[10px] font-black uppercase tracking-widest text-muted">
+                    Fallback: Uses PC Banner
+                  </div>
+                )}
+
+                <div className="flex gap-2 items-center">
+                  <label className="flex items-center gap-2 border border-border px-3 py-2.5 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-card transition-colors shrink-0">
+                    <Upload size={13} />
+                    {isUploading && cropTarget === 'mobile' ? 'Uploading...' : 'Upload Mobile Image'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleFileSelect('mobile', e)}
+                      className="hidden"
+                      disabled={isUploading}
+                    />
+                  </label>
+
+                  <input
+                    type="text"
+                    value={heroImageMobileUrl}
+                    onChange={(e) => setHeroImageMobileUrl(e.target.value)}
+                    placeholder="Or paste Mobile image URL..."
+                    className="flex-1 bg-card border border-border px-3 py-2.5 text-[11px] font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -374,8 +445,8 @@ export default function AdminSettingsPage() {
         }}
         onCropComplete={handleCropComplete}
         onSkipCrop={handleCropComplete}
-        defaultAspectRatio={16 / 9}
-        title="Crop Hero Banner Image"
+        defaultAspectRatio={cropTarget === 'desktop' ? 16 / 9 : 3 / 4}
+        title={cropTarget === 'desktop' ? 'Crop PC / Desktop Widescreen Banner (16:9)' : 'Crop Mobile Device Banner (3:4)'}
       />
     </div>
   );
