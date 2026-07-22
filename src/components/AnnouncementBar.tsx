@@ -31,8 +31,8 @@ export default function AnnouncementBar() {
         >
           {/* Scrolling ticker track container */}
           <div className="py-1.5 flex whitespace-nowrap items-center marquee-track">
-            {/* Create duplicate copies of the text string array to form a continuous infinite text scroll loop */}
-            {[...Array(10)].map((_, i) => (
+            {/* Create 4 copies of text array for continuous ticker loop */}
+            {[...Array(4)].map((_, i) => (
               <span key={i} className="font-display font-black text-[9px] uppercase tracking-[0.2em] mx-4 flex items-center gap-4">
                 Free Shipping on orders above ₹2999 <Star size={8} fill="currentColor" />
                 Authentic Vintage Selection <Star size={8} fill="currentColor" />
