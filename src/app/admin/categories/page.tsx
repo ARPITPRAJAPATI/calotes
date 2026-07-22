@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Trash2, Upload } from 'lucide-react';
 // Import hot toast notification triggers
 import toast from 'react-hot-toast';
+import ImageCropperModal from '@/components/ImageCropperModal';
 
 // Category interface schema definitions
 interface Category {
@@ -28,6 +29,10 @@ export default function AdminCategoriesPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Image Cropper State
+  const [cropperFile, setCropperFile] = useState<File | null>(null);
+  const [isCropperOpen, setIsCropperOpen] = useState<boolean>(false);
+
   // Fetch categories list from backend API
   const fetchCategories = async () => {
     try {
@@ -49,14 +54,20 @@ export default function AdminCategoriesPage() {
     setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
   };
 
-  // Upload single category cover image to Cloudinary via upload endpoint
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Intercept file selection and open Cropper
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setCropperFile(file);
+    setIsCropperOpen(true);
+    e.target.value = '';
+  };
 
+  // Upload single category cover image (cropped or original) to Cloudinary via upload endpoint
+  const handleCropComplete = async (fileToUpload: File) => {
     setIsUploading(true);
     const formData = new FormData();
-    formData.append('file', file); // Bind binary payload
+    formData.append('file', fileToUpload);
 
     try {
       const res = await fetch('/api/upload', {
@@ -70,7 +81,7 @@ export default function AdminCategoriesPage() {
       } else {
         toast.error(data.error || 'Upload failed');
       }
-    } catch (err) {
+    } catch {
       toast.error('Image upload failed');
     } finally {
       setIsUploading(false);
@@ -201,7 +212,7 @@ export default function AdminCategoriesPage() {
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={handleImageUpload}
+                    onChange={handleFileSelect}
                     className="hidden"
                   />
                   <Upload size={20} className="text-muted group-hover:text-text transition-colors mb-2 animate-bounce" />
@@ -215,9 +226,9 @@ export default function AdminCategoriesPage() {
             <button
               type="submit"
               disabled={isSubmitting || isUploading}
-              className="w-full bg-text text-bg py-3 text-[10px] font-black uppercase tracking-widest hover:bg-bg-dark transition-colors disabled:opacity-50"
+              className="w-full bg-text text-bg py-4 text-[10px] font-black uppercase tracking-widest hover:bg-bg-dark transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              {isSubmitting ? 'Creating...' : 'Create Collection'}
+              <Plus size={14} /> {isSubmitting ? 'Adding...' : 'Add Category'}
             </button>
           </form>
         </div>
@@ -225,27 +236,38 @@ export default function AdminCategoriesPage() {
         {/* Right column - Categories Grid List */}
         <div className="lg:col-span-2 space-y-6">
           <h2 className="text-xs font-black uppercase tracking-[0.2em] border-b border-border pb-2">
-            Existing Collections ({categories.length})
+            Active Categories ({categories.length})
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {categories.map((cat) => (
-              <div key={cat._id} className="bg-card border border-border p-4 flex gap-4 relative group">
-                {/* Visual image box */}
-                <div className="w-20 h-20 bg-white border border-border overflow-hidden shrink-0">
+              <div key={cat._id} className="border border-border bg-card overflow-hidden flex flex-col justify-between group relative">
+                {/* Category preview image header */}
+                <div className="aspect-[21/9] w-full bg-bg relative overflow-hidden">
                   {cat.image ? (
-                    <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                    <img
+                      src={cat.image}
+                      alt={cat.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[10px] text-muted font-black uppercase tracking-widest bg-gray-100">
-                      NO IMG
+                    <div className="w-full h-full flex items-center justify-center text-[10px] font-black uppercase tracking-widest text-muted">
+                      No Banner Asset
                     </div>
                   )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-3 left-3 text-white">
+                    <span className="text-[9px] font-mono tracking-widest text-terracotta bg-black/40 px-1.5 py-0.5 rounded">
+                      /{cat.slug}
+                    </span>
+                  </div>
                 </div>
-                {/* Details layout */}
-                <div className="flex-1 flex flex-col justify-between">
+
+                <div className="p-4 flex-1 flex flex-col justify-between">
                   <div>
-                    <h3 className="text-sm font-black uppercase tracking-tight">{cat.name}</h3>
-                    <p className="text-[9px] text-muted font-bold tracking-widest mt-1">/{cat.slug}</p>
+                    <h3 className="font-display font-black text-sm uppercase tracking-tight">
+                      {cat.name}
+                    </h3>
                     {cat.description && (
                       <p className="text-[10px] text-muted line-clamp-2 mt-2 leading-relaxed font-semibold">
                         {cat.description}
@@ -272,7 +294,20 @@ export default function AdminCategoriesPage() {
           </div>
         </div>
       </div>
+
+      {/* Image Cropper Modal */}
+      <ImageCropperModal
+        file={cropperFile}
+        isOpen={isCropperOpen}
+        onClose={() => {
+          setIsCropperOpen(false);
+          setCropperFile(null);
+        }}
+        onCropComplete={handleCropComplete}
+        onSkipCrop={handleCropComplete}
+        defaultAspectRatio={16 / 9}
+        title="Crop Category Banner"
+      />
     </div>
   );
 }
-

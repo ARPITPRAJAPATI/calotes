@@ -8,8 +8,8 @@ import { useRouter } from 'next/navigation';
 import { Upload, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
 // Import hot toast notification helper
 import toast from 'react-hot-toast';
-// Import Link for page transitions
 import Link from 'next/link';
+import ImageCropperModal from '@/components/ImageCropperModal';
 
 // Category interface mapping
 interface Category {
@@ -108,41 +108,59 @@ export default function EditProductPage({ params }: PageProps) {
     setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
   };
 
-  // Upload loop uploading multiple selected images to Cloudinary via upload APIs
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
+  // Image Cropper States
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [currentCropIndex, setCurrentCropIndex] = useState<number>(0);
+  const [isCropperOpen, setIsCropperOpen] = useState<boolean>(false);
 
+  // Helper to upload a single file (original or cropped) to Cloudinary
+  const uploadSingleFile = async (fileToUpload: File) => {
     setIsUploading(true);
-    const uploadedUrls: string[] = [];
-
     try {
-      // Loop through all selected image files sequentially
-      for (let i = 0; i < files.length; i++) {
-        const formData = new FormData();
-        formData.append('file', files[i]); // Bind binary file
-        
-        // Execute POST request to upload endpoint
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        const data = await res.json();
-        if (res.ok) {
-          uploadedUrls.push(data.url); // Append returned Cloudinary asset URL
-        } else {
-          toast.error(`Failed to upload ${files[i].name}: ${data.error}`);
-        }
-      }
+      const formData = new FormData();
+      formData.append('file', fileToUpload);
       
-      if (uploadedUrls.length > 0) {
-        setImages((prev) => [...prev, ...uploadedUrls]); // Hydrate upload URLs list
-        toast.success(`Uploaded ${uploadedUrls.length} images!`);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setImages((prev) => [...prev, data.url]);
+        toast.success('Image uploaded successfully!');
+      } else {
+        toast.error(`Upload failed: ${data.error || 'Unknown error'}`);
       }
     } catch {
       toast.error('Image upload failed');
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  // Intercept file selection and open Cropper Modal
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const fileList = Array.from(files);
+    setPendingFiles(fileList);
+    setCurrentCropIndex(0);
+    setIsCropperOpen(true);
+    e.target.value = ''; // Reset file input
+  };
+
+  // Handler when user finishes cropping an image in the modal
+  const handleCropComplete = async (croppedFile: File) => {
+    await uploadSingleFile(croppedFile);
+    
+    // Check if more files are queued for cropping
+    if (currentCropIndex + 1 < pendingFiles.length) {
+      setCurrentCropIndex((prev) => prev + 1);
+    } else {
+      setIsCropperOpen(false);
+      setPendingFiles([]);
+      setCurrentCropIndex(0);
     }
   };
 
@@ -506,6 +524,21 @@ export default function EditProductPage({ params }: PageProps) {
           </div>
         </div>
       </form>
+
+      {/* Image Cropper Modal */}
+      <ImageCropperModal
+        file={pendingFiles[currentCropIndex] || null}
+        isOpen={isCropperOpen}
+        onClose={() => {
+          setIsCropperOpen(false);
+          setPendingFiles([]);
+          setCurrentCropIndex(0);
+        }}
+        onCropComplete={handleCropComplete}
+        onSkipCrop={handleCropComplete}
+        defaultAspectRatio={3 / 4}
+        title={`Crop Product Image (${currentCropIndex + 1}/${pendingFiles.length})`}
+      />
     </div>
   );
 }

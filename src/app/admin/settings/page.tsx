@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 // Import UI vector graphics icons
 import { Loader2, Save, Upload } from 'lucide-react';
+import ImageCropperModal from '@/components/ImageCropperModal';
 
 export default function AdminSettingsPage() {
   // Bind form configurations to individual state hooks
@@ -22,6 +23,10 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Image Cropper State
+  const [cropperFile, setCropperFile] = useState<File | null>(null);
+  const [isCropperOpen, setIsCropperOpen] = useState<boolean>(false);
 
   // Preset accent configurations matching brand palettes
   const presets = [
@@ -60,14 +65,21 @@ export default function AdminSettingsPage() {
     fetchSettings();
   }, []);
 
-  // Upload hero banner image using multipart/form-data POST endpoints
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Intercept file selection and open Cropper Modal
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setCropperFile(file);
+    setIsCropperOpen(true);
+    e.target.value = '';
+  };
 
+  // Upload cropped or original hero banner image using multipart/form-data POST endpoints
+  const handleCropComplete = async (fileToUpload: File) => {
     setIsUploading(true);
+    setIsCropperOpen(false);
     const formData = new FormData();
-    formData.append('file', file); // Append binary file
+    formData.append('file', fileToUpload);
 
     try {
       const res = await fetch('/api/upload', {
@@ -206,7 +218,7 @@ export default function AdminSettingsPage() {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={handleImageUpload}
+                  onChange={handleFileSelect}
                   className="hidden"
                   disabled={isUploading}
                 />
@@ -264,53 +276,50 @@ export default function AdminSettingsPage() {
                 ))}
               </div>
             </div>
+
+            {/* Custom HEX code input */}
+            <div className="flex gap-4 items-center max-w-xs pt-2">
+              <input
+                type="color"
+                value={accentColor}
+                onChange={(e) => setAccentColor(e.target.value)}
+                className="w-10 h-10 border border-border bg-bg cursor-pointer rounded p-1"
+              />
+              <input
+                type="text"
+                value={accentColor}
+                onChange={(e) => setAccentColor(e.target.value)}
+                className="flex-1 bg-bg border border-border px-4 py-2.5 text-xs font-mono font-bold tracking-widest focus:outline-none focus:border-text uppercase"
+                placeholder="#C85A32"
+              />
+            </div>
           </div>
         </div>
 
-        {/* Section 3: Tickers & Announcements */}
+        {/* Section 4: Contact & Social links */}
         <div className="bg-card border border-border p-8 space-y-6">
           <h2 className="text-xs font-black uppercase tracking-[0.2em] border-b border-border pb-2 text-text">
-            Announcements & Promotion
-          </h2>
-
-          <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted block">
-              Running Announcement Bar Text
-            </label>
-            <input
-              type="text"
-              value={announcementText}
-              onChange={(e) => setAnnouncementText(e.target.value)}
-              placeholder="e.g., Free Shipping Pan India · Authentic Pre-Loved Streetwear"
-              className="w-full bg-bg border border-border px-4 py-3 text-xs font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
-              required
-            />
-          </div>
-        </div>
-
-        {/* Section 4: Contact links */}
-        <div className="bg-card border border-border p-8 space-y-6">
-          <h2 className="text-xs font-black uppercase tracking-[0.2em] border-b border-border pb-2 text-text">
-            Support & Community Links
+            Contact & Social Connections
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-1">
               <label className="text-[10px] font-black uppercase tracking-widest text-muted block">
-                Contact Email
+                Support Email
               </label>
               <input
                 type="email"
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
-                placeholder="contact@calotesvintage.com"
+                placeholder="support@calotes.com"
                 className="w-full bg-bg border border-border px-4 py-3 text-xs font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
                 required
               />
             </div>
+
             <div className="space-y-1">
               <label className="text-[10px] font-black uppercase tracking-widest text-muted block">
-                Instagram URL
+                Instagram Profile URL
               </label>
               <input
                 type="url"
@@ -318,13 +327,12 @@ export default function AdminSettingsPage() {
                 onChange={(e) => setInstagramUrl(e.target.value)}
                 placeholder="https://instagram.com/calotes.vintage"
                 className="w-full bg-bg border border-border px-4 py-3 text-xs font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
-                required
               />
             </div>
           </div>
         </div>
 
-        {/* Section 5: Shipping fees */}
+        {/* Section 5: Shipping Fee logic */}
         <div className="bg-card border border-border p-8 space-y-6">
           <h2 className="text-xs font-black uppercase tracking-[0.2em] border-b border-border pb-2 text-text">
             Fulfillment & Shipping Rules
@@ -355,7 +363,20 @@ export default function AdminSettingsPage() {
           {saving ? 'Saving Configurations...' : 'Save Configuration'}
         </button>
       </form>
+
+      {/* Image Cropper Modal */}
+      <ImageCropperModal
+        file={cropperFile}
+        isOpen={isCropperOpen}
+        onClose={() => {
+          setIsCropperOpen(false);
+          setCropperFile(null);
+        }}
+        onCropComplete={handleCropComplete}
+        onSkipCrop={handleCropComplete}
+        defaultAspectRatio={16 / 9}
+        title="Crop Hero Banner Image"
+      />
     </div>
   );
 }
-
