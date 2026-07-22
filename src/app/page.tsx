@@ -19,30 +19,30 @@ import ProductImageSlider from "@/components/ProductImageSlider";
    Latest Arrivals (Fallback horizontal scroll data)
    ───────────────────────────────────────────────────────── */
 const ARRIVALS = [
-  { name: "Vintage Levi's 501",       price: "₹3,499", tag: "Denim",     img: "https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=800" },
-  { name: "Carhartt Detroit Jacket",  price: "₹7,999", tag: "Outerwear", img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800" },
-  { name: "Harley Davidson Tee",      price: "₹2,499", tag: "Tees",      img: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800" },
-  { name: "Military Field Jacket",    price: "₹6,499", tag: "Outerwear", img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800" },
-  { name: "Vintage Nike Hoodie",      price: "₹4,299", tag: "Hoodies",   img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800" },
-  { name: "90s Striped Rugby",        price: "₹1,999", tag: "Jerseys",   img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800" },
+  { name: "Vintage Levi's 501",       price: "₹3,499", tag: "Denim",     img: "https://images.unsplash.com/photo-1542272604-787c3835535d?q=70&w=400&auto=format" },
+  { name: "Carhartt Detroit Jacket",  price: "₹7,999", tag: "Outerwear", img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=70&w=400&auto=format" },
+  { name: "Harley Davidson Tee",      price: "₹2,499", tag: "Tees",      img: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=70&w=400&auto=format" },
+  { name: "Military Field Jacket",    price: "₹6,499", tag: "Outerwear", img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=70&w=400&auto=format" },
+  { name: "Vintage Nike Hoodie",      price: "₹4,299", tag: "Hoodies",   img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=70&w=400&auto=format" },
+  { name: "90s Striped Rugby",        price: "₹1,999", tag: "Jerseys",   img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=70&w=400&auto=format" },
 ];
 
 // Fallback categories list
 const CATEGORIES = [
-  { title: "Denim",       img: "https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?q=80&w=900", href: "/shop?category=denim" },
-  { title: "Outerwear",   img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=900",   href: "/shop?category=outerwear" },
-  { title: "Oversized",   img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=900",   href: "/shop?category=oversized" },
-  { title: "Plus Size",   img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900", href: "/shop?category=plus-size" },
+  { title: "Denim",       img: "https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?q=70&w=400&auto=format", href: "/shop?category=denim" },
+  { title: "Outerwear",   img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=70&w=400&auto=format",   href: "/shop?category=outerwear" },
+  { title: "Oversized",   img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=70&w=400&auto=format",   href: "/shop?category=oversized" },
+  { title: "Plus Size",   img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=70&w=400&auto=format", href: "/shop?category=plus-size" },
 ];
 
 // Insta lookbook teaser assets
 const INSTA_IMGS = [
-  "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=600",
-  "https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=600",
-  "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600",
-  "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=600",
-  "https://images.unsplash.com/photo-1529139572765-798728d32ec4?q=80&w=600",
-  "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=600",
+  "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=70&w=350&auto=format",
+  "https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=70&w=350&auto=format",
+  "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=70&w=350&auto=format",
+  "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=70&w=350&auto=format",
+  "https://images.unsplash.com/photo-1529139572765-798728d32ec4?q=70&w=350&auto=format",
+  "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=70&w=350&auto=format",
 ];
 
 export default function Home() {
