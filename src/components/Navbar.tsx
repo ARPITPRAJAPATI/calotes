@@ -69,11 +69,18 @@ export default function Navbar() {
     }
   };
 
-  // Add scroll event listener to dynamically apply blur/border styling to sticky header on page scroll
+  // Add passive scroll event listener to dynamically apply blur/border styling only when threshold changes
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll); // Clean up scroll listeners on unmount
+    let prev = false;
+    const onScroll = () => {
+      const isScrolled = window.scrollY > 40;
+      if (isScrolled !== prev) {
+        prev = isScrolled;
+        setScrolled(isScrolled);
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const lastPathname = useRef(pathname); // Persist reference to previous route path name

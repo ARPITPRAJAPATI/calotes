@@ -17,9 +17,15 @@ export async function GET(req: Request) {
     const categorySlug = searchParams.get('category'); // Filter category
     const brand = searchParams.get('brand');          // Filter brand
     const searchTerm = searchParams.get('q');         // Filter keyword
+    const slug = searchParams.get('slug');             // Filter slug
     const sort = searchParams.get('sort') || '-createdAt'; // Sort criteria
     
     let query: any = {}; // Construct dynamic query clauses object
+
+    // If slug parameter is passed, match specific product slug
+    if (slug) {
+      query.slug = slug;
+    }
 
     // If search term is present, match key-word regex against product name, brand, or descriptions
     if (searchTerm) {
