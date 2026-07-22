@@ -2,17 +2,14 @@ import type { Metadata } from "next";
 import { Inter, Barlow, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
-import CartDrawer from "@/components/CartDrawer";
 import Navbar from "@/components/Navbar";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
-import { Toaster } from "react-hot-toast";
-import CookieBanner from "@/components/CookieBanner";
 import PageTransition from "@/components/PageTransition";
 import connectDB from "@/lib/db";
 import Settings from "@/models/Settings";
-import WishlistDrawer from "@/components/WishlistDrawer";
+
+import ClientOverlays from "@/components/ClientOverlays";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -120,21 +117,7 @@ export default async function RootLayout({
             </main>
           </PageTransition>
           <Footer />
-          <CartDrawer />
-          <WishlistDrawer />
-          <WhatsAppButton />
-          <CookieBanner />
-          <Toaster 
-            position="bottom-center" 
-            toastOptions={{
-              style: {
-                background: '#111010',
-                color: '#F2EDE6',
-                borderRadius: '0',
-                border: '1px solid #D5CFC8',
-              }
-            }} 
-          />
+          <ClientOverlays />
         </Providers>
       </body>
     </html>

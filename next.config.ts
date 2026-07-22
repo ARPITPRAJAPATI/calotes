@@ -3,15 +3,15 @@ import type { NextConfig } from "next";
 // PWA support using next-pwa
 const withPWA = require('next-pwa')({
   dest: 'public',
-  register: true,
+  register: false,
   skipWaiting: true,
   runtimeCaching: [
     {
-      urlPattern: /\\.(?:png|jpg|jpeg|svg|gif|webp|avif)$/, // image assets
+      urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|avif)$/,
       handler: 'CacheFirst',
       options: {
         cacheName: 'image-cache',
-        expiration: { maxEntries: 200, maxAgeSeconds: 30 * 24 * 60 * 60 }, // 30 days
+        expiration: { maxEntries: 200, maxAgeSeconds: 30 * 24 * 60 * 60 },
       },
     },
   ],
