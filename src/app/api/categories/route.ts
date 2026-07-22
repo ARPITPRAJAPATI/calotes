@@ -11,7 +11,7 @@ export async function GET() {
     const categories = await Category.find().populate('parent').sort('name').lean();
     return NextResponse.json(categories, {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=600',
       },
     });
   } catch (error: any) {

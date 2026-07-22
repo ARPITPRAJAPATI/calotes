@@ -102,6 +102,12 @@ export default function Home() {
 
   const { toggleWishlist, isInWishlist } = useWishlist(); // Extract wishlist actions
 
+  // Helper: append Cloudinary f_auto,q_auto transformations for optimized delivery
+  const optimizeCloudinaryUrl = (url: string) => {
+    if (!url || !url.includes('res.cloudinary.com')) return url;
+    return url.replace('/upload/', '/upload/f_auto,q_auto,w_600/');
+  };
+
   // Format product lists mapping DB records, falling back to static ARRIVALS list if DB is empty
   const arrivalsList = dbArrivals.length > 0 ? dbArrivals.map((p, idx) => ({
     productId: p._id,
@@ -109,8 +115,8 @@ export default function Home() {
     price: p.price,
     priceFormatted: `₹${p.price.toLocaleString('en-IN')}`,
     tag: p.category?.name || 'Archive',
-    img: p.images?.[0] || 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=800',
-    imgs: p.images || ['https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=800'],
+    img: optimizeCloudinaryUrl(p.images?.[0] || 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=70&w=400&auto=format'),
+    imgs: (p.images || ['https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=70&w=400&auto=format']).map(optimizeCloudinaryUrl),
     href: `/shop/product/${p.slug}`,
     slug: p.slug,
   })) : ARRIVALS.map((a, idx) => ({
@@ -128,7 +134,7 @@ export default function Home() {
   // Format categories mapping DB records, falling back to static CATEGORIES list if DB is empty
   const categoriesList = dbCategories.length > 0 ? dbCategories.map(c => ({
     title: c.name,
-    img: c.image || 'https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?q=80&w=900',
+    img: optimizeCloudinaryUrl(c.image || 'https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?q=70&w=400&auto=format'),
     href: `/shop?category=${c.slug}`
   })) : CATEGORIES;
 
@@ -402,9 +408,10 @@ export default function Home() {
             className="relative aspect-[4/5] overflow-hidden bg-bg-warm group"
           >
             <Image
-              src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000"
+              src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=70&w=600&auto=format"
               alt="Vintage Philosophy"
               fill
+              loading="lazy"
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover transition-transform duration-[2s] group-hover:scale-105"
             />
@@ -477,6 +484,7 @@ export default function Home() {
               <img
                 src={img}
                 alt={`Look ${i + 1}`}
+                loading="lazy"
                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-bg/50 opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex items-center justify-center">
@@ -516,6 +524,7 @@ export default function Home() {
               <img
                 src={img}
                 alt="Community post"
+                loading="lazy"
                 className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-bg/60 opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex items-center justify-center">

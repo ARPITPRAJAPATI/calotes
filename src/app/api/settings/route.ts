@@ -13,7 +13,11 @@ export async function GET() {
       const doc = await Settings.create({});
       settings = doc.toObject();
     }
-    return NextResponse.json(settings);
+    return NextResponse.json(settings, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=600',
+      },
+    });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
