@@ -84,8 +84,8 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="manifest" href="/manifest.webmanifest" />
-        <link rel="preload" as="image" href="/images/hero-pc.jpg" fetchPriority="high" />
-        <link rel="preload" as="image" href="/images/hero-mobile.jpg" fetchPriority="high" />
+        <link rel="preload" as="image" href="/images/hero-mobile.jpg" media="(max-width: 767px)" fetchPriority="high" />
+        <link rel="preload" as="image" href="/images/hero-pc.jpg" media="(min-width: 768px)" fetchPriority="high" />
         <meta name="theme-color" content="#C85a32" />
         <script dangerouslySetInnerHTML={{ __html: `
           (function() {

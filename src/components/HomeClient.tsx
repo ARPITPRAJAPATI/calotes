@@ -50,30 +50,17 @@ export default function HomeClient({
       ══════════════════════════════════════════════════ */}
       <section ref={heroRef} className="relative w-full h-[100svh] min-h-[600px] overflow-hidden flex flex-col">
         <motion.div className="absolute inset-0" style={{ y: heroY }}>
-          <div className="hidden md:block absolute inset-0">
-            <Image
+          <picture className="absolute inset-0 block w-full h-full">
+            <source media="(max-width: 767px)" srcSet={heroImageMobileUrl || heroImageUrl} />
+            <source media="(min-width: 768px)" srcSet={heroImageUrl} />
+            <img
               src={heroImageUrl}
-              alt="Calotes Vintage Desktop Hero"
-              fill
-              priority
+              alt="Calotes Vintage Hero"
               fetchPriority="high"
-              quality={90}
-              sizes="100vw"
-              className="object-cover object-center"
+              decoding="async"
+              className="w-full h-full object-cover object-top md:object-center"
             />
-          </div>
-          <div className="block md:hidden absolute inset-0">
-            <Image
-              src={heroImageMobileUrl || heroImageUrl}
-              alt="Calotes Vintage Mobile Hero"
-              fill
-              priority
-              fetchPriority="high"
-              quality={90}
-              sizes="100vw"
-              className="object-cover object-top"
-            />
-          </div>
+          </picture>
           <div className="absolute inset-0 bg-gradient-to-b from-bg/70 via-bg/40 to-bg/80" />
         </motion.div>
 
