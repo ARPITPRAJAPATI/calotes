@@ -17,7 +17,7 @@ const SettingsSchema = new Schema(
     // Shipping cost applied to checkout order totals (0 represents free shipping)
     shippingRate: { type: Number, default: 0 },
     // Main image file URL displayed as the homepage background on desktop/PC
-    heroImageUrl: { type: String, default: "/images/hero-pc.png" },
+    heroImageUrl: { type: String, default: "/images/hero-pc.jpg" },
     // Image file URL displayed as the homepage background on mobile devices
     heroImageMobileUrl: { type: String, default: "/images/hero-mobile.jpg" },
     // Hex code string variable used to style UI components dynamically (defaults to terracotta orange)

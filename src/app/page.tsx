@@ -57,7 +57,7 @@ export default function Home() {
   const [dbCategories, setDbCategories] = useState<any[]>([]); // Holds category listing taxonomy
   const [heroHeadline, setHeroHeadline] = useState("Adapt. Stand Out. Be Calotes."); // Configured landing headline text
   const [heroSubtext, setHeroSubtext] = useState("Hand-picked vintage & streetwear.\nFor the Indian modern icon.");
-  const [heroImageUrl, setHeroImageUrl] = useState("/images/hero-pc.png"); // Landing hero background image URL (Desktop)
+  const [heroImageUrl, setHeroImageUrl] = useState("/images/hero-pc.jpg"); // Landing hero background image URL (Desktop)
   const [heroImageMobileUrl, setHeroImageMobileUrl] = useState("/images/hero-mobile.jpg"); // Mobile hero background image URL
 
   // Fetch landing page and collection data concurrently on component mount
@@ -86,7 +86,10 @@ export default function Home() {
           if (data) {
             if (data.heroHeadline) setHeroHeadline(data.heroHeadline);
             if (data.heroSubtext) setHeroSubtext(data.heroSubtext);
-            if (data.heroImageUrl) setHeroImageUrl(data.heroImageUrl);
+            if (data.heroImageUrl) {
+              const url = data.heroImageUrl === "/images/hero-pc.png" ? "/images/hero-pc.jpg" : data.heroImageUrl;
+              setHeroImageUrl(url);
+            }
             if (data.heroImageMobileUrl) setHeroImageMobileUrl(data.heroImageMobileUrl);
           }
         }
