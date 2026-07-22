@@ -60,7 +60,7 @@ function ShopContent() {
         url += (url.includes("?") ? "&" : "?") + `q=${encodeURIComponent(searchQuery)}`;
       }
       
-      const res  = await fetch(url, { cache: 'no-store' }); // Disable fetch cache queries to fetch fresh inventory
+      const res  = await fetch(url); // Leverages 60s Cache-Control HTTP headers
       const data = await res.json();
       if (res.ok && Array.isArray(data)) {
         setProducts(data); // Bind list data

@@ -20,9 +20,12 @@ const withPWA = require('next-pwa')({
 const nextConfig: NextConfig = {
   compress: true,
   turbopack: {},
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'framer-motion'],
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 31536000,
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'assets.mixkit.co' },
