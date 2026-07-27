@@ -16,7 +16,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-bg-warm border-t border-border pt-20 pb-10 px-6 md:px-12">
+    <footer className="bg-bg-warm border-t border-border pt-20 pb-10 px-6 md:px-12 cv-auto">
       <div className="max-w-[1800px] mx-auto">
 
         {/* Top grid layout */}

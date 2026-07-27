@@ -128,6 +128,10 @@ body {
     -webkit-text-stroke: 1px var(--color-text);
     color: transparent;
   }
+  .cv-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 500px;
+  }
 }
 
 /* ─── Typography Utilities ──────────────────────────────── */

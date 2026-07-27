@@ -96,6 +96,8 @@ export default function ProductImageSlider({
           src={images[currentIdx]}
           alt={`${productName} - view ${currentIdx + 1}`}
           fill
+          placeholder="blur"
+          blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDQiPjxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjQiIGZpbGw9IiNGQUY3RjIiLz48L3N2Zz4="
           // Set adaptive size maps to inform browser page sizing lookups
           sizes="(max-width: 640px) 48vw, (max-width: 768px) 36vw, (max-width: 1024px) 26vw, (max-width: 1280px) 20vw, 17vw"
           // Conditionally dim opacity and apply a grayscale filter if the item is sold out

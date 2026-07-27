@@ -213,7 +213,15 @@ export default function HomeClient({
             {categoriesList.map((cat, i) => (
               <div key={cat.title}>
                 <Link href={cat.href} className="relative block aspect-[3/4] group overflow-hidden bg-bg border border-border">
-                  <Image src={cat.img} alt={cat.title} fill sizes="(max-width: 640px) 48vw, (max-width: 768px) 36vw, (max-width: 1024px) 25vw, 20vw" className="object-cover transition-transform duration-[1.6s] group-hover:scale-108" />
+                  <Image
+                    src={cat.img}
+                    alt={cat.title}
+                    fill
+                    placeholder="blur"
+                    blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDQiPjxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjQiIGZpbGw9IiNGQUY3RjIiLz48L3N2Zz4="
+                    sizes="(max-width: 640px) 48vw, (max-width: 768px) 36vw, (max-width: 1024px) 25vw, 20vw"
+                    className="object-cover transition-transform duration-[1.6s] group-hover:scale-108"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-bg/20 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
                     <h3 className="font-display font-black text-lg md:text-2xl uppercase tracking-tight text-text leading-none">{cat.title}</h3>
@@ -243,6 +251,8 @@ export default function HomeClient({
               alt="Vintage Philosophy"
               fill
               loading="lazy"
+              placeholder="blur"
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDQiPjxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjQiIGZpbGw9IiNGQUY3RjIiLz48L3N2Zz4="
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover transition-transform duration-[2s] group-hover:scale-105"
             />
@@ -277,7 +287,7 @@ export default function HomeClient({
       {/* ══════════════════════════════════════════════════
           5 · LOOKBOOK TEASER
       ══════════════════════════════════════════════════ */}
-      <section className="py-10 md:py-16 bg-bg-warm border-y border-border overflow-hidden">
+      <section className="py-10 md:py-16 bg-bg-warm border-y border-border overflow-hidden cv-auto">
         <div className="max-w-[1800px] mx-auto px-6 md:px-12 mb-10 flex justify-between items-end">
           <div>
             <p className="section-label mb-3">Volume I</p>
@@ -303,7 +313,7 @@ export default function HomeClient({
       {/* ══════════════════════════════════════════════════
           6 · COMMUNITY / INSTAGRAM FOOTER
       ══════════════════════════════════════════════════ */}
-      <section className="py-10 md:py-16 px-6 md:px-12 max-w-[1800px] mx-auto w-full">
+      <section className="py-10 md:py-16 px-6 md:px-12 max-w-[1800px] mx-auto w-full cv-auto">
         <div className="text-center max-w-lg mx-auto mb-16">
           <p className="section-label mb-4">Community</p>
           <h2 className="font-display font-black text-4xl md:text-5xl uppercase tracking-tighter leading-tight mb-4">Wear It. Tag It.</h2>

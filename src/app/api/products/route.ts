@@ -27,9 +27,10 @@ export async function GET(req: Request) {
       query.slug = slug;
     }
 
-    // If search term is present, match key-word regex against product name, brand, or descriptions
+    // If search term is present, use high-performance text index search with regex fallback
     if (searchTerm) {
       query.$or = [
+        { $text: { $search: searchTerm } },
         { name: { $regex: searchTerm, $options: 'i' } },
         { brand: { $regex: searchTerm, $options: 'i' } },
         { description: { $regex: searchTerm, $options: 'i' } }

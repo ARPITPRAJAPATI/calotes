@@ -88,6 +88,12 @@ const ProductSchema = new Schema(
   { timestamps: true }
 );
 
+// Create compound and text search indexes for high-speed query performance
+ProductSchema.index({ name: 'text', brand: 'text', description: 'text' }); // Fast text search
+ProductSchema.index({ category: 1, createdAt: -1 }); // Fast category + date sorting
+ProductSchema.index({ brand: 1, createdAt: -1 });    // Fast brand + date sorting
+ProductSchema.index({ price: 1 });                   // Fast price range queries
+
 // Cache the model or compilation if model is already registered in Mongoose memory (prevents compilation duplication on hot-reload)
 const Product = models.Product || model('Product', ProductSchema);
 
