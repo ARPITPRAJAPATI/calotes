@@ -11,8 +11,6 @@ import Settings from "@/models/Settings";
 
 import ClientOverlays from "@/components/ClientOverlays";
 
-import Script from "next/script";
-
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -104,42 +102,26 @@ export default async function RootLayout({
         <link rel="preload" as="image" href="/images/hero-mobile.jpg" media="(max-width: 767px)" fetchPriority="high" />
         <link rel="preload" as="image" href="/images/hero-pc.jpg" media="(min-width: 768px)" fetchPriority="high" />
         <meta name="theme-color" content="#C85a32" />
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            try {
+              const theme = localStorage.getItem('theme');
+              if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+              } else {
+                document.documentElement.classList.remove('dark');
+              }
+            } catch (_) {}
+          })();
+        `}} />
         <style dangerouslySetInnerHTML={{ __html: `
-          :root:not(.theme-calotes) {
-            --color-accent: ${activeAccent};
-            --color-terracotta: ${activeAccent};
+          :root {
+            --color-accent: ${activeAccent} !important;
+            --color-terracotta: ${activeAccent} !important;
           }
         `}} />
       </head>
       <body className="relative bg-bg text-text min-h-screen flex flex-col">
-        <Script
-          id="theme-init"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  const stored = localStorage.getItem('theme');
-                  const theme = stored || 'dark';
-                  if (!stored) {
-                    localStorage.setItem('theme', 'dark');
-                  }
-                  const isHome = window.location.pathname === '/';
-                  document.documentElement.classList.remove('dark', 'theme-calotes');
-                  if (theme === 'calotes') {
-                    if (isHome) {
-                      document.documentElement.classList.add('theme-calotes');
-                    } else {
-                      document.documentElement.classList.add('dark');
-                    }
-                  } else if (theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch (_) {}
-              })();
-            `,
-          }}
-        />
         <Providers>
           <AnnouncementBar />
           <Navbar />

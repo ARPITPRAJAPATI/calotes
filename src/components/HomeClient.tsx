@@ -72,7 +72,7 @@ export default function HomeClient({
                   );
                 }
                 return (
-                  <span key={index} className="block overflow-hidden text-text">
+                  <span key={index} className="block overflow-hidden">
                     {part}.
                   </span>
                 );
@@ -91,7 +91,7 @@ export default function HomeClient({
 
         <div className="absolute bottom-6 right-8 flex flex-col items-center gap-2">
           <div className="w-px h-12 bg-gradient-to-b from-transparent to-text/40 animate-pulse" />
-          <span className="section-label writing-mode-vertical rotate-90 text-text/40">Scroll</span>
+          <span className="section-label writing-mode-vertical rotate-90 text-text/30">Scroll</span>
         </div>
       </section>
 

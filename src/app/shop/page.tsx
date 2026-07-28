@@ -39,16 +39,12 @@ function ShopContent() {
   const [activeCategory, setActiveCategory] = useState(initialCat);    // Track active category filters selection
   const [searchQuery,   setSearchQuery]    = useState("");           // Holds user typed search queries
 
-  // Fetch trigger: instant for category switches, debounced for typed search queries
+  // Debounced side-effect trigger: waits 300ms after user finishes typing before executing API fetch
   useEffect(() => { 
-    if (searchQuery.trim()) {
-      const delayDebounceFn = setTimeout(() => {
-        fetchProducts(); // Query API products with debounce
-      }, 150);
-      return () => clearTimeout(delayDebounceFn);
-    } else {
-      fetchProducts(); // Instant query for category clicks
-    }
+    const delayDebounceFn = setTimeout(() => {
+      fetchProducts(); // Query API products
+    }, 300);
+    return () => clearTimeout(delayDebounceFn); // Clear debounced timer on text changes
   }, [activeCategory, searchQuery]);
 
   // Method executing fetch requests to retrieve list of matched products from MongoDB collection API route
