@@ -23,6 +23,7 @@ export default function AnnouncementBar() {
     <AnimatePresence>
       {isVisible && (
         <motion.div
+          suppressHydrationWarning
           // Slide open height from 0 on load, and reverse height to 0 on exit
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}

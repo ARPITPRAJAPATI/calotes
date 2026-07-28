@@ -68,8 +68,11 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark" | "calotes">("dark");
 
+  const [mounted, setMounted] = useState(false);
+
   // Sync theme with localStorage and route changes (Calotes morphing applies only on Home Page '/')
   useEffect(() => {
+    setMounted(true);
     const stored = (localStorage.getItem("theme") as "light" | "dark" | "calotes" | null) || "dark";
     setTheme(stored);
     
@@ -245,14 +248,15 @@ export default function Navbar() {
             {/* 3-Way Mode Theme switch trigger button (Dark [Default] -> Calotes Adaptive [Home Only] -> Light -> Dark) */}
             <button
               onClick={toggleTheme}
+              suppressHydrationWarning
               className="relative flex items-center gap-2 section-label hover:text-terracotta transition-colors"
               aria-label="Toggle Theme"
               title={theme === "dark" ? "Switch to Calotes Adaptive Mode (Home Only)" : theme === "calotes" ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              {theme === "dark" && <Moon size={18} strokeWidth={1.5} />}
-              {theme === "calotes" && <ChameleonIcon size={18} className="text-terracotta animate-pulse" />}
-              {theme === "light" && <Sun size={18} strokeWidth={1.5} />}
-              <span className="hidden sm:block">
+              {(!mounted || theme === "dark") && <Moon size={18} strokeWidth={1.5} />}
+              {mounted && theme === "calotes" && <ChameleonIcon size={18} className="text-terracotta animate-pulse" />}
+              {mounted && theme === "light" && <Sun size={18} strokeWidth={1.5} />}
+              <span className="hidden sm:block" suppressHydrationWarning>
                 {theme === "dark" ? "Dark" : theme === "calotes" ? "Calotes" : "Light"}
               </span>
             </button>
@@ -296,13 +300,14 @@ export default function Navbar() {
           <div className="flex items-center gap-1.5 xs:gap-2 z-10">
             <button
               onClick={toggleTheme}
+              suppressHydrationWarning
               className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
               aria-label="Toggle Theme"
               title={theme === "dark" ? "Switch to Calotes Adaptive Mode (Home Only)" : theme === "calotes" ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              {theme === "dark" && <Moon size={18} strokeWidth={1.5} />}
-              {theme === "calotes" && <ChameleonIcon size={18} className="text-terracotta animate-pulse" />}
-              {theme === "light" && <Sun size={18} strokeWidth={1.5} />}
+              {(!mounted || theme === "dark") && <Moon size={18} strokeWidth={1.5} />}
+              {mounted && theme === "calotes" && <ChameleonIcon size={18} className="text-terracotta animate-pulse" />}
+              {mounted && theme === "light" && <Sun size={18} strokeWidth={1.5} />}
             </button>
             <button
               onClick={() => setIsWishlistOpen(true)}
