@@ -47,9 +47,19 @@
 .dark ::-webkit-scrollbar-track { background: var(--color-bg); }
 .dark ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); }
 
+/* ─── Registered CSS Properties for 120 FPS GPU Hardware Acceleration ─── */
+@property --color-bg { syntax: '<color>'; inherits: true; initial-value: #06140E; }
+@property --color-bg-warm { syntax: '<color>'; inherits: true; initial-value: #0E2018; }
+@property --color-bg-card { syntax: '<color>'; inherits: true; initial-value: #152A20; }
+@property --color-card { syntax: '<color>'; inherits: true; initial-value: #152A20; }
+@property --color-text { syntax: '<color>'; inherits: true; initial-value: #F7F3E9; }
+@property --color-muted { syntax: '<color>'; inherits: true; initial-value: #95AEA0; }
+@property --color-accent { syntax: '<color>'; inherits: true; initial-value: #E5B869; }
+@property --color-terracotta { syntax: '<color>'; inherits: true; initial-value: #E5B869; }
+
 /* ─── Calotes Adaptive Chameleon Living Palette ─────────────── */
 .theme-calotes {
-  animation: calotesChameleonMorph 24s ease-in-out infinite;
+  animation: calotesChameleonMorph 28s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 .theme-calotes,
@@ -69,12 +79,12 @@
 .theme-calotes h3,
 .theme-calotes h4,
 .theme-calotes span {
-  transition: background-color 2.5s ease-in-out, color 2.5s ease-in-out, border-color 2.5s ease-in-out, fill 2.5s ease-in-out, stroke 2.5s ease-in-out !important;
+  transition: background-color 3s cubic-bezier(0.4, 0, 0.2, 1), color 3s cubic-bezier(0.4, 0, 0.2, 1), border-color 3s cubic-bezier(0.4, 0, 0.2, 1), fill 3s cubic-bezier(0.4, 0, 0.2, 1), stroke 3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 @keyframes calotesChameleonMorph {
   /* 🌿 Palette 1: Royal Forest Emerald & Venetian Gold (Deep Emerald Green) */
-  0%, 20% {
+  0%, 18% {
     --color-bg: #06140E;
     --color-bg-warm: #0E2018;
     --color-bg-card: #152A20;
@@ -87,7 +97,7 @@
     --color-border-warm: rgba(229, 184, 105, 0.38);
   }
   /* 🌌 Palette 2: Midnight Sapphire & Rosé Bronze (Deep Midnight Navy) */
-  25%, 45% {
+  25%, 43% {
     --color-bg: #070D1D;
     --color-bg-warm: #0F182F;
     --color-bg-card: #172342;
@@ -100,7 +110,7 @@
     --color-border-warm: rgba(232, 135, 113, 0.38);
   }
   /* 📜 Palette 3: Vintage Sand Linen & Tuscan Copper (Warm Ivory Linen) */
-  50%, 70% {
+  50%, 68% {
     --color-bg: #F7F1E7;
     --color-bg-warm: #ECE4D6;
     --color-bg-card: #DFD5C4;
@@ -113,7 +123,7 @@
     --color-border-warm: rgba(24, 18, 14, 0.3);
   }
   /* 🍇 Palette 4: Velvet Plum & Sunset Amber (Luxury Deep Velvet Purple) */
-  75%, 95% {
+  75%, 93% {
     --color-bg: #14071A;
     --color-bg-warm: #200E29;
     --color-bg-card: #2B1638;

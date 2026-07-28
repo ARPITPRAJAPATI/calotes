@@ -279,8 +279,18 @@ export default function Navbar() {
             <Logo className="w-12 h-12" />
           </Link>
 
-          {/* Right actions: Wishlist + Bag */}
+          {/* Right actions: Theme + Wishlist + Bag */}
           <div className="flex items-center gap-1.5 xs:gap-2 z-10">
+            <button
+              onClick={toggleTheme}
+              className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
+              aria-label="Toggle Theme"
+              title={theme === "light" ? "Switch to Dark Mode" : theme === "dark" ? "Switch to Calotes Adaptive Mode" : "Switch to Light Mode"}
+            >
+              {theme === "light" && <Sun size={18} strokeWidth={1.5} />}
+              {theme === "dark" && <Moon size={18} strokeWidth={1.5} />}
+              {theme === "calotes" && <ChameleonIcon size={18} className="text-terracotta animate-pulse" />}
+            </button>
             <button
               onClick={() => setIsWishlistOpen(true)}
               className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
