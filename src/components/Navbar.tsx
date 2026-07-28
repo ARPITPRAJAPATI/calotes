@@ -36,16 +36,23 @@ function ChameleonIcon({ size = 18, className = "" }: { size?: number; className
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.75"
+      strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
     >
-      <path d="M19 5c-1.5 0-3 1.2-4.5 2.5C12.8 9 10.5 10 8 10H6a3 3 0 0 0-3 3v.5A2.5 2.5 0 0 0 5.5 16H6c2.5 0 4.8 1 6.5 2.5C14 19.8 15.5 21 17 21a3 3 0 0 0 3-3v-1.5M18 7.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" />
-      <path d="M9 13.5h.01" />
-      <path d="M13 13.5h.01" />
-      <path d="M6 16c-1 1.5-2.5 2-4 2" />
-      <path d="M17 16.5c1 1.2 2 1.5 3.5 1" />
+      {/* Calotes Lizard Contour: Head, Spine Crest, Body & Legs */}
+      <path d="M19.5 7c-1-1.2-2.5-2-4.2-2C12 5 9 7 7.5 10H5a2 2 0 0 0-2 2v.5A2.5 2.5 0 0 0 5.5 15H7c1.4 0 2.6.7 3.3 1.8.6 1 1.4 1.8 2.4 2.2" />
+      {/* Dorsal Spine Spikes */}
+      <path d="M10.5 5.2L11.5 6.8" />
+      <path d="M13 4.5L14 6.3" />
+      <path d="M15.5 4.8L16.2 6.5" />
+      {/* Calotes Lizard Eye */}
+      <circle cx="17.8" cy="7.8" r="0.9" fill="currentColor" />
+      {/* Spiral Curled Chameleon Tail */}
+      <path d="M12.7 19c1.6.8 3.5.5 4.5-.6 1.3-1.3.9-3.4-.7-4.1-1.3-.5-2.5.2-2.7 1.3-.2 1.1.7 1.8 1.6 1.6" />
+      {/* Front Leg */}
+      <path d="M8 15l-1.5 3.2h2" />
     </svg>
   );
 }
