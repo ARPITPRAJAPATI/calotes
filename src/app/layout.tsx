@@ -105,12 +105,21 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: `
           (function() {
             try {
-              const theme = localStorage.getItem('theme');
+              const stored = localStorage.getItem('theme');
+              const theme = stored || 'dark';
+              if (!stored) {
+                localStorage.setItem('theme', 'dark');
+              }
+              const isHome = window.location.pathname === '/';
               document.documentElement.classList.remove('dark', 'theme-calotes');
-              if (theme === 'dark') {
+              if (theme === 'calotes') {
+                if (isHome) {
+                  document.documentElement.classList.add('theme-calotes');
+                } else {
+                  document.documentElement.classList.add('dark');
+                }
+              } else if (theme === 'dark') {
                 document.documentElement.classList.add('dark');
-              } else if (theme === 'calotes') {
-                document.documentElement.classList.add('theme-calotes');
               }
             } catch (_) {}
           })();
