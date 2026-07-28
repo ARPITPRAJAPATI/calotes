@@ -57,34 +57,14 @@
 @property --color-accent { syntax: '<color>'; inherits: true; initial-value: #E5B869; }
 @property --color-terracotta { syntax: '<color>'; inherits: true; initial-value: #E5B869; }
 
-/* ─── Calotes Adaptive Chameleon Living Palette ─────────────── */
+/* ─── Calotes Adaptive Chameleon Living Palette (Liquid Silk Morph) ─── */
 .theme-calotes {
-  animation: calotesChameleonMorph 28s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-
-.theme-calotes,
-.theme-calotes body,
-.theme-calotes header,
-.theme-calotes nav,
-.theme-calotes div,
-.theme-calotes main,
-.theme-calotes section,
-.theme-calotes article,
-.theme-calotes footer,
-.theme-calotes button,
-.theme-calotes a,
-.theme-calotes p,
-.theme-calotes h1,
-.theme-calotes h2,
-.theme-calotes h3,
-.theme-calotes h4,
-.theme-calotes span {
-  transition: background-color 3s cubic-bezier(0.4, 0, 0.2, 1), color 3s cubic-bezier(0.4, 0, 0.2, 1), border-color 3s cubic-bezier(0.4, 0, 0.2, 1), fill 3s cubic-bezier(0.4, 0, 0.2, 1), stroke 3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  animation: calotesChameleonMorph 36s linear infinite;
 }
 
 @keyframes calotesChameleonMorph {
-  /* 🌿 Palette 1: Bottega Forest Emerald & Antique Brass Gold */
-  0%, 18% {
+  /* 🌿 0%: Bottega Forest Emerald & Antique Brass Gold */
+  0% {
     --color-bg: #0A1913;
     --color-bg-warm: #12241C;
     --color-bg-card: #1A3026;
@@ -96,45 +76,46 @@
     --color-border: rgba(214, 173, 96, 0.25);
     --color-border-warm: rgba(214, 173, 96, 0.4);
   }
-  /* 👜 Palette 2: Hermès Saddle Cognac Leather & Warm Terracotta */
-  25%, 43% {
-    --color-bg: #1A100C;
-    --color-bg-warm: #261812;
-    --color-bg-card: #33221A;
-    --color-card: #33221A;
+  /* 👜 25%: Hermès Saddle Cognac Leather & Warm Terracotta */
+  25% {
+    --color-bg: #1C110C;
+    --color-bg-warm: #291B14;
+    --color-bg-card: #36241C;
+    --color-card: #36241C;
     --color-text: #FAF4EE;
-    --color-muted: #BDABA0;
-    --color-accent: #C85A32;
-    --color-terracotta: #C85A32;
-    --color-border: rgba(200, 90, 50, 0.25);
-    --color-border-warm: rgba(200, 90, 50, 0.4);
+    --color-muted: #BEAFA5;
+    --color-accent: #D96B43;
+    --color-terracotta: #D96B43;
+    --color-border: rgba(217, 107, 67, 0.25);
+    --color-border-warm: rgba(217, 107, 67, 0.4);
   }
-  /* 🍸 Palette 3: Saint Laurent Smoked Espresso & Vintage Champagne */
-  50%, 68% {
-    --color-bg: #16100E;
-    --color-bg-warm: #231B18;
-    --color-bg-card: #302622;
-    --color-card: #302622;
+  /* 🍸 50%: Saint Laurent Smoked Espresso & Vintage Champagne */
+  50% {
+    --color-bg: #1A120F;
+    --color-bg-warm: #271D1A;
+    --color-bg-card: #352925;
+    --color-card: #352925;
     --color-text: #FBF7F0;
-    --color-muted: #B3A79E;
-    --color-accent: #D4B26F;
-    --color-terracotta: #D4B26F;
-    --color-border: rgba(212, 178, 111, 0.25);
-    --color-border-warm: rgba(212, 178, 111, 0.4);
+    --color-muted: #B5AAA2;
+    --color-accent: #D8B573;
+    --color-terracotta: #D8B573;
+    --color-border: rgba(216, 181, 115, 0.25);
+    --color-border-warm: rgba(216, 181, 115, 0.4);
   }
-  /* 🧥 Palette 4: Kith / Bode Vintage Olive & Sunset Amber */
-  75%, 93% {
-    --color-bg: #0E1712;
-    --color-bg-warm: #17231C;
-    --color-bg-card: #213027;
-    --color-card: #213027;
+  /* 🧥 75%: Kith / Bode Vintage Olive Moss & Sunset Amber */
+  75% {
+    --color-bg: #101C15;
+    --color-bg-warm: #18281E;
+    --color-bg-card: #223529;
+    --color-card: #223529;
     --color-text: #F6F4ED;
-    --color-muted: #9FB2A5;
-    --color-accent: #D97736;
-    --color-terracotta: #D97736;
-    --color-border: rgba(217, 119, 54, 0.25);
-    --color-border-warm: rgba(217, 119, 54, 0.4);
+    --color-muted: #A0B4A7;
+    --color-accent: #DB803C;
+    --color-terracotta: #DB803C;
+    --color-border: rgba(219, 128, 60, 0.25);
+    --color-border-warm: rgba(219, 128, 60, 0.4);
   }
+  /* 🌿 100%: Smoothly loop back to Bottega Forest Emerald */
   100% {
     --color-bg: #0A1913;
     --color-bg-warm: #12241C;
