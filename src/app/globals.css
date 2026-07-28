@@ -83,69 +83,69 @@
 }
 
 @keyframes calotesChameleonMorph {
-  /* 🌿 Palette 1: Royal Forest Emerald & Venetian Gold (Vibrant Emerald Green) */
+  /* 🌿 Palette 1: Bottega Forest Emerald & Antique Brass Gold */
   0%, 18% {
-    --color-bg: #0F3D2E;
-    --color-bg-warm: #18523F;
-    --color-bg-card: #226751;
-    --color-card: #226751;
-    --color-text: #FBF7EE;
-    --color-muted: #A8D1C1;
-    --color-accent: #F7D070;
-    --color-terracotta: #F7D070;
-    --color-border: rgba(247, 208, 112, 0.3);
-    --color-border-warm: rgba(247, 208, 112, 0.45);
+    --color-bg: #0A1913;
+    --color-bg-warm: #12241C;
+    --color-bg-card: #1A3026;
+    --color-card: #1A3026;
+    --color-text: #F5F0E6;
+    --color-muted: #9DB5A7;
+    --color-accent: #D6AD60;
+    --color-terracotta: #D6AD60;
+    --color-border: rgba(214, 173, 96, 0.25);
+    --color-border-warm: rgba(214, 173, 96, 0.4);
   }
-  /* 🌌 Palette 2: Midnight Sapphire & Rosé Coral (Vibrant Royal Blue) */
+  /* 👜 Palette 2: Hermès Saddle Cognac Leather & Warm Terracotta */
   25%, 43% {
-    --color-bg: #122D68;
-    --color-bg-warm: #1A3E8B;
-    --color-bg-card: #244FAC;
-    --color-card: #244FAC;
-    --color-text: #F4F8FC;
-    --color-muted: #A3C1E8;
-    --color-accent: #FFA291;
-    --color-terracotta: #FFA291;
-    --color-border: rgba(255, 162, 145, 0.3);
-    --color-border-warm: rgba(255, 162, 145, 0.45);
+    --color-bg: #1A100C;
+    --color-bg-warm: #261812;
+    --color-bg-card: #33221A;
+    --color-card: #33221A;
+    --color-text: #FAF4EE;
+    --color-muted: #BDABA0;
+    --color-accent: #C85A32;
+    --color-terracotta: #C85A32;
+    --color-border: rgba(200, 90, 50, 0.25);
+    --color-border-warm: rgba(200, 90, 50, 0.4);
   }
-  /* 🍷 Palette 3: Tuscan Crimson & Warm Champagne (Vibrant Terracotta Crimson) */
+  /* 🍸 Palette 3: Saint Laurent Smoked Espresso & Vintage Champagne */
   50%, 68% {
-    --color-bg: #591717;
-    --color-bg-warm: #732222;
-    --color-bg-card: #8D2F2F;
-    --color-card: #8D2F2F;
-    --color-text: #FFF9F5;
-    --color-muted: #E2BDB4;
-    --color-accent: #FFC98A;
-    --color-terracotta: #FFC98A;
-    --color-border: rgba(255, 201, 138, 0.3);
-    --color-border-warm: rgba(255, 201, 138, 0.45);
+    --color-bg: #16100E;
+    --color-bg-warm: #231B18;
+    --color-bg-card: #302622;
+    --color-card: #302622;
+    --color-text: #FBF7F0;
+    --color-muted: #B3A79E;
+    --color-accent: #D4B26F;
+    --color-terracotta: #D4B26F;
+    --color-border: rgba(212, 178, 111, 0.25);
+    --color-border-warm: rgba(212, 178, 111, 0.4);
   }
-  /* 🍇 Palette 4: Velvet Imperial Purple & Sunset Amber (Vibrant Royal Purple) */
+  /* 🧥 Palette 4: Kith / Bode Vintage Olive & Sunset Amber */
   75%, 93% {
-    --color-bg: #461763;
-    --color-bg-warm: #5D2282;
-    --color-bg-card: #742EA0;
-    --color-card: #742EA0;
-    --color-text: #FDF7FE;
-    --color-muted: #CFB2E5;
-    --color-accent: #FFC254;
-    --color-terracotta: #FFC254;
-    --color-border: rgba(255, 194, 84, 0.3);
-    --color-border-warm: rgba(255, 194, 84, 0.45);
+    --color-bg: #0E1712;
+    --color-bg-warm: #17231C;
+    --color-bg-card: #213027;
+    --color-card: #213027;
+    --color-text: #F6F4ED;
+    --color-muted: #9FB2A5;
+    --color-accent: #D97736;
+    --color-terracotta: #D97736;
+    --color-border: rgba(217, 119, 54, 0.25);
+    --color-border-warm: rgba(217, 119, 54, 0.4);
   }
   100% {
-    --color-bg: #0F3D2E;
-    --color-bg-warm: #18523F;
-    --color-bg-card: #226751;
-    --color-card: #226751;
-    --color-text: #FBF7EE;
-    --color-muted: #A8D1C1;
-    --color-accent: #F7D070;
-    --color-terracotta: #F7D070;
-    --color-border: rgba(247, 208, 112, 0.3);
-    --color-border-warm: rgba(247, 208, 112, 0.45);
+    --color-bg: #0A1913;
+    --color-bg-warm: #12241C;
+    --color-bg-card: #1A3026;
+    --color-card: #1A3026;
+    --color-text: #F5F0E6;
+    --color-muted: #9DB5A7;
+    --color-accent: #D6AD60;
+    --color-terracotta: #D6AD60;
+    --color-border: rgba(214, 173, 96, 0.25);
+    --color-border-warm: rgba(214, 173, 96, 0.4);
   }
 }
 
