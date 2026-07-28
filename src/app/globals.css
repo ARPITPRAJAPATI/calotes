@@ -60,6 +60,8 @@
 /* ─── Calotes Adaptive Chameleon Living Palette (Liquid Silk Morph) ─── */
 .theme-calotes {
   animation: calotesChameleonMorph 36s linear infinite;
+  background-color: var(--color-bg) !important;
+  color: var(--color-text) !important;
 }
 
 /* Protect drawers from inheriting theme-calotes morphing variables */
@@ -76,6 +78,72 @@
   --color-border: rgba(255, 255, 255, 0.1) !important;
   --color-border-warm: rgba(255, 255, 255, 0.15) !important;
   animation: none !important;
+}
+
+/* Top-to-bottom synchronous font & border theme engine */
+.theme-calotes header:not([data-drawer]),
+.theme-calotes nav:not([data-drawer]),
+.theme-calotes footer:not([data-drawer]),
+.theme-calotes section:not([data-drawer]),
+.theme-calotes main:not([data-drawer]) {
+  border-color: var(--color-border) !important;
+}
+
+.theme-calotes h1:not([data-drawer] *),
+.theme-calotes h2:not([data-drawer] *),
+.theme-calotes h3:not([data-drawer] *),
+.theme-calotes h4:not([data-drawer] *),
+.theme-calotes h5:not([data-drawer] *),
+.theme-calotes h6:not([data-drawer] *),
+.theme-calotes p:not(.text-muted):not(.text-terracotta):not([data-drawer] *),
+.theme-calotes a:not(.text-terracotta):not(.hover\:text-terracotta):not([data-drawer] *),
+.theme-calotes span:not(.text-muted):not(.text-terracotta):not(.bg-terracotta):not([data-drawer] *) {
+  color: var(--color-text);
+}
+
+.theme-calotes .text-muted:not([data-drawer] *),
+.theme-calotes .section-label:not([data-drawer] *) {
+  color: var(--color-muted) !important;
+}
+
+.theme-calotes .text-terracotta:not([data-drawer] *) {
+  color: var(--color-terracotta) !important;
+}
+
+.theme-calotes .bg-terracotta:not([data-drawer] *) {
+  background-color: var(--color-terracotta) !important;
+  color: var(--color-bg) !important;
+}
+
+.theme-calotes .border-border:not([data-drawer] *),
+.theme-calotes .border-border-warm:not([data-drawer] *) {
+  border-color: var(--color-border) !important;
+}
+
+.theme-calotes .bg-bg-warm:not([data-drawer] *) {
+  background-color: var(--color-bg-warm) !important;
+}
+
+.theme-calotes .bg-bg-card:not([data-drawer] *),
+.theme-calotes .bg-card:not([data-drawer] *) {
+  background-color: var(--color-bg-card) !important;
+}
+
+.theme-calotes .btn-outline:not([data-drawer] *) {
+  border-color: var(--color-border-warm) !important;
+  color: var(--color-text) !important;
+  background-color: transparent !important;
+}
+
+.theme-calotes .btn-outline:not([data-drawer] *):hover {
+  background-color: var(--color-text) !important;
+  color: var(--color-bg) !important;
+}
+
+.theme-calotes .btn-primary:not([data-drawer] *) {
+  background-color: var(--color-text) !important;
+  color: var(--color-bg) !important;
+  border-color: var(--color-text) !important;
 }
 
 @keyframes calotesChameleonMorph {
