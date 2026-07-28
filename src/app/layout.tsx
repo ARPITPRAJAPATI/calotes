@@ -106,10 +106,11 @@ export default async function RootLayout({
           (function() {
             try {
               const theme = localStorage.getItem('theme');
+              document.documentElement.classList.remove('dark', 'theme-calotes');
               if (theme === 'dark') {
                 document.documentElement.classList.add('dark');
-              } else {
-                document.documentElement.classList.remove('dark');
+              } else if (theme === 'calotes') {
+                document.documentElement.classList.add('theme-calotes');
               }
             } catch (_) {}
           })();
