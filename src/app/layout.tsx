@@ -122,9 +122,6 @@ export default async function RootLayout({
         `}} />
       </head>
       <body className="relative bg-bg text-text min-h-screen flex flex-col">
-        {/* Vintage Noise Texture Overlay */}
-        <div className="fixed inset-0 z-[-1] bg-noise" />
-        
         <Providers>
           <AnnouncementBar />
           <Navbar />

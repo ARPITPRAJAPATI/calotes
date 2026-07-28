@@ -49,7 +49,7 @@ export default function HomeClient({
           1 · HERO
       ══════════════════════════════════════════════════ */}
       <section ref={heroRef} className="relative w-full h-[100svh] min-h-[600px] overflow-hidden flex flex-col">
-        <motion.div className="absolute inset-0" style={{ y: heroY }}>
+        <motion.div className="absolute inset-0" style={{ y: heroY, willChange: "transform" }}>
           <picture className="absolute inset-0 block w-full h-full">
             <source media="(max-width: 767px)" srcSet={heroImageMobileUrl || heroImageUrl} />
             <source media="(min-width: 768px)" srcSet={heroImageUrl} />

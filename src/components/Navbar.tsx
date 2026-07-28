@@ -106,8 +106,8 @@ export default function Navbar() {
     <>
       {/* Sticky header container */}
       <header
-        className={`sticky top-0 w-full z-50 transition-all duration-700 ${scrolled
-            ? "bg-bg/95 backdrop-blur-md border-b border-border py-3"
+        className={`sticky top-0 w-full z-50 transition-all duration-300 ${scrolled
+            ? "bg-bg/98 border-b border-border py-3 shadow-xs"
             : "bg-transparent py-6 md:py-8"
           }`}
       >

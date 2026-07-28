@@ -27,7 +27,7 @@ export default function CartDrawer() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsCartOpen(false)} // Close the cart drawer if the user clicks outside on the dimmed backdrop
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[100]"
+            className="fixed inset-0 bg-black/40 z-[100]"
           />
           
           {/* ── Sliding Panel (contains cart contents) ── */}

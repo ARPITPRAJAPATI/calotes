@@ -44,7 +44,7 @@ export default function WishlistDrawer() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsOpen(false)} // Close wishlist panel if clicked outside
-            className="fixed inset-0 z-[90] bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[90] bg-black/50"
           />
 
           {/* ── Sliding Panel (contains saved wishlist archive) ── */}
