@@ -15,12 +15,8 @@ export default function CookieBanner() {
   useEffect(() => {
     // Completely hide the cookie banner on administrative panel route layouts
     if (pathname?.startsWith('/admin')) {
-      if (isVisible) {
-        requestAnimationFrame(() => {
-          setIsVisible(false); // Instantly close banner if currently visible
-        });
-      }
-      return; // Stop execution
+      setIsVisible(false);
+      return;
     }
     
     // Inspect browser storage to verify if the user has previously accepted cookie consent
@@ -32,7 +28,7 @@ export default function CookieBanner() {
       }, 1500);
       return () => clearTimeout(timer); // Clean up timing loop if the component unmounts early
     }
-  }, [pathname, isVisible]);
+  }, [pathname]);
 
   // Action callback to record consent preference and dismiss dialog
   const acceptCookies = () => {

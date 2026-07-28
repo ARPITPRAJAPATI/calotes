@@ -35,26 +35,28 @@ const STORAGE_KEY = "calotes_wishlist";
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<WishlistItem[]>([]); // Initialize state array for wishlist items
   const [isOpen, setIsOpen] = useState(false); // Track drawer visibility state (defaults to closed)
+  const [isMounted, setIsMounted] = useState(false); // Mount flag tracking to prevent overwriting saved items
 
   // Run on mount to hydrate wishlist state from browser's localStorage
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY); // Retrieve stringified data
-      if (stored) {
+    setIsMounted(true);
+    const stored = localStorage.getItem(STORAGE_KEY); // Retrieve stringified data
+    if (stored) {
+      try {
         const parsed = JSON.parse(stored); // Parse back into array
-        requestAnimationFrame(() => {
-          setItems(parsed); // Hydrate state after initial page paint
-        });
-      }
-    } catch {}
+        setItems(parsed); // Hydrate state
+      } catch {}
+    }
   }, []);
 
   // Run whenever items state updates to sync changes back to localStorage
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); // Write stringified array
-    } catch {}
-  }, [items]);
+    if (isMounted) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); // Write stringified array
+      } catch {}
+    }
+  }, [items, isMounted]);
 
   // Evaluator function returning boolean value checking if an item exists in wishlist
   // Wrapped in useCallback to prevent child components re-rendering on parent updates

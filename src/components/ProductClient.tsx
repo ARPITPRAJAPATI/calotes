@@ -42,7 +42,7 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
       productId: product._id.toString(),
       name: product.name,
       price: product.price,
-      image: product.images[0],
+      image: product.images?.[0] || '/images/hero-pc.jpg',
       size: selectedSize || "OS",
       quantity: 1,
     });
