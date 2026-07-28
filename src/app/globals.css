@@ -83,69 +83,69 @@
 }
 
 @keyframes calotesChameleonMorph {
-  /* 🌿 Palette 1: Royal Forest Emerald & Venetian Gold (Deep Emerald Green) */
+  /* 🌿 Palette 1: Royal Forest Emerald & Venetian Gold (Vibrant Emerald Green) */
   0%, 18% {
-    --color-bg: #06140E;
-    --color-bg-warm: #0E2018;
-    --color-bg-card: #152A20;
-    --color-card: #152A20;
-    --color-text: #F7F3E9;
-    --color-muted: #95AEA0;
-    --color-accent: #E5B869;
-    --color-terracotta: #E5B869;
-    --color-border: rgba(229, 184, 105, 0.22);
-    --color-border-warm: rgba(229, 184, 105, 0.38);
+    --color-bg: #0F3D2E;
+    --color-bg-warm: #18523F;
+    --color-bg-card: #226751;
+    --color-card: #226751;
+    --color-text: #FBF7EE;
+    --color-muted: #A8D1C1;
+    --color-accent: #F7D070;
+    --color-terracotta: #F7D070;
+    --color-border: rgba(247, 208, 112, 0.3);
+    --color-border-warm: rgba(247, 208, 112, 0.45);
   }
-  /* 🌌 Palette 2: Midnight Sapphire & Rosé Bronze (Deep Midnight Navy) */
+  /* 🌌 Palette 2: Midnight Sapphire & Rosé Coral (Vibrant Royal Blue) */
   25%, 43% {
-    --color-bg: #070D1D;
-    --color-bg-warm: #0F182F;
-    --color-bg-card: #172342;
-    --color-card: #172342;
-    --color-text: #EFF4F9;
-    --color-muted: #8A9BB1;
-    --color-accent: #E88771;
-    --color-terracotta: #E88771;
-    --color-border: rgba(232, 135, 113, 0.22);
-    --color-border-warm: rgba(232, 135, 113, 0.38);
+    --color-bg: #122D68;
+    --color-bg-warm: #1A3E8B;
+    --color-bg-card: #244FAC;
+    --color-card: #244FAC;
+    --color-text: #F4F8FC;
+    --color-muted: #A3C1E8;
+    --color-accent: #FFA291;
+    --color-terracotta: #FFA291;
+    --color-border: rgba(255, 162, 145, 0.3);
+    --color-border-warm: rgba(255, 162, 145, 0.45);
   }
-  /* 📜 Palette 3: Vintage Sand Linen & Tuscan Copper (Warm Ivory Linen) */
+  /* 🍷 Palette 3: Tuscan Crimson & Warm Champagne (Vibrant Terracotta Crimson) */
   50%, 68% {
-    --color-bg: #F7F1E7;
-    --color-bg-warm: #ECE4D6;
-    --color-bg-card: #DFD5C4;
-    --color-card: #DFD5C4;
-    --color-text: #18120E;
-    --color-muted: #6B6156;
-    --color-accent: #C85A32;
-    --color-terracotta: #C85A32;
-    --color-border: rgba(24, 18, 14, 0.16);
-    --color-border-warm: rgba(24, 18, 14, 0.3);
+    --color-bg: #591717;
+    --color-bg-warm: #732222;
+    --color-bg-card: #8D2F2F;
+    --color-card: #8D2F2F;
+    --color-text: #FFF9F5;
+    --color-muted: #E2BDB4;
+    --color-accent: #FFC98A;
+    --color-terracotta: #FFC98A;
+    --color-border: rgba(255, 201, 138, 0.3);
+    --color-border-warm: rgba(255, 201, 138, 0.45);
   }
-  /* 🍇 Palette 4: Velvet Plum & Sunset Amber (Luxury Deep Velvet Purple) */
+  /* 🍇 Palette 4: Velvet Imperial Purple & Sunset Amber (Vibrant Royal Purple) */
   75%, 93% {
-    --color-bg: #14071A;
-    --color-bg-warm: #200E29;
-    --color-bg-card: #2B1638;
-    --color-card: #2B1638;
-    --color-text: #FAF2FC;
-    --color-muted: #A895B3;
-    --color-accent: #E59F38;
-    --color-terracotta: #E59F38;
-    --color-border: rgba(229, 159, 56, 0.22);
-    --color-border-warm: rgba(229, 159, 56, 0.38);
+    --color-bg: #461763;
+    --color-bg-warm: #5D2282;
+    --color-bg-card: #742EA0;
+    --color-card: #742EA0;
+    --color-text: #FDF7FE;
+    --color-muted: #CFB2E5;
+    --color-accent: #FFC254;
+    --color-terracotta: #FFC254;
+    --color-border: rgba(255, 194, 84, 0.3);
+    --color-border-warm: rgba(255, 194, 84, 0.45);
   }
   100% {
-    --color-bg: #06140E;
-    --color-bg-warm: #0E2018;
-    --color-bg-card: #152A20;
-    --color-card: #152A20;
-    --color-text: #F7F3E9;
-    --color-muted: #95AEA0;
-    --color-accent: #E5B869;
-    --color-terracotta: #E5B869;
-    --color-border: rgba(229, 184, 105, 0.22);
-    --color-border-warm: rgba(229, 184, 105, 0.38);
+    --color-bg: #0F3D2E;
+    --color-bg-warm: #18523F;
+    --color-bg-card: #226751;
+    --color-card: #226751;
+    --color-text: #FBF7EE;
+    --color-muted: #A8D1C1;
+    --color-accent: #F7D070;
+    --color-terracotta: #F7D070;
+    --color-border: rgba(247, 208, 112, 0.3);
+    --color-border-warm: rgba(247, 208, 112, 0.45);
   }
 }
 
