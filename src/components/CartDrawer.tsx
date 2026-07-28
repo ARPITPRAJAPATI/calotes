@@ -37,7 +37,8 @@ export default function CartDrawer() {
             exit={{ x: "100%" }}    // Slide back off-screen on close
             // Configure spring transition options for premium snap feel
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed right-0 top-0 h-full w-full max-w-md bg-bg-warm border-l border-border-warm z-[101] flex flex-col"
+            className="fixed right-0 top-0 h-full w-full max-w-md bg-[#111111] text-[#F5F5F5] border-l border-white/10 z-[101] flex flex-col shadow-2xl"
+            data-drawer="cart"
           >
             {/* Header section containing drawer title and close trigger button */}
             <div className="p-8 border-b border-border flex justify-between items-center">

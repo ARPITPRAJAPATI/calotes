@@ -28,44 +28,81 @@ const CATEGORIES = [
   { name: "Accessories", href: "/shop?category=accessories" },
 ];
 
+function ChameleonIcon({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      {/* Calotes Lizard Contour: Head, Spine Crest, Body & Legs */}
+      <path d="M19.5 7c-1-1.2-2.5-2-4.2-2C12 5 9 7 7.5 10H5a2 2 0 0 0-2 2v.5A2.5 2.5 0 0 0 5.5 15H7c1.4 0 2.6.7 3.3 1.8.6 1 1.4 1.8 2.4 2.2" />
+      {/* Dorsal Spine Spikes */}
+      <path d="M10.5 5.2L11.5 6.8" />
+      <path d="M13 4.5L14 6.3" />
+      <path d="M15.5 4.8L16.2 6.5" />
+      {/* Calotes Lizard Eye */}
+      <circle cx="17.8" cy="7.8" r="0.9" fill="currentColor" />
+      {/* Spiral Curled Chameleon Tail */}
+      <path d="M12.7 19c1.6.8 3.5.5 4.5-.6 1.3-1.3.9-3.4-.7-4.1-1.3-.5-2.5.2-2.7 1.3-.2 1.1.7 1.8 1.6 1.6" />
+      {/* Front Leg */}
+      <path d="M8 15l-1.5 3.2h2" />
+    </svg>
+  );
+}
+
 export default function Navbar() {
-  const { data: session } = useSession(); // Access user profile session data
-  const { setIsCartOpen, cartCount } = useCart(); // Extract cart count and drawer trigger controls
-  const { setIsOpen: setIsWishlistOpen, count: wishlistCount } = useWishlist(); // Extract wishlist count and drawer controls
-  const pathname = usePathname(); // Track active route path
+  const { data: session } = useSession();
+  const { setIsCartOpen, cartCount } = useCart();
+  const { setIsOpen: setIsWishlistOpen, count: wishlistCount } = useWishlist();
+  const pathname = usePathname();
 
-  // Component states
-  const [scrolled, setScrolled] = useState(false); // Tracks if page scroll position is > 40px (adjusts navbar background styling)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Controls mobile full-screen slide menu visibility
-  const [dropdownOpen, setDropdownOpen] = useState(false); // Controls desktop categories dropdown modal visibility
-  const [theme, setTheme] = useState<"light" | "dark">("light"); // Tracks dark/light mode preference
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark" | "calotes">("dark");
 
-  // Hydrate theme settings from browser storage on initial page load
+  // Sync theme with localStorage and route changes (Calotes morphing applies only on Home Page '/')
   useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    if (stored === "dark") {
-      document.documentElement.classList.add("dark"); // Inject tailwind selector class to root html element
-      requestAnimationFrame(() => {
-        setTheme("dark"); // Update theme state variables
-      });
-    } else {
-      document.documentElement.classList.remove("dark");
-      requestAnimationFrame(() => {
-        setTheme("light");
-      });
+    const stored = (localStorage.getItem("theme") as "light" | "dark" | "calotes" | null) || "dark";
+    setTheme(stored);
+    
+    document.documentElement.classList.remove("dark", "theme-calotes");
+    if (stored === "calotes") {
+      if (pathname === "/") {
+        document.documentElement.classList.add("theme-calotes");
+      } else {
+        document.documentElement.classList.add("dark");
+      }
+    } else if (stored === "dark") {
+      document.documentElement.classList.add("dark");
     }
-  }, []);
+  }, [pathname]);
 
-  // Callback to toggle dark/light theme options and persist preference
+  // Callback to cycle theme options: Dark -> Calotes Adaptive (Home Only) -> Light -> Dark
   const toggleTheme = () => {
-    if (theme === "light") {
+    document.documentElement.classList.remove("dark", "theme-calotes");
+    if (theme === "dark") {
+      setTheme("calotes");
+      if (pathname === "/") {
+        document.documentElement.classList.add("theme-calotes");
+      } else {
+        document.documentElement.classList.add("dark");
+      }
+      localStorage.setItem("theme", "calotes");
+    } else if (theme === "calotes") {
+      setTheme("light");
+      localStorage.setItem("theme", "light");
+    } else {
       setTheme("dark");
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
-    } else {
-      setTheme("light");
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
     }
   };
 
@@ -205,16 +242,19 @@ export default function Navbar() {
               <Heart size={18} strokeWidth={1.5} className="text-text" fill={wishlistCount > 0 ? "currentColor" : "none"} />
               <span className="hidden sm:block">Wishlist</span>
             </button>
-
-            {/* Light/Dark mode theme switch trigger button */}
+            {/* 3-Way Mode Theme switch trigger button (Dark [Default] -> Calotes Adaptive [Home Only] -> Light -> Dark) */}
             <button
               onClick={toggleTheme}
               className="relative flex items-center gap-2 section-label hover:text-terracotta transition-colors"
               aria-label="Toggle Theme"
-              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              title={theme === "dark" ? "Switch to Calotes Adaptive Mode (Home Only)" : theme === "calotes" ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              {theme === "dark" ? <Sun size={18} strokeWidth={1.5} /> : <Moon size={18} strokeWidth={1.5} />}
-              <span className="hidden sm:block">Theme</span>
+              {theme === "dark" && <Moon size={18} strokeWidth={1.5} />}
+              {theme === "calotes" && <ChameleonIcon size={18} className="text-terracotta animate-pulse" />}
+              {theme === "light" && <Sun size={18} strokeWidth={1.5} />}
+              <span className="hidden sm:block">
+                {theme === "dark" ? "Dark" : theme === "calotes" ? "Calotes" : "Light"}
+              </span>
             </button>
           </div>
         </div>
@@ -249,50 +289,45 @@ export default function Navbar() {
             href="/"
             className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center justify-center leading-none z-10 hover:opacity-80 transition-opacity"
           >
-            <Logo className="w-14 h-14" />
+            <Logo className="w-12 h-12" />
           </Link>
 
-          {/* Right actions: Bag + Wishlist + Theme */}
+          {/* Right actions: Theme + Wishlist + Bag */}
           <div className="flex items-center gap-1.5 xs:gap-2 z-10">
-            {/* Bag Button */}
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
-              aria-label="Open cart"
-              title="Bag"
-            >
-              <ShoppingBag size={18} strokeWidth={1.5} />
-              {cartCount > 0 && (
-                <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 bg-terracotta text-bg text-[7px] font-black rounded-full flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </button>
-
-            {/* Wishlist Button */}
-            <button
-              onClick={() => setIsWishlistOpen(true)}
-              className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
-              aria-label="Open wishlist"
-              title="Wishlist"
-            >
-              <Heart size={18} strokeWidth={1.5} fill={wishlistCount > 0 ? "currentColor" : "none"} />
-            </button>
-
-            {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
               className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
               aria-label="Toggle Theme"
-              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              title={theme === "dark" ? "Switch to Calotes Adaptive Mode (Home Only)" : theme === "calotes" ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              {theme === "dark" ? <Sun size={18} strokeWidth={1.5} /> : <Moon size={18} strokeWidth={1.5} />}
+              {theme === "dark" && <Moon size={18} strokeWidth={1.5} />}
+              {theme === "calotes" && <ChameleonIcon size={18} className="text-terracotta animate-pulse" />}
+              {theme === "light" && <Sun size={18} strokeWidth={1.5} />}
+            </button>
+            <button
+              onClick={() => setIsWishlistOpen(true)}
+              className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
+              aria-label="Wishlist"
+            >
+              <Heart size={18} strokeWidth={1.5} fill={wishlistCount > 0 ? "currentColor" : "none"} />
+            </button>
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
+              aria-label="Shopping Bag"
+            >
+              <ShoppingBag size={18} strokeWidth={1.5} />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-terracotta text-bg font-black text-[8px] rounded-full flex items-center justify-center shadow-md">
+                  {cartCount}
+                </span>
+              )}
             </button>
           </div>
         </div>
       </header>
 
-      {/* ─── MOBILE FULL-SCREEN NAVIGATION MODAL DRAWER ─── */}
+      {/* ─── MOBILE FULL-SCREEN SLIDE MENU ─── */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -310,10 +345,12 @@ export default function Navbar() {
               <div className="flex items-center gap-4">
                 <button
                   onClick={toggleTheme}
-                  className="text-text hover:text-terracotta transition-colors flex items-center justify-center"
+                  className="text-text hover:text-terracotta transition-colors flex items-center justify-center gap-1.5"
                   aria-label="Toggle Theme"
                 >
-                  {theme === "dark" ? <Sun size={22} strokeWidth={1.5} /> : <Moon size={22} strokeWidth={1.5} />}
+                  {theme === "light" && <Sun size={22} strokeWidth={1.5} />}
+                  {theme === "dark" && <Moon size={22} strokeWidth={1.5} />}
+                  {theme === "calotes" && <ChameleonIcon size={22} className="text-terracotta animate-pulse" />}
                 </button>
                 <button onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
                   <X size={24} strokeWidth={1} className="text-muted hover:text-text transition-colors" />

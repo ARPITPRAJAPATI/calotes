@@ -27,7 +27,8 @@ export default function AnnouncementBar() {
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          className="bg-black text-white overflow-hidden relative z-[100]"
+          className="bg-bg-warm text-text overflow-hidden relative z-[100] border-b border-border"
+          data-announcement-bar
         >
           {/* Scrolling ticker track container */}
           <div className="py-1.5 flex whitespace-nowrap items-center marquee-track">
