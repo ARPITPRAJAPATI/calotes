@@ -251,13 +251,21 @@ export default function Navbar() {
               suppressHydrationWarning
               className="relative flex items-center gap-2 section-label hover:text-terracotta transition-colors"
               aria-label="Toggle Theme"
-              title={theme === "dark" ? "Switch to Calotes Adaptive Mode (Home Only)" : theme === "calotes" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              title={
+                !mounted
+                  ? "Toggle Theme"
+                  : theme === "dark"
+                  ? "Switch to Calotes Adaptive Mode (Home Only)"
+                  : theme === "calotes"
+                  ? "Switch to Light Mode"
+                  : "Switch to Dark Mode"
+              }
             >
               {(!mounted || theme === "dark") && <Moon size={18} strokeWidth={1.5} />}
               {mounted && theme === "calotes" && <ChameleonIcon size={18} className="text-terracotta animate-pulse" />}
               {mounted && theme === "light" && <Sun size={18} strokeWidth={1.5} />}
               <span className="hidden sm:block" suppressHydrationWarning>
-                {theme === "dark" ? "Dark" : theme === "calotes" ? "Calotes" : "Light"}
+                {!mounted ? "Dark" : theme === "dark" ? "Dark" : theme === "calotes" ? "Calotes" : "Light"}
               </span>
             </button>
           </div>
@@ -303,7 +311,15 @@ export default function Navbar() {
               suppressHydrationWarning
               className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
               aria-label="Toggle Theme"
-              title={theme === "dark" ? "Switch to Calotes Adaptive Mode (Home Only)" : theme === "calotes" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              title={
+                !mounted
+                  ? "Toggle Theme"
+                  : theme === "dark"
+                  ? "Switch to Calotes Adaptive Mode (Home Only)"
+                  : theme === "calotes"
+                  ? "Switch to Light Mode"
+                  : "Switch to Dark Mode"
+              }
             >
               {(!mounted || theme === "dark") && <Moon size={18} strokeWidth={1.5} />}
               {mounted && theme === "calotes" && <ChameleonIcon size={18} className="text-terracotta animate-pulse" />}
