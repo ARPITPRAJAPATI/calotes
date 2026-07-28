@@ -61,28 +61,28 @@ export default function HomeClient({
 
         <div className="relative z-10 flex flex-col justify-center items-center text-center h-full px-6 md:px-12 max-w-[1800px] w-full mx-auto">
           <div className="flex flex-col items-center">
-            <p className="section-label mb-6 text-white/90 drop-shadow-sm">Premium Pre-Owned · Est. India</p>
-            <h1 className="font-display font-bold text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] uppercase tracking-tight leading-[0.85] text-white drop-shadow-lg mb-8 md:mb-12">
+            <p className="section-label mb-6">Premium Pre-Owned · Est. India</p>
+            <h1 className="font-display font-bold text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] uppercase tracking-tight leading-[0.85] text-text mb-8 md:mb-12">
               {headlineParts.map((part, index) => {
                 if (index === 1) {
                   return (
-                    <span key={index} className="block overflow-hidden font-serif italic font-light lowercase tracking-normal text-[0.88em] -mt-1 text-terracotta drop-shadow-md">
+                    <span key={index} className="block overflow-hidden font-serif italic font-light lowercase tracking-normal text-[0.88em] -mt-1 text-terracotta">
                       {part}.
                     </span>
                   );
                 }
                 return (
-                  <span key={index} className="block overflow-hidden text-white drop-shadow-lg">
+                  <span key={index} className="block overflow-hidden text-text">
                     {part}.
                   </span>
                 );
               })}
             </h1>
             <div className="flex flex-col items-center gap-8">
-              <p className="text-white/90 text-[11px] font-medium uppercase tracking-[0.2em] leading-relaxed max-w-sm whitespace-pre-line drop-shadow-sm">
+              <p className="text-muted text-[11px] font-medium uppercase tracking-[0.2em] leading-relaxed max-w-sm whitespace-pre-line">
                 {heroSubtext}
               </p>
-              <Link href="/shop" className="btn-outline px-12 py-5 text-sm tracking-[0.3em] text-white border-white/60 hover:bg-white hover:text-black transition-all">
+              <Link href="/shop" className="btn-outline px-12 py-5 text-sm tracking-[0.3em]">
                 Shop
               </Link>
             </div>
@@ -90,8 +90,8 @@ export default function HomeClient({
         </div>
 
         <div className="absolute bottom-6 right-8 flex flex-col items-center gap-2">
-          <div className="w-px h-12 bg-gradient-to-b from-transparent to-white/60 animate-pulse" />
-          <span className="section-label writing-mode-vertical rotate-90 text-white/50">Scroll</span>
+          <div className="w-px h-12 bg-gradient-to-b from-transparent to-text/40 animate-pulse" />
+          <span className="section-label writing-mode-vertical rotate-90 text-text/40">Scroll</span>
         </div>
       </section>
 
