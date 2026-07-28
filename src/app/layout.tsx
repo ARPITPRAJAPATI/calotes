@@ -90,7 +90,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${barlow.variable} ${playfair.variable} antialiased selection:bg-terracotta selection:text-bg`}>
+    <html lang="en" suppressHydrationWarning className={`dark ${inter.variable} ${barlow.variable} ${playfair.variable} antialiased selection:bg-terracotta selection:text-bg`}>
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
@@ -104,33 +104,6 @@ export default async function RootLayout({
         <link rel="preload" as="image" href="/images/hero-mobile.jpg" media="(max-width: 767px)" fetchPriority="high" />
         <link rel="preload" as="image" href="/images/hero-pc.jpg" media="(min-width: 768px)" fetchPriority="high" />
         <meta name="theme-color" content="#C85a32" />
-        <script
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  const stored = localStorage.getItem('theme');
-                  const theme = stored || 'dark';
-                  if (!stored) {
-                    localStorage.setItem('theme', 'dark');
-                  }
-                  const isHome = window.location.pathname === '/';
-                  document.documentElement.classList.remove('dark', 'theme-calotes');
-                  if (theme === 'calotes') {
-                    if (isHome) {
-                      document.documentElement.classList.add('theme-calotes', 'dark');
-                    } else {
-                      document.documentElement.classList.add('dark');
-                    }
-                  } else if (theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch (_) {}
-              })();
-            `,
-          }}
-        />
         <style dangerouslySetInnerHTML={{ __html: `
           :root:not(.theme-calotes) {
             --color-accent: ${activeAccent};
