@@ -1,10 +1,8 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Heart } from "lucide-react";
-import { useRef } from "react";
 import { useWishlist } from "@/context/WishlistContext";
 import ProductImageSlider from "@/components/ProductImageSlider";
 
@@ -36,9 +34,6 @@ export default function HomeClient({
   heroImageUrl,
   heroImageMobileUrl,
 }: HomeClientProps) {
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
   const { toggleWishlist, isInWishlist } = useWishlist();
 
   const headlineParts = heroHeadline.split('.').map(x => x.trim()).filter(Boolean);
@@ -48,8 +43,8 @@ export default function HomeClient({
       {/* ══════════════════════════════════════════════════
           1 · HERO
       ══════════════════════════════════════════════════ */}
-      <section ref={heroRef} className="relative w-full h-[100svh] min-h-[600px] overflow-hidden flex flex-col">
-        <motion.div className="absolute inset-0" style={{ y: heroY, willChange: "transform" }}>
+      <section className="relative w-full h-[100svh] min-h-[600px] overflow-hidden flex flex-col">
+        <div className="absolute inset-0">
           <picture className="absolute inset-0 block w-full h-full">
             <source media="(max-width: 767px)" srcSet={heroImageMobileUrl || heroImageUrl} />
             <source media="(min-width: 768px)" srcSet={heroImageUrl} />
@@ -62,42 +57,23 @@ export default function HomeClient({
             />
           </picture>
           <div className="absolute inset-0 bg-gradient-to-b from-bg/70 via-bg/40 to-bg/80" />
-        </motion.div>
+        </div>
 
         <div className="relative z-10 flex flex-col justify-center items-center text-center h-full px-6 md:px-12 max-w-[1800px] w-full mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col items-center"
-          >
+          <div className="flex flex-col items-center">
             <p className="section-label mb-6">Premium Pre-Owned · Est. India</p>
-            <h1 className="font-display font-bold text-[13vw] md:text-[10vw] lg:text-[8vw] uppercase tracking-tight leading-[0.82] text-text mb-8 md:mb-12">
+            <h1 className="font-display font-bold text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] uppercase tracking-tight leading-[0.85] text-text mb-8 md:mb-12">
               {headlineParts.map((part, index) => {
                 if (index === 1) {
                   return (
-                    <span key={index} className="block overflow-hidden font-serif italic font-light lowercase tracking-normal text-[0.88em] -mt-1">
-                      <motion.span
-                        className="block text-terracotta"
-                        initial={{ y: "100%" }}
-                        animate={{ y: 0 }}
-                        transition={{ duration: 1, delay: 0.2, ease: [0.19, 1, 0.22, 1] }}
-                      >
-                        {part}.
-                      </motion.span>
+                    <span key={index} className="block overflow-hidden font-serif italic font-light lowercase tracking-normal text-[0.88em] -mt-1 text-terracotta">
+                      {part}.
                     </span>
                   );
                 }
                 return (
                   <span key={index} className="block overflow-hidden">
-                    <motion.span
-                      className="block"
-                      initial={{ y: "100%" }}
-                      animate={{ y: 0 }}
-                      transition={{ duration: 1, delay: 0.1 * (index + 1), ease: [0.19, 1, 0.22, 1] }}
-                    >
-                      {part}.
-                    </motion.span>
+                    {part}.
                   </span>
                 );
               })}
@@ -110,17 +86,13 @@ export default function HomeClient({
                 Shop
               </Link>
             </div>
-          </motion.div>
+          </div>
         </div>
 
-        <motion.div
-          className="absolute bottom-6 right-8 flex flex-col items-center gap-2"
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-        >
-          <div className="w-px h-12 bg-gradient-to-b from-transparent to-text/40" />
+        <div className="absolute bottom-6 right-8 flex flex-col items-center gap-2">
+          <div className="w-px h-12 bg-gradient-to-b from-transparent to-text/40 animate-pulse" />
           <span className="section-label writing-mode-vertical rotate-90 text-text/30">Scroll</span>
-        </motion.div>
+        </div>
       </section>
 
       {/* ══════════════════════════════════════════════════

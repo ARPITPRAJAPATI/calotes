@@ -50,7 +50,7 @@
 /* ─── Global Reset ─────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+/* Global Reset */
 
 body {
   background-color: var(--color-bg);
