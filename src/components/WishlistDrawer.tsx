@@ -52,7 +52,7 @@ export default function WishlistDrawer() {
             initial={{ x: "100%" }} // Off-screen right
             animate={{ x: 0 }}       // Move to target resting coordinates
             exit={{ x: "100%" }}    // Slide back on close
-            transition={{ type: "spring", damping: 32, stiffness: 300 }} // Config spring stiffness
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="fixed top-0 right-0 h-full w-full sm:w-[420px] z-[95] bg-bg flex flex-col border-l border-border shadow-2xl"
           >
             {/* Header section containing drawer title and count text */}

@@ -241,19 +241,19 @@ function ShopContent() {
                           <span className="text-[7px] font-bold uppercase tracking-widest bg-terracotta/90 text-bg px-2 py-0.5 shadow-sm">
                             Sale
                           </span>
-                          <span className="text-[7px] font-bold uppercase tracking-widest bg-bg/85 backdrop-blur-[2px] text-muted px-2 py-0.5 shadow-sm">
+                          <span className="text-[7px] font-bold uppercase tracking-widest bg-bg/95 text-muted px-2 py-0.5 shadow-sm border border-border/20">
                             {product.condition || "Pre-Loved"}
                           </span>
                         </div>
                       ) : (
-                        <span className="absolute top-2 left-2 z-20 text-[7px] font-bold uppercase tracking-widest bg-bg/85 backdrop-blur-[2px] text-muted px-2 py-0.5 shadow-sm">
+                        <span className="absolute top-2 left-2 z-20 text-[7px] font-bold uppercase tracking-widest bg-bg/95 text-muted px-2 py-0.5 shadow-sm border border-border/20">
                           {product.condition || "Pre-Loved"}
                         </span>
                       )}
 
                       {/* Display SOLD OUT overlay on depleted product stocks */}
                       {product.stock !== undefined && product.stock <= 0 && (
-                        <div className="absolute inset-0 bg-black/45 backdrop-blur-[1px] z-20 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-black/60 z-20 flex items-center justify-center">
                           <span className="text-[10px] font-black uppercase tracking-[0.3em] bg-bg text-text px-4 py-2 border border-border">
                             SOLD
                           </span>
@@ -304,13 +304,13 @@ function ShopContent() {
             {/* Backdrop Blur panel overlay */}
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-bg/70 backdrop-blur-sm z-[100]"
+              className="fixed inset-0 bg-black/50 z-[100]"
               onClick={() => setIsFilterOpen(false)}
             />
             {/* Drawer layout */}
             <motion.div
               initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 28, stiffness: 200 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
               className="fixed right-0 top-0 h-full w-full max-w-sm bg-bg-warm border-l border-border-warm z-[101] flex flex-col"
             >
               <div className="flex justify-between items-center px-8 py-6 border-b border-border">
