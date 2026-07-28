@@ -53,7 +53,8 @@ export default function WishlistDrawer() {
             animate={{ x: 0 }}       // Move to target resting coordinates
             exit={{ x: "100%" }}    // Slide back on close
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed top-0 right-0 h-full w-full sm:w-[420px] z-[95] bg-bg flex flex-col border-l border-border shadow-2xl"
+            className="fixed top-0 right-0 h-full w-full sm:w-[420px] z-[95] bg-[#0A0A0A] text-[#F5F5F5] flex flex-col border-l border-white/10 shadow-2xl"
+            data-drawer="wishlist"
           >
             {/* Header section containing drawer title and count text */}
             <div className="flex items-center justify-between px-6 py-6 border-b border-border shrink-0">
