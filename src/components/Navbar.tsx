@@ -72,20 +72,24 @@ export default function Navbar() {
 
   // Sync theme with localStorage and route changes (Calotes morphing applies only on Home Page '/')
   useEffect(() => {
-    setMounted(true);
-    const stored = (localStorage.getItem("theme") as "light" | "dark" | "calotes" | null) || "dark";
-    setTheme(stored);
-    
-    document.documentElement.classList.remove("dark", "theme-calotes");
-    if (stored === "calotes") {
-      if (pathname === "/") {
-        document.documentElement.classList.add("theme-calotes");
-      } else {
+    const timer = setTimeout(() => {
+      setMounted(true);
+      const stored = (localStorage.getItem("theme") as "light" | "dark" | "calotes" | null) || "dark";
+      setTheme(stored);
+      
+      document.documentElement.classList.remove("dark", "theme-calotes");
+      if (stored === "calotes") {
+        if (pathname === "/") {
+          document.documentElement.classList.add("theme-calotes");
+        } else {
+          document.documentElement.classList.add("dark");
+        }
+      } else if (stored === "dark") {
         document.documentElement.classList.add("dark");
       }
-    } else if (stored === "dark") {
-      document.documentElement.classList.add("dark");
-    }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [pathname]);
 
   // Callback to cycle theme options: Dark -> Calotes Adaptive (Home Only) -> Light -> Dark
