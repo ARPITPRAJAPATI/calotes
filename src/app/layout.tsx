@@ -104,6 +104,14 @@ export default async function RootLayout({
         <link rel="preload" as="image" href="/images/hero-mobile.jpg" media="(max-width: 767px)" fetchPriority="high" />
         <link rel="preload" as="image" href="/images/hero-pc.jpg" media="(min-width: 768px)" fetchPriority="high" />
         <meta name="theme-color" content="#C85a32" />
+        <style dangerouslySetInnerHTML={{ __html: `
+          :root:not(.theme-calotes) {
+            --color-accent: ${activeAccent};
+            --color-terracotta: ${activeAccent};
+          }
+        `}} />
+      </head>
+      <body className="relative bg-bg text-text min-h-screen flex flex-col">
         <Script
           id="theme-init"
           strategy="beforeInteractive"
@@ -132,14 +140,6 @@ export default async function RootLayout({
             `,
           }}
         />
-        <style dangerouslySetInnerHTML={{ __html: `
-          :root:not(.theme-calotes) {
-            --color-accent: ${activeAccent};
-            --color-terracotta: ${activeAccent};
-          }
-        `}} />
-      </head>
-      <body className="relative bg-bg text-text min-h-screen flex flex-col">
         <Providers>
           <AnnouncementBar />
           <Navbar />
