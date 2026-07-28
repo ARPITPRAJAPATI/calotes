@@ -19,6 +19,18 @@
   --font-serif:   var(--font-playfair), 'Cormorant Garamond', serif;
 }
 
+/* Global hardware compositing & typography smoothing */
+html, body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img, video, canvas {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
 :root {
   --color-bg:       #FAF7F2;
   --color-bg-warm:  #F3EFE6;
