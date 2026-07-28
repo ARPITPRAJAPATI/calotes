@@ -39,7 +39,7 @@ export async function GET(req: Request) {
     
     // Query category ObjectID matching slug parameters
     if (categorySlug) {
-      const category = await Category.findOne({ slug: categorySlug });
+      const category = await Category.findOne({ slug: categorySlug }).select('_id').lean();
       if (category) {
         query.category = category._id;
       }
@@ -52,9 +52,10 @@ export async function GET(req: Request) {
 
     // Execute query with populate, sorting parameters, and limit records to prevent payload bloating
     const products = await Product.find(query)
-      .populate('category')
+      .select('name slug price compareAtPrice images category brand stock condition sizes description')
+      .populate('category', 'name slug')
       .sort(sort)
-      .limit(20)
+      .limit(24)
       .lean(); // Return plain javascript objects to optimize serialization speeds
 
     return NextResponse.json(products, {

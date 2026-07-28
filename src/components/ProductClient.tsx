@@ -1,0 +1,343 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, ShieldCheck, Ruler, MessageCircle, Star, Sparkles, Heart, ChevronLeft, ChevronRight, ScanLine } from "lucide-react";
+import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
+import PatinaInspector from "@/components/PatinaInspector";
+
+interface ProductClientProps {
+  product: any;
+  relatedProducts: any[];
+}
+
+export default function ProductClient({ product, relatedProducts }: ProductClientProps) {
+  const { addToCart, setIsCartOpen } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedSize, setSelectedSize] = useState<string>("");
+  const [added, setAdded] = useState(false);
+  const [inspectorOpen, setInspectorOpen] = useState(false);
+
+  if (!product) {
+    return (
+      <div className="h-screen bg-bg flex flex-col items-center justify-center gap-6">
+        <p className="text-muted uppercase tracking-widest font-bold text-xs">This piece is no longer in the items list.</p>
+        <Link href="/shop" className="btn-primary">Return to Shop</Link>
+      </div>
+    );
+  }
+
+  const categoryName = typeof product.category === "object" ? product.category?.name : product.category || "Vintage";
+
+  const handleAddToCart = () => {
+    if (product.sizes?.length > 0 && !selectedSize) {
+      alert("Select a size first.");
+      return;
+    }
+    addToCart({
+      productId: product._id.toString(),
+      name: product.name,
+      price: product.price,
+      image: product.images[0],
+      size: selectedSize || "OS",
+      quantity: 1,
+    });
+    setAdded(true);
+    setTimeout(() => {
+      setAdded(false);
+      setIsCartOpen(true);
+    }, 1000);
+  };
+
+  const handleWhatsApp = () => {
+    const msg = `Hi Calotes, I'm interested in the ${product.name} (₹${product.price}). Is it available?`;
+    window.open(`https://wa.me/919999999999?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
+  return (
+    <div className="w-full pt-28 pb-24 flex-1">
+      <AnimatePresence>
+        {inspectorOpen && (
+          <PatinaInspector
+            images={product.images}
+            productName={product.name}
+            brand={product.brand}
+            condition={product.condition}
+            category={categoryName}
+            onClose={() => setInspectorOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      <div className="px-6 md:px-12 border-b border-border/40 py-8 mb-6">
+        <div className="max-w-[1800px] mx-auto flex items-center justify-between">
+          <Link href="/shop" className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-muted hover:text-text transition-all duration-300">
+            <div className="w-8 h-px bg-muted group-hover:w-12 group-hover:bg-text transition-all duration-500" />
+            <span>Back to Items</span>
+          </Link>
+          <div className="hidden sm:flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.2em] text-muted/40">
+            <span>Items</span>
+            <div className="w-1 h-1 rounded-full bg-border" />
+            <span className="text-muted">{categoryName}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-[1800px] mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 mb-12">
+          {/* Left Column: Image Gallery */}
+          <div className="lg:col-span-5 flex flex-col gap-4">
+            <div className="relative aspect-[3/4] bg-bg-warm overflow-hidden border border-border/30 group">
+              {product.images[selectedImage]?.endsWith(".mp4") ? (
+                <video autoPlay loop muted playsInline className="w-full h-full object-cover">
+                  <source src={product.images[selectedImage]} type="video/mp4" />
+                </video>
+              ) : (
+                <img 
+                  src={product.images[selectedImage]} 
+                  alt={`${product.name} - View ${selectedImage + 1}`} 
+                  className="w-full h-full object-cover transition-all duration-700" 
+                />
+              )}
+
+              {product.images.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setSelectedImage((prev) => (prev === 0 ? product.images.length - 1 : prev - 1))}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 p-2.5 bg-bg/90 border border-border hover:bg-text hover:text-bg transition-colors duration-300 z-10 flex items-center justify-center cursor-pointer shadow-lg"
+                    aria-label="Previous image"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <button
+                    onClick={() => setSelectedImage((prev) => (prev === product.images.length - 1 ? 0 : prev + 1))}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2.5 bg-bg/90 border border-border hover:bg-text hover:text-bg transition-colors duration-300 z-10 flex items-center justify-center cursor-pointer shadow-lg"
+                    aria-label="Next image"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </>
+              )}
+            </div>
+
+            <button
+              onClick={() => setInspectorOpen(true)}
+              className="group flex items-center justify-between w-full border border-border hover:border-terracotta bg-bg-warm hover:bg-terracotta/5 px-5 py-4 transition-all duration-300"
+            >
+              <div className="flex items-center gap-3">
+                <ScanLine size={12} className="text-terracotta shrink-0" />
+                <div className="text-left">
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-text group-hover:text-terracotta transition-colors">
+                    Inspect Patina &amp; Tags
+                  </p>
+                  <p className="text-[7px] font-bold uppercase tracking-widest text-muted mt-0.5">
+                    Magnify · Authenticate · Explore
+                  </p>
+                </div>
+              </div>
+              <div className="w-6 h-px bg-border group-hover:w-10 group-hover:bg-terracotta transition-all duration-500" />
+            </button>
+          </div>
+
+          {/* Right Column: Product Panel */}
+          <div className="lg:col-span-7 lg:sticky lg:top-32 lg:h-max space-y-10 py-8">
+            <div>
+              <p className="section-label mb-4 flex items-center gap-2">
+                <Sparkles size={10} /> Pre-Loved · Authenticated
+              </p>
+              <h1 className="font-display font-black text-4xl md:text-5xl uppercase tracking-tighter leading-[0.9] mb-4">
+                {product.name}
+              </h1>
+              <p className="section-label mb-8">{product.brand}</p>
+              
+              <div className="flex items-end gap-4">
+                <span className="text-3xl font-black text-terracotta">
+                  ₹{product.price.toLocaleString("en-IN")}
+                </span>
+                {product.compareAtPrice && (
+                  <span className="text-muted line-through text-lg mb-1">₹{product.compareAtPrice.toLocaleString("en-IN")}</span>
+                )}
+              </div>
+
+              <div className="mt-6">
+                {product.stock !== undefined && product.stock > 0 ? (
+                  product.stock === 1 ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[8px] font-black uppercase tracking-widest bg-amber-500/10 border border-amber-500/30 text-amber-600">
+                      ⚠️ ONLY 1 UNIQUE PIECE AVAILABLE IN THE VAULT!
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[8px] font-black uppercase tracking-widest bg-emerald-500/10 border border-emerald-500/30 text-emerald-600">
+                      🔥 ONLY {product.stock} PIECES REMAINING!
+                    </span>
+                  )
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[8px] font-black uppercase tracking-widest bg-red-500/10 border border-red-500/30 text-red-600">
+                    ❌ SOLD OUT / CURATED
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 border-y border-border py-5 bg-bg-warm px-4">
+              <ShieldCheck size={16} className="text-terracotta" />
+              <div className="flex flex-col">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-text">Condition: {product.condition}</span>
+                <span className="section-label mt-1">Professionally authenticated and cleaned.</span>
+              </div>
+            </div>
+
+            {product.sizes?.length > 0 && (
+              <div>
+                <div className="flex justify-between items-end mb-4">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em]">Select Size</p>
+                  <button className="text-[9px] font-bold uppercase tracking-widest text-muted underline-hover">Size Guide</button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {product.sizes.map((size: string) => {
+                    const isPlus = size === "XXL" || size === "XXXL" || size === "4XL";
+                    return (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={`relative px-5 py-3 text-[9px] font-black uppercase tracking-widest border transition-all duration-300 ${
+                          selectedSize === size
+                            ? 'bg-terracotta text-bg border-terracotta'
+                            : isPlus 
+                              ? 'bg-accent/10 border-accent/30 text-text hover:border-accent' 
+                              : 'bg-transparent border-border hover:border-border-warm'
+                        }`}
+                      >
+                        {size}
+                        {isPlus && <span className="absolute -top-2 -right-2 bg-accent text-bg text-[7px] px-1 py-0.5">PLUS</span>}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-3">
+              {product.stock !== undefined && product.stock <= 0 ? (
+                <div className="space-y-4">
+                  <button
+                    disabled
+                    className="w-full py-5 bg-muted/20 border border-border text-muted text-[10px] font-black uppercase tracking-[0.3em] cursor-not-allowed"
+                  >
+                    SOLD OUT / CURATED
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleAddToCart}
+                      className="btn-primary flex-1 py-5 flex items-center justify-center"
+                    >
+                      {added ? "✓ Added to Bag" : "Add to Bag"}
+                    </button>
+                    <button
+                      onClick={() => toggleWishlist({
+                        productId: product._id.toString(),
+                        name: product.name,
+                        price: product.price,
+                        image: product.images[0],
+                        slug: product.slug,
+                        category: categoryName,
+                      })}
+                      className="p-5 border border-border bg-bg-warm text-text hover:text-terracotta hover:border-terracotta transition-colors flex items-center justify-center shrink-0"
+                      title={isInWishlist(product._id.toString()) ? "Remove from Wishlist" : "Add to Wishlist"}
+                    >
+                      <Heart size={16} className={isInWishlist(product._id.toString()) ? "fill-current text-terracotta" : ""} />
+                    </button>
+                  </div>
+                  <button
+                    onClick={handleWhatsApp}
+                    className="w-full py-5 bg-transparent border border-[#25D366]/60 text-[#25D366] text-[9px] font-bold uppercase tracking-[0.3em] hover:bg-[#25D366] hover:text-white transition-colors duration-300 flex items-center justify-center gap-3"
+                  >
+                    <MessageCircle size={14} /> Buy on WhatsApp
+                  </button>
+                </>
+              )}
+            </div>
+
+            <div className="space-y-8 pt-8 border-t border-border">
+              <div className="space-y-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">The Story</p>
+                <p className="text-sm text-muted leading-relaxed font-medium">{product.description}</p>
+              </div>
+
+              {product.measurements && (
+                <div className="space-y-4 bg-bg-warm p-6 border border-border">
+                  <p className="section-label flex items-center gap-2"><Ruler size={12} /> Measurements</p>
+                  <div className="grid grid-cols-1 gap-0 text-[9px] font-bold uppercase tracking-widest text-muted">
+                    {product.measurements.pitToPit && <div className="flex justify-between border-b border-border py-2.5"><span>Pit to Pit</span><span className="text-text">{product.measurements.pitToPit}</span></div>}
+                    {product.measurements.length && <div className="flex justify-between border-b border-border py-2.5"><span>Length</span><span className="text-text">{product.measurements.length}</span></div>}
+                    {product.measurements.waist && <div className="flex justify-between border-b border-border py-2.5"><span>Waist</span><span className="text-text">{product.measurements.waist}</span></div>}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Reviews */}
+        <div className="border-t border-border pt-10 mb-16">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-6">
+            <div>
+              <h2 className="font-display font-black text-4xl uppercase tracking-tighter mb-4">Community Reviews</h2>
+              <div className="flex items-center gap-1.5 text-terracotta">
+                {[1,2,3,4,5].map(i => <Star key={i} size={14} fill="currentColor" />)}
+                <span className="text-text text-[9px] font-bold ml-2 uppercase tracking-widest">4.9 / 5.0 · 24 Reviews</span>
+              </div>
+            </div>
+            <button className="btn-outline">Write a Review</button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            {[
+              { name: "Rahul S.", text: "Incredible piece. Exactly as described and shipping was super fast.", date: "2 days ago" },
+              { name: "Karan M.", text: "The condition is actually better than I expected for a vintage item. Will buy again.", date: "1 week ago" },
+              { name: "Priya T.", text: "Finally found my holy grail jacket here. Amazing curation.", date: "2 weeks ago" },
+            ].map((rev, i) => (
+              <div key={i} className="bg-bg-warm p-6 border border-border">
+                <div className="flex text-terracotta mb-4">
+                  {[1,2,3,4,5].map(star => <Star key={star} size={11} fill="currentColor" />)}
+                </div>
+                <p className="text-[11px] text-muted leading-relaxed mb-5">{"\""}{rev.text}{"\""}</p>
+                <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest text-muted border-t border-border pt-3">
+                  <span>{rev.name} <span className="text-terracotta ml-2">✓ Verified</span></span>
+                  <span>{rev.date}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Related Products */}
+        {relatedProducts.length > 0 && (
+          <div className="border-t border-border pt-10 mb-6">
+            <h2 className="font-display font-black text-4xl uppercase tracking-tighter mb-6 text-center">You May Also Like</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {relatedProducts.map((item, idx) => (
+                <Link href={`/shop/product/${item.slug}`} key={idx} className="group block">
+                  <div className="aspect-[3/4] overflow-hidden bg-card mb-4 border border-border/50 relative">
+                    <img src={item.images[0]} alt={item.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+                    <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-bg-dark/90 text-center">
+                       <span className="text-text text-[10px] font-black uppercase tracking-widest">View details</span>
+                    </div>
+                  </div>
+                  <h3 className="text-xs font-black uppercase tracking-wider mb-1 truncate">{item.name}</h3>
+                  <p className="text-[10px] font-bold text-muted">₹{item.price.toLocaleString("en-IN")}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
