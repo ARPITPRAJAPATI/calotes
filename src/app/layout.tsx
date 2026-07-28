@@ -116,9 +116,9 @@ export default async function RootLayout({
           })();
         `}} />
         <style dangerouslySetInnerHTML={{ __html: `
-          :root {
-            --color-accent: ${activeAccent} !important;
-            --color-terracotta: ${activeAccent} !important;
+          :root:not(.theme-calotes) {
+            --color-accent: ${activeAccent};
+            --color-terracotta: ${activeAccent};
           }
         `}} />
       </head>

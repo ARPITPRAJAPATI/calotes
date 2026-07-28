@@ -49,76 +49,93 @@
 
 /* ─── Calotes Adaptive Chameleon Living Palette ─────────────── */
 .theme-calotes {
-  transition: background-color 3s ease, color 3s ease, border-color 3s ease;
   animation: calotesChameleonMorph 24s ease-in-out infinite;
 }
 
-.theme-calotes *,
-.theme-calotes *::before,
-.theme-calotes *::after {
-  transition: background-color 3s ease, color 3s ease, border-color 3s ease, fill 3s ease, stroke 3s ease;
+.theme-calotes,
+.theme-calotes body,
+.theme-calotes header,
+.theme-calotes nav,
+.theme-calotes div,
+.theme-calotes main,
+.theme-calotes section,
+.theme-calotes article,
+.theme-calotes footer,
+.theme-calotes button,
+.theme-calotes a,
+.theme-calotes p,
+.theme-calotes h1,
+.theme-calotes h2,
+.theme-calotes h3,
+.theme-calotes h4,
+.theme-calotes span {
+  transition: background-color 2.5s ease-in-out, color 2.5s ease-in-out, border-color 2.5s ease-in-out, fill 2.5s ease-in-out, stroke 2.5s ease-in-out !important;
 }
 
 @keyframes calotesChameleonMorph {
+  /* 🌿 Palette 1: Royal Forest Emerald & Venetian Gold (Deep Emerald Green) */
   0%, 20% {
-    --color-bg: #0C0C0E;
-    --color-bg-warm: #141418;
-    --color-bg-card: #1C1C22;
-    --color-card: #1C1C22;
-    --color-text: #F4EFE6;
-    --color-muted: #9E988F;
-    --color-accent: #D4AF37;
-    --color-terracotta: #D4AF37;
-    --color-border: rgba(212, 175, 55, 0.15);
-    --color-border-warm: rgba(212, 175, 55, 0.25);
+    --color-bg: #06140E;
+    --color-bg-warm: #0E2018;
+    --color-bg-card: #152A20;
+    --color-card: #152A20;
+    --color-text: #F7F3E9;
+    --color-muted: #95AEA0;
+    --color-accent: #E5B869;
+    --color-terracotta: #E5B869;
+    --color-border: rgba(229, 184, 105, 0.22);
+    --color-border-warm: rgba(229, 184, 105, 0.38);
   }
+  /* 🌌 Palette 2: Midnight Sapphire & Rosé Bronze (Deep Midnight Navy) */
   25%, 45% {
-    --color-bg: #08120E;
-    --color-bg-warm: #0F1D17;
-    --color-bg-card: #162620;
-    --color-card: #162620;
-    --color-text: #EAE6DF;
-    --color-muted: #8AA094;
+    --color-bg: #070D1D;
+    --color-bg-warm: #0F182F;
+    --color-bg-card: #172342;
+    --color-card: #172342;
+    --color-text: #EFF4F9;
+    --color-muted: #8A9BB1;
+    --color-accent: #E88771;
+    --color-terracotta: #E88771;
+    --color-border: rgba(232, 135, 113, 0.22);
+    --color-border-warm: rgba(232, 135, 113, 0.38);
+  }
+  /* 📜 Palette 3: Vintage Sand Linen & Tuscan Copper (Warm Ivory Linen) */
+  50%, 70% {
+    --color-bg: #F7F1E7;
+    --color-bg-warm: #ECE4D6;
+    --color-bg-card: #DFD5C4;
+    --color-card: #DFD5C4;
+    --color-text: #18120E;
+    --color-muted: #6B6156;
     --color-accent: #C85A32;
     --color-terracotta: #C85A32;
-    --color-border: rgba(200, 90, 50, 0.18);
-    --color-border-warm: rgba(200, 90, 50, 0.28);
+    --color-border: rgba(24, 18, 14, 0.16);
+    --color-border-warm: rgba(24, 18, 14, 0.3);
   }
-  50%, 70% {
-    --color-bg: #F5EFE6;
-    --color-bg-warm: #EBE4D8;
-    --color-bg-card: #E0D7C7;
-    --color-card: #E0D7C7;
-    --color-text: #16120E;
-    --color-muted: #6B6258;
-    --color-accent: #B85028;
-    --color-terracotta: #B85028;
-    --color-border: rgba(22, 18, 14, 0.12);
-    --color-border-warm: rgba(22, 18, 14, 0.22);
-  }
+  /* 🍇 Palette 4: Velvet Plum & Sunset Amber (Luxury Deep Velvet Purple) */
   75%, 95% {
-    --color-bg: #100C14;
-    --color-bg-warm: #18131E;
-    --color-bg-card: #201A28;
-    --color-card: #201A28;
-    --color-text: #F2ECF7;
-    --color-muted: #9D92A6;
-    --color-accent: #D48B46;
-    --color-terracotta: #D48B46;
-    --color-border: rgba(212, 139, 70, 0.16);
-    --color-border-warm: rgba(212, 139, 70, 0.26);
+    --color-bg: #14071A;
+    --color-bg-warm: #200E29;
+    --color-bg-card: #2B1638;
+    --color-card: #2B1638;
+    --color-text: #FAF2FC;
+    --color-muted: #A895B3;
+    --color-accent: #E59F38;
+    --color-terracotta: #E59F38;
+    --color-border: rgba(229, 159, 56, 0.22);
+    --color-border-warm: rgba(229, 159, 56, 0.38);
   }
   100% {
-    --color-bg: #0C0C0E;
-    --color-bg-warm: #141418;
-    --color-bg-card: #1C1C22;
-    --color-card: #1C1C22;
-    --color-text: #F4EFE6;
-    --color-muted: #9E988F;
-    --color-accent: #D4AF37;
-    --color-terracotta: #D4AF37;
-    --color-border: rgba(212, 175, 55, 0.15);
-    --color-border-warm: rgba(212, 175, 55, 0.25);
+    --color-bg: #06140E;
+    --color-bg-warm: #0E2018;
+    --color-bg-card: #152A20;
+    --color-card: #152A20;
+    --color-text: #F7F3E9;
+    --color-muted: #95AEA0;
+    --color-accent: #E5B869;
+    --color-terracotta: #E5B869;
+    --color-border: rgba(229, 184, 105, 0.22);
+    --color-border-warm: rgba(229, 184, 105, 0.38);
   }
 }
 
