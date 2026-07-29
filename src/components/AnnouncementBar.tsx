@@ -26,7 +26,7 @@ export default function AnnouncementBar() {
         overflow: "hidden",
         transition: "max-height 0.3s ease, opacity 0.25s ease",
       }}
-      className="bg-bg-warm text-text border-b border-border relative z-[100]"
+      className="bg-[#0A0A0A] text-[#F5F5F5] border-b border-white/10 relative z-[100]"
     >
       <div className="py-1.5 flex whitespace-nowrap items-center marquee-track">
         {[...Array(4)].map((_, i) => (

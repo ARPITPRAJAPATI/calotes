@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  /* Calotes Vintage — Premium Creamy Luxury Light Palette */
-  --color-bg:       #FAF7F2;
-  --color-bg-warm:  #F3EFE6;
-  --color-bg-card:  #ECE7DE;
-  --color-card:     #ECE7DE;
-  --color-text:     #12100E;
-  --color-muted:    #68635C;
+  /* Calotes Vintage — Luxury Cream Parchment Palette */
+  --color-bg:       #F5EDD8;
+  --color-bg-warm:  #EDE0C4;
+  --color-bg-card:  #E4D4AE;
+  --color-card:     #E4D4AE;
+  --color-text:     #1A1410;
+  --color-muted:    #6B6050;
   --color-accent:   #C85A32;
   --color-terracotta: #C85A32;
-  --color-border:   rgba(18, 16, 14, 0.08);
-  --color-border-warm: rgba(18, 16, 14, 0.16);
+  --color-border:   rgba(26, 20, 16, 0.10);
+  --color-border-warm: rgba(26, 20, 16, 0.18);
 
   /* Typography */
   --font-sans:    var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -32,16 +32,16 @@ img, video, canvas {
 }
 
 :root {
-  --color-bg:       #FAF7F2;
-  --color-bg-warm:  #F3EFE6;
-  --color-bg-card:  #ECE7DE;
-  --color-card:     #ECE7DE;
-  --color-text:     #12100E;
-  --color-muted:    #68635C;
+  --color-bg:       #F5EDD8;
+  --color-bg-warm:  #EDE0C4;
+  --color-bg-card:  #E4D4AE;
+  --color-card:     #E4D4AE;
+  --color-text:     #1A1410;
+  --color-muted:    #6B6050;
   --color-accent:   #C85A32;
   --color-terracotta: #C85A32;
-  --color-border:   rgba(18, 16, 14, 0.08);
-  --color-border-warm: rgba(18, 16, 14, 0.16);
+  --color-border:   rgba(26, 20, 16, 0.10);
+  --color-border-warm: rgba(26, 20, 16, 0.18);
 }
 
 /* ─── Premium Brutalist Dark Mode Palette ─────────────────── */
