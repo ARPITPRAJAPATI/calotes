@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Sun, Moon, Heart } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
 
-// Calotes Lizard Icon
+// Kalotes Lizard Icon
 function ChameleonIcon({ size = 18, className = "" }: { size?: number; className?: string }) {
   return (
     <svg
@@ -33,27 +33,27 @@ function ChameleonIcon({ size = 18, className = "" }: { size?: number; className
 // ── Shared theme hook ────────────────────────────────────────────────────────
 export function useTheme() {
   const pathname = usePathname();
-  const [theme, setTheme] = useState<"light" | "dark" | "calotes">("dark");
+  const [theme, setTheme] = useState<"light" | "dark" | "Kalotes">("dark");
 
   useEffect(() => {
-    const stored = (localStorage.getItem("theme") as "light" | "dark" | "calotes" | null) || "dark";
+    const stored = (localStorage.getItem("theme") as "light" | "dark" | "Kalotes" | null) || "dark";
     setTheme(stored);
 
-    document.documentElement.classList.remove("dark", "theme-calotes");
-    if (stored === "calotes") {
-      document.documentElement.classList.add(pathname === "/" ? "theme-calotes" : "dark");
+    document.documentElement.classList.remove("dark", "theme-Kalotes");
+    if (stored === "Kalotes") {
+      document.documentElement.classList.add(pathname === "/" ? "theme-Kalotes" : "dark");
     } else if (stored === "dark") {
       document.documentElement.classList.add("dark");
     }
   }, [pathname]);
 
   const toggleTheme = () => {
-    document.documentElement.classList.remove("dark", "theme-calotes");
+    document.documentElement.classList.remove("dark", "theme-Kalotes");
     if (theme === "dark") {
-      setTheme("calotes");
-      document.documentElement.classList.add(pathname === "/" ? "theme-calotes" : "dark");
-      localStorage.setItem("theme", "calotes");
-    } else if (theme === "calotes") {
+      setTheme("Kalotes");
+      document.documentElement.classList.add(pathname === "/" ? "theme-Kalotes" : "dark");
+      localStorage.setItem("theme", "Kalotes");
+    } else if (theme === "Kalotes") {
       setTheme("light");
       localStorage.setItem("theme", "light");
     } else {
@@ -76,17 +76,17 @@ export function DesktopThemeToggle() {
       aria-label="Toggle Theme"
       title={
         theme === "dark"
-          ? "Switch to Calotes Adaptive Mode (Home Only)"
-          : theme === "calotes"
+          ? "Switch to Kalotes Adaptive Mode (Home Only)"
+          : theme === "Kalotes"
           ? "Switch to Light Mode"
           : "Switch to Dark Mode"
       }
     >
       {theme === "dark" && <Moon size={18} strokeWidth={1.5} />}
-      {theme === "calotes" && <ChameleonIcon size={18} className="text-terracotta animate-pulse" />}
+      {theme === "Kalotes" && <ChameleonIcon size={18} className="text-terracotta animate-pulse" />}
       {theme === "light" && <Sun size={18} strokeWidth={1.5} />}
       <span className="hidden sm:block">
-        {theme === "dark" ? "Dark" : theme === "calotes" ? "Calotes" : "Light"}
+        {theme === "dark" ? "Dark" : theme === "Kalotes" ? "Kalotes" : "Light"}
       </span>
     </button>
   );
@@ -103,7 +103,7 @@ export function MobileThemeToggle({ size = 18 }: { size?: number }) {
       title="Toggle Theme"
     >
       {theme === "dark" && <Moon size={size} strokeWidth={1.5} />}
-      {theme === "calotes" && <ChameleonIcon size={size} className="text-terracotta animate-pulse" />}
+      {theme === "Kalotes" && <ChameleonIcon size={size} className="text-terracotta animate-pulse" />}
       {theme === "light" && <Sun size={size} strokeWidth={1.5} />}
     </button>
   );
@@ -120,7 +120,7 @@ export function DrawerThemeToggle() {
     >
       {theme === "light" && <Sun size={22} strokeWidth={1.5} />}
       {theme === "dark" && <Moon size={22} strokeWidth={1.5} />}
-      {theme === "calotes" && <ChameleonIcon size={22} className="text-terracotta animate-pulse" />}
+      {theme === "Kalotes" && <ChameleonIcon size={22} className="text-terracotta animate-pulse" />}
     </button>
   );
 }
@@ -137,3 +137,4 @@ export function WishlistHeart({ size = 18, className = "" }: { size?: number; cl
     />
   );
 }
+

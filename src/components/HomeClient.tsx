@@ -50,7 +50,7 @@ export default function HomeClient({
             <source media="(min-width: 768px)" srcSet={heroImageUrl} />
             <img
               src={heroImageUrl}
-              alt="Calotes Vintage Hero"
+              alt="Kalotes Vintage Hero"
               fetchPriority="high"
               decoding="async"
               className="w-full h-full object-cover object-top md:object-center"
@@ -213,7 +213,7 @@ export default function HomeClient({
       </section>
 
       {/* ══════════════════════════════════════════════════
-          4 · WHY CALOTES (Brand Philosophy)
+          4 · WHY Kalotes (Brand Philosophy)
       ══════════════════════════════════════════════════ */}
       <section className="py-12 md:py-20 px-6 md:px-12 max-w-[1800px] mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
@@ -289,7 +289,7 @@ export default function HomeClient({
         <div className="text-center max-w-lg mx-auto mb-16">
           <p className="section-label mb-4">Community</p>
           <h2 className="font-display font-black text-4xl md:text-5xl uppercase tracking-tighter leading-tight mb-4">Wear It. Tag It.</h2>
-          <p className="text-muted text-[11px] uppercase tracking-widest font-medium">@calotes.vintage — Show us how you style your pieces.</p>
+          <p className="text-muted text-[11px] uppercase tracking-widest font-medium">@Kalotes.vintage — Show us how you style your pieces.</p>
         </div>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3">
           {INSTA_IMGS.map((img, i) => (
@@ -303,10 +303,11 @@ export default function HomeClient({
         </div>
         <div className="mt-10 flex justify-center">
           <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="btn-outline flex items-center gap-3">
-            Follow @calotes.vintage <ArrowRight size={12} />
+            Follow @Kalotes.vintage <ArrowRight size={12} />
           </a>
         </div>
       </section>
     </div>
   );
 }
+

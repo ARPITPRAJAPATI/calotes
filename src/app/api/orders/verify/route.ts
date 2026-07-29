@@ -57,7 +57,7 @@ export async function POST(req: Request) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             to: (updatedOrder as any).user.email,
-            subject: 'Order Confirmed - Calotes Vintage',
+            subject: 'Order Confirmed - Kalotes Vintage',
             orderId: updatedOrder._id,
             total: updatedOrder.totalAmount
           })
@@ -75,4 +75,5 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
 

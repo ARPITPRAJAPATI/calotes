@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     const uploadResult = await new Promise<any>((resolve, reject) => {
       cloudinary.uploader.upload_stream(
         {
-          folder: 'calotes-vintage', // Target directory folder in Cloudinary
+          folder: 'Kalotes-vintage', // Target directory folder in Cloudinary
           resource_type: 'auto', // Auto-detect image/video/raw asset types
         },
         (error, result) => {
@@ -51,4 +51,5 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
 

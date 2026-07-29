@@ -42,7 +42,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setIsMounted(true); // Flag component as mounted on the client
     });
     
-    const savedCart = localStorage.getItem("calotes_cart"); // Retrieve stringified cart data
+    const savedCart = localStorage.getItem("Kalotes_cart"); // Retrieve stringified cart data
     if (savedCart) {
       try {
         const parsed = JSON.parse(savedCart); // Parse string back into array
@@ -59,7 +59,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Only perform write operations if the component has successfully completed its mount phase
     if (isMounted) {
-      localStorage.setItem("calotes_cart", JSON.stringify(items));
+      localStorage.setItem("Kalotes_cart", JSON.stringify(items));
     }
   }, [items, isMounted]);
 
@@ -145,4 +145,5 @@ export function useCart() {
   }
   return context; // Return context state reference
 }
+
 

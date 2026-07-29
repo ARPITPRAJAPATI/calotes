@@ -35,15 +35,15 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://calotesvintage.com"),
-  title: "Calotes Vintage | Authentic Pre-Owned Fashion",
-  description: "Curated vintage pieces. Adapt. Stand Out. Be Calotes.",
-  keywords: ["vintage", "streetwear", "pre-owned fashion", "calotes vintage", "authentic clothing"],
+  metadataBase: new URL("https://Kalotesvintage.com"),
+  title: "Kalotes Vintage | Authentic Pre-Owned Fashion",
+  description: "Curated vintage pieces. Adapt. Stand Out. Be Kalotes.",
+  keywords: ["vintage", "streetwear", "pre-owned fashion", "Kalotes vintage", "authentic clothing"],
   openGraph: {
-    title: "Calotes Vintage | Authentic Pre-Owned Fashion",
-    description: "Curated vintage pieces. Adapt. Stand Out. Be Calotes.",
-    url: "https://calotesvintage.com",
-    siteName: "Calotes Vintage",
+    title: "Kalotes Vintage | Authentic Pre-Owned Fashion",
+    description: "Curated vintage pieces. Adapt. Stand Out. Be Kalotes.",
+    url: "https://Kalotesvintage.com",
+    siteName: "Kalotes Vintage",
     images: [
       {
         url: "/og-image.jpg",
@@ -56,8 +56,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Calotes Vintage | Authentic Pre-Owned Fashion",
-    description: "Curated vintage pieces. Adapt. Stand Out. Be Calotes.",
+    title: "Kalotes Vintage | Authentic Pre-Owned Fashion",
+    description: "Curated vintage pieces. Adapt. Stand Out. Be Kalotes.",
     images: ["/og-image.jpg"],
   },
   icons: {
@@ -105,7 +105,7 @@ export default async function RootLayout({
         <link rel="preload" as="image" href="/images/hero-pc.jpg" media="(min-width: 768px)" fetchPriority="high" />
         <meta name="theme-color" content="#C85a32" />
         <style dangerouslySetInnerHTML={{ __html: `
-          :root:not(.theme-calotes) {
+          :root:not(.theme-Kalotes) {
             --color-accent: ${activeAccent};
             --color-terracotta: ${activeAccent};
           }
@@ -127,3 +127,4 @@ export default async function RootLayout({
     </html>
   );
 }
+

@@ -5,15 +5,15 @@ import mongoose, { Schema, model, models } from 'mongoose';
 const SettingsSchema = new Schema(
   {
     // Headline text rendering in the homepage hero slide
-    heroHeadline: { type: String, default: "Adapt. Stand Out. Be Calotes." },
+    heroHeadline: { type: String, default: "Adapt. Stand Out. Be Kalotes." },
     // Subtext description under the hero headline
     heroSubtext: { type: String, default: "Hand-picked vintage & streetwear. For the Indian modern icon." },
     // Banner scroll notification text displaying at the very top of pages
     announcementText: { type: String, default: "Free Shipping Pan India · Authentic Pre-Loved Streetwear" },
     // Primary support mailbox contact email address
-    contactEmail: { type: String, default: "contact@calotesvintage.com" },
+    contactEmail: { type: String, default: "contact@Kalotesvintage.com" },
     // Redirection URL linked to Instagram profile page
-    instagramUrl: { type: String, default: "https://instagram.com/calotes.vintage" },
+    instagramUrl: { type: String, default: "https://instagram.com/Kalotes.vintage" },
     // Shipping cost applied to checkout order totals (0 represents free shipping)
     shippingRate: { type: Number, default: 0 },
     // Main image file URL displayed as the homepage background on desktop/PC
@@ -32,4 +32,5 @@ const Settings = models.Settings || model('Settings', SettingsSchema);
 
 // Export compiled Settings model
 export default Settings;
+
 

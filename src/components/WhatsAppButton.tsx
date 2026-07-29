@@ -15,7 +15,7 @@ export default function WhatsAppButton() {
   }
 
   // Pre-filled WhatsApp message details
-  const message = "Hi Calotes, I am looking for pre-loved vintage pieces!";
+  const message = "Hi Kalotes, I am looking for pre-loved vintage pieces!";
   const whatsappUrl = `https://wa.me/919999999999?text=${encodeURIComponent(message)}`;
 
   return (
@@ -35,3 +35,4 @@ export default function WhatsAppButton() {
     </motion.a>
   );
 }
+

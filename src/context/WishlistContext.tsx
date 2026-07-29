@@ -29,7 +29,7 @@ interface WishlistContextType {
 // Create the Context with null fallback value
 const WishlistContext = createContext<WishlistContextType | null>(null);
 // LocalStorage key constant for consistent namespace reads/writes
-const STORAGE_KEY = "calotes_wishlist";
+const STORAGE_KEY = "Kalotes_wishlist";
 
 // Provider wrapper component housing the wishlist state manager
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
@@ -111,4 +111,5 @@ export function useWishlist() {
   if (!ctx) throw new Error("useWishlist must be used within WishlistProvider");
   return ctx; // Return context value reference
 }
+
 

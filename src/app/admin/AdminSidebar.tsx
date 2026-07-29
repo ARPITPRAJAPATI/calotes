@@ -17,7 +17,7 @@ export default function AdminSidebar() {
       {/* Mobile/Tablet View Header Bar: shown only on smaller screens */}
       <header className="lg:hidden fixed top-0 left-0 w-full h-16 bg-card border-b border-border flex items-center justify-between px-6 z-50">
         <Link href="/admin" className="font-display font-black text-xl uppercase tracking-tighter">
-          Calotes Admin
+          Kalotes Admin
         </Link>
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -45,7 +45,7 @@ export default function AdminSidebar() {
         {/* Desktop Branding Header: shown on large viewports */}
         <div className="hidden lg:block p-6 border-b border-border">
           <Link href="/admin" className="font-display font-black text-2xl uppercase tracking-tighter hover:opacity-80 transition-opacity">
-            Calotes Admin
+            Kalotes Admin
           </Link>
         </div>
 
@@ -67,4 +67,5 @@ export default function AdminSidebar() {
     </>
   );
 }
+
 

@@ -25,7 +25,7 @@ export default function Footer() {
           {/* Brand details column */}
           <div className="col-span-2 md:col-span-5">
             <Link href="/" className="block font-display font-black text-6xl md:text-8xl uppercase tracking-tighter text-text hover:text-terracotta transition-colors leading-none mb-8">
-              CALOTES
+              Kalotes
             </Link>
             <p className="text-[10px] text-muted leading-[1.9] max-w-xs font-medium uppercase tracking-widest mb-10">
               {"India's premium archive for authentic pre-owned vintage & streetwear. Curated for the modern icon."}
@@ -114,9 +114,9 @@ export default function Footer() {
 
         {/* Bottom copyright and legal page links */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-[8px] font-bold uppercase tracking-[0.3em] text-muted">
-          <p>© {new Date().getFullYear()} Calotes Vintage. Curated in India.</p>
+          <p>© {new Date().getFullYear()} Kalotes Vintage. Curated in India.</p>
           <p className="font-serif italic lowercase text-sm tracking-normal normal-case font-light text-muted">
-            {"\"Adapt. Stand Out. Be Calotes.\""}
+            {"\"Adapt. Stand Out. Be Kalotes.\""}
           </p>
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-terracotta transition-colors">Privacy</Link>
@@ -127,4 +127,5 @@ export default function Footer() {
     </footer>
   );
 }
+
 

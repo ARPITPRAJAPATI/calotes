@@ -31,10 +31,10 @@ export default function LogoPreview() {
           <path id="top-text-path" d="M 30,105 A 70,70 0 0,1 170,105" fill="none" />
           <path id="bottom-text-path" d="M 170,95 A 70,70 0 0,1 30,95" fill="none" />
 
-          {/* Top Text: CALOTES */}
+          {/* Top Text: Kalotes */}
           <text className="fill-current text-[28px] font-black tracking-widest uppercase font-display">
             <textPath href="#top-text-path" startOffset="50%" textAnchor="middle">
-              CALOTES
+              Kalotes
             </textPath>
           </text>
 
@@ -49,8 +49,8 @@ export default function LogoPreview() {
         {/* Central Animal Image (Lizard) */}
         <div className="absolute flex items-center justify-center w-[45%] h-[45%] rounded-full overflow-hidden">
           <img
-            src="/calotes-logo.png"
-            alt="Calotes Lizard"
+            src="/Kalotes-logo.png"
+            alt="Kalotes Lizard"
             className="w-full h-full object-contain"
           />
         </div>
@@ -64,3 +64,4 @@ export default function LogoPreview() {
     </div>
   );
 }
+

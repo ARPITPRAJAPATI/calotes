@@ -167,7 +167,7 @@ export default function PatinaInspector({
         <div className="flex items-center gap-3 min-w-0">
           <Scan size={11} className="text-[#C45B3A] animate-pulse shrink-0" />
           <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/60 truncate">
-            <span className="hidden sm:inline">Calotes · </span>Patina Inspector
+            <span className="hidden sm:inline">Kalotes · </span>Patina Inspector
           </span>
         </div>
         <div className="flex items-center gap-4 shrink-0">
@@ -547,4 +547,5 @@ export default function PatinaInspector({
     </motion.div>
   );
 }
+
 

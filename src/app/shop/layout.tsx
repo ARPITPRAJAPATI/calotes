@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Shop The Items | Calotes Vintage",
+  title: "Shop The Items | Kalotes Vintage",
   description: "Browse our curated collection of authentic vintage streetwear, designer archive, and rare pieces.",
   openGraph: {
-    title: "Shop The Items | Calotes Vintage",
+    title: "Shop The Items | Kalotes Vintage",
     description: "Browse our curated collection of authentic vintage streetwear.",
     type: "website",
   },
@@ -17,3 +17,4 @@ export default function ShopLayout({
 }) {
   return <>{children}</>;
 }
+
