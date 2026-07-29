@@ -12,7 +12,7 @@ import { useSession } from "next-auth/react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 // Import UI vector icon components
-import { ShoppingBag, Menu, X, ChevronDown, Sparkles, Heart, Sun, Moon, User, MoreHorizontal } from "lucide-react";
+import { ShoppingBag, X, ChevronDown, Sparkles, Heart, Sun, Moon, User, MoreHorizontal } from "lucide-react";
 // Import Framer Motion animations
 import { motion, AnimatePresence } from "framer-motion";
 // Import Branding logo component
@@ -57,6 +57,24 @@ function ChameleonIcon({ size = 18, className = "" }: { size?: number; className
   );
 }
 
+// Renders ALL 3 theme icons always — CSS shows/hides based on html class.
+// Zero React state needed = zero hydration mismatch possible.
+function CSSThemeIcons({ size = 18 }: { size?: number }) {
+  return (
+    <>
+      <span className="theme-icon-moon">
+        <Moon size={size} strokeWidth={1.5} />
+      </span>
+      <span className="theme-icon-calotes">
+        <ChameleonIcon size={size} className="text-terracotta animate-pulse" />
+      </span>
+      <span className="theme-icon-light">
+        <Sun size={size} strokeWidth={1.5} />
+      </span>
+    </>
+  );
+}
+
 export default function Navbar() {
   const { data: session } = useSession();
   const { setIsCartOpen, cartCount } = useCart();
@@ -67,29 +85,26 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark" | "calotes">("dark");
+  // clientReady: false during SSR and hydration, true only after first client paint
+  // useEffect with [] fires ONCE after hydration is complete — never during SSR
+  const [clientReady, setClientReady] = useState(false);
 
-  const [mounted, setMounted] = useState(false);
-
-  // Sync theme with localStorage and route changes (Calotes morphing applies only on Home Page '/')
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setMounted(true);
-      const stored = (localStorage.getItem("theme") as "light" | "dark" | "calotes" | null) || "dark";
-      setTheme(stored);
-      
-      document.documentElement.classList.remove("dark", "theme-calotes");
-      if (stored === "calotes") {
-        if (pathname === "/") {
-          document.documentElement.classList.add("theme-calotes");
-        } else {
-          document.documentElement.classList.add("dark");
-        }
-      } else if (stored === "dark") {
-        document.documentElement.classList.add("dark");
-      }
-    }, 0);
+    // Read actual theme from localStorage after hydration
+    const stored = (localStorage.getItem("theme") as "light" | "dark" | "calotes" | null) || "dark";
+    setTheme(stored);
+    setClientReady(true);
+  }, []); // Empty: runs exactly once after mount, never during hydration
 
-    return () => clearTimeout(timer);
+  // Sync DOM classes on pathname changes (calotes mode only applies on home page)
+  useEffect(() => {
+    const stored = (localStorage.getItem("theme") as "light" | "dark" | "calotes" | null) || "dark";
+    document.documentElement.classList.remove("dark", "theme-calotes");
+    if (stored === "calotes") {
+      document.documentElement.classList.add(pathname === "/" ? "theme-calotes" : "dark");
+    } else if (stored === "dark") {
+      document.documentElement.classList.add("dark");
+    }
   }, [pathname]);
 
   // Callback to cycle theme options: Dark -> Calotes Adaptive (Home Only) -> Light -> Dark
@@ -97,11 +112,7 @@ export default function Navbar() {
     document.documentElement.classList.remove("dark", "theme-calotes");
     if (theme === "dark") {
       setTheme("calotes");
-      if (pathname === "/") {
-        document.documentElement.classList.add("theme-calotes");
-      } else {
-        document.documentElement.classList.add("dark");
-      }
+      document.documentElement.classList.add(pathname === "/" ? "theme-calotes" : "dark");
       localStorage.setItem("theme", "calotes");
     } else if (theme === "calotes") {
       setTheme("light");
@@ -127,40 +138,39 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const lastPathname = useRef(pathname); // Persist reference to previous route path name
+  const lastPathname = useRef(pathname);
 
   // Auto-close mobile dropdown menus whenever a user clicks navigation links and routes update
   useEffect(() => {
     if (lastPathname.current !== pathname) {
       lastPathname.current = pathname;
       if (mobileMenuOpen) {
-        requestAnimationFrame(() => {
-          setMobileMenuOpen(false); // Close sliding mobile menu
-        });
+        requestAnimationFrame(() => setMobileMenuOpen(false));
       }
     }
   }, [pathname, mobileMenuOpen]);
 
   // Hide Navbar completely on administrative dashboard panel layout views
   if (pathname?.startsWith("/admin")) {
-    return null; // Stop rendering
+    return null;
   }
 
   return (
     <>
       {/* Sticky header container */}
       <header
-        className={`sticky top-0 w-full z-50 transition-all duration-300 ${scrolled
-            ? "bg-bg/98 border-b border-border py-3 shadow-xs"
-            : "bg-transparent py-6 md:py-8"
-          }`}
+        className={`sticky top-0 w-full z-50 transition-all duration-300 ${
+          scrolled ? "bg-bg/98 border-b border-border py-3 shadow-xs" : "bg-transparent py-6 md:py-8"
+        }`}
       >
         {/* ─── DESKTOP HEADER LAYOUT ─── */}
         <div className="hidden lg:flex max-w-[1800px] mx-auto px-10 items-center justify-between relative w-full">
           {/* Left Navigation Links */}
           <nav className="flex items-center gap-8 xl:gap-10">
             <Link href="/shop" className="section-label underline-hover">Shop</Link>
-            <Link href="/canvas" className="section-label underline-hover text-terracotta flex items-center gap-1"><Sparkles size={12} /> Studio</Link>
+            <Link href="/canvas" className="section-label underline-hover text-terracotta flex items-center gap-1">
+              <Sparkles size={12} /> Studio
+            </Link>
 
             {/* Desktop Categories Dropdown trigger */}
             <div
@@ -171,8 +181,6 @@ export default function Navbar() {
               <button className="section-label underline-hover flex items-center gap-1 pb-0.5">
                 Categories <ChevronDown size={10} className="mt-0.5" />
               </button>
-
-              {/* Animate list items on hover status */}
               <AnimatePresence>
                 {dropdownOpen && (
                   <motion.div
@@ -182,7 +190,6 @@ export default function Navbar() {
                     transition={{ duration: 0.2 }}
                     className="absolute top-full left-0 mt-3 w-44 bg-bg-warm border border-border-warm shadow-2xl p-4 flex flex-col gap-3"
                   >
-                    {/* Render category listings */}
                     {CATEGORIES.map(cat => (
                       <Link
                         key={cat.href}
@@ -220,9 +227,7 @@ export default function Navbar() {
               title={session ? "Profile" : "Login"}
             >
               <User size={18} strokeWidth={1.5} />
-              <span className="hidden sm:block">
-                {session ? "Profile" : "Login"}
-              </span>
+              <span className="hidden sm:block">{session ? "Profile" : "Login"}</span>
             </Link>
 
             {/* Shopping Bag trigger button */}
@@ -246,40 +251,30 @@ export default function Navbar() {
               className="relative flex items-center gap-2 section-label hover:text-terracotta transition-colors"
               aria-label="Open wishlist"
             >
-              <Heart size={18} strokeWidth={1.5} className="text-text" fill={wishlistCount > 0 ? "currentColor" : "none"} />
+              {/* fill="none" on server, actual count after mount — no hydration mismatch */}
+              <Heart size={18} strokeWidth={1.5} className="text-text" fill={clientReady && wishlistCount > 0 ? "currentColor" : "none"} />
               <span className="hidden sm:block">Wishlist</span>
             </button>
-            {/* 3-Way Mode Theme switch trigger button (Dark [Default] -> Calotes Adaptive [Home Only] -> Light -> Dark) */}
+
+            {/* 3-Way Theme toggle — CSS shows correct icon, no React state needed */}
             <button
               onClick={toggleTheme}
-              suppressHydrationWarning
               className="relative flex items-center gap-2 section-label hover:text-terracotta transition-colors"
               aria-label="Toggle Theme"
-              title={
-                !mounted
-                  ? "Toggle Theme"
-                  : theme === "dark"
-                  ? "Switch to Calotes Adaptive Mode (Home Only)"
-                  : theme === "calotes"
-                  ? "Switch to Light Mode"
-                  : "Switch to Dark Mode"
-              }
+              title="Toggle Theme"
             >
-              {(!mounted || theme === "dark") && <Moon size={18} strokeWidth={1.5} />}
-              {mounted && theme === "calotes" && <ChameleonIcon size={18} className="text-terracotta animate-pulse" />}
-              {mounted && theme === "light" && <Sun size={18} strokeWidth={1.5} />}
-              <span className="hidden sm:block" suppressHydrationWarning>
-                {!mounted ? "Dark" : theme === "dark" ? "Dark" : theme === "calotes" ? "Calotes" : "Light"}
-              </span>
+              <CSSThemeIcons size={18} />
+              <span className="hidden sm:block theme-icon-moon">Dark</span>
+              <span className="hidden sm:block theme-icon-calotes">Calotes</span>
+              <span className="hidden sm:block theme-icon-light">Light</span>
             </button>
           </div>
         </div>
 
-        {/* ─── MOBILE & TABLET HEADER LAYOUT (pure icons without circles) ─── */}
+        {/* ─── MOBILE & TABLET HEADER LAYOUT ─── */}
         <div className="lg:hidden w-full px-4 flex items-center justify-between relative">
           {/* Left actions: Menu + Profile */}
           <div className="flex items-center gap-1.5 xs:gap-2 z-10">
-            {/* Menu trigger button */}
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
@@ -288,8 +283,6 @@ export default function Navbar() {
             >
               <MoreHorizontal size={18} strokeWidth={2} />
             </button>
-
-            {/* Profile / Account Login Link */}
             <Link
               href={session ? "/profile" : "/login"}
               className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
@@ -310,31 +303,21 @@ export default function Navbar() {
 
           {/* Right actions: Theme + Wishlist + Bag */}
           <div className="flex items-center gap-1.5 xs:gap-2 z-10">
+            {/* Mobile Theme toggle — CSS driven */}
             <button
               onClick={toggleTheme}
-              suppressHydrationWarning
               className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
               aria-label="Toggle Theme"
-              title={
-                !mounted
-                  ? "Toggle Theme"
-                  : theme === "dark"
-                  ? "Switch to Calotes Adaptive Mode (Home Only)"
-                  : theme === "calotes"
-                  ? "Switch to Light Mode"
-                  : "Switch to Dark Mode"
-              }
+              title="Toggle Theme"
             >
-              {(!mounted || theme === "dark") && <Moon size={18} strokeWidth={1.5} />}
-              {mounted && theme === "calotes" && <ChameleonIcon size={18} className="text-terracotta animate-pulse" />}
-              {mounted && theme === "light" && <Sun size={18} strokeWidth={1.5} />}
+              <CSSThemeIcons size={18} />
             </button>
             <button
               onClick={() => setIsWishlistOpen(true)}
               className="relative flex items-center justify-center text-text hover:text-terracotta transition-colors p-1.5"
               aria-label="Wishlist"
             >
-              <Heart size={18} strokeWidth={1.5} fill={wishlistCount > 0 ? "currentColor" : "none"} />
+              <Heart size={18} strokeWidth={1.5} fill={clientReady && wishlistCount > 0 ? "currentColor" : "none"} />
             </button>
             <button
               onClick={() => setIsCartOpen(true)}
@@ -373,9 +356,7 @@ export default function Navbar() {
                   className="text-text hover:text-terracotta transition-colors flex items-center justify-center gap-1.5"
                   aria-label="Toggle Theme"
                 >
-                  {theme === "light" && <Sun size={22} strokeWidth={1.5} />}
-                  {theme === "dark" && <Moon size={22} strokeWidth={1.5} />}
-                  {theme === "calotes" && <ChameleonIcon size={22} className="text-terracotta animate-pulse" />}
+                  <CSSThemeIcons size={22} />
                 </button>
                 <button onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
                   <X size={24} strokeWidth={1} className="text-muted hover:text-text transition-colors" />
@@ -395,7 +376,6 @@ export default function Navbar() {
                   key={item.href}
                   initial={{ x: 30, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  // Cascade delay calculations based on index listing positions
                   transition={{ delay: 0.05 * i, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <Link
@@ -448,4 +428,3 @@ export default function Navbar() {
     </>
   );
 }
-

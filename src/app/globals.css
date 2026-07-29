@@ -118,7 +118,23 @@ img, video, canvas {
   color: var(--color-muted) !important;
 }
 
+/* ─── Theme Toggle Icon Visibility (CSS-only, zero React state mismatch) ─── */
+/* All 3 icons always rendered in DOM — CSS shows the correct one per theme  */
+.theme-icon-moon    { display: inline-block; }
+.theme-icon-calotes { display: none; }
+.theme-icon-light   { display: none; }
+.dark .theme-icon-moon    { display: inline-block; }
+.dark .theme-icon-calotes { display: none; }
+.dark .theme-icon-light   { display: none; }
+.theme-calotes .theme-icon-moon    { display: none; }
+.theme-calotes .theme-icon-calotes { display: inline-block; }
+.theme-calotes .theme-icon-light   { display: none; }
+html:not(.dark):not(.theme-calotes) .theme-icon-moon    { display: none; }
+html:not(.dark):not(.theme-calotes) .theme-icon-calotes { display: none; }
+html:not(.dark):not(.theme-calotes) .theme-icon-light   { display: inline-block; }
+
 .theme-calotes .text-terracotta:not([data-drawer] *) {
+
   color: var(--color-terracotta) !important;
 }
 
