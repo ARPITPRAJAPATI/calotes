@@ -12,7 +12,7 @@ export default function AnnouncementBar() {
   if (pathname?.startsWith("/admin") || !visible) return null;
 
   return (
-    <div className="bg-bg-warm text-text border-b border-border relative z-[100] overflow-hidden">
+    <div suppressHydrationWarning className="bg-bg-warm text-text border-b border-border relative z-[100] overflow-hidden">
       <div className="py-1.5 flex whitespace-nowrap items-center marquee-track">
         {[...Array(4)].map((_, i) => (
           <span
@@ -26,6 +26,7 @@ export default function AnnouncementBar() {
         ))}
       </div>
       <button
+        suppressHydrationWarning
         onClick={() => setVisible(false)}
         className="absolute right-0 top-0 bottom-0 px-3 z-10 bg-black/80 hover:bg-black hover:text-terracotta transition-colors flex items-center justify-center border-l border-white/10"
         aria-label="Close announcement"
