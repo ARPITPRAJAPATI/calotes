@@ -6,13 +6,28 @@ import { X, Star } from "lucide-react";
 
 export default function AnnouncementBar() {
   const [visible, setVisible] = useState(true);
+  const [dismissing, setDismissing] = useState(false);
   const pathname = usePathname();
 
-  // Hide on admin routes
   if (pathname?.startsWith("/admin") || !visible) return null;
 
+  const handleDismiss = () => {
+    setDismissing(true);
+    // Wait for CSS transition to complete, then remove from DOM
+    setTimeout(() => setVisible(false), 320);
+  };
+
   return (
-    <div suppressHydrationWarning className="bg-bg-warm text-text border-b border-border relative z-[100] overflow-hidden">
+    <div
+      suppressHydrationWarning
+      style={{
+        maxHeight: dismissing ? "0px" : "60px",
+        opacity: dismissing ? 0 : 1,
+        overflow: "hidden",
+        transition: "max-height 0.3s ease, opacity 0.25s ease",
+      }}
+      className="bg-bg-warm text-text border-b border-border relative z-[100]"
+    >
       <div className="py-1.5 flex whitespace-nowrap items-center marquee-track">
         {[...Array(4)].map((_, i) => (
           <span
@@ -27,7 +42,7 @@ export default function AnnouncementBar() {
       </div>
       <button
         suppressHydrationWarning
-        onClick={() => setVisible(false)}
+        onClick={handleDismiss}
         className="absolute right-0 top-0 bottom-0 px-3 z-10 bg-black/80 hover:bg-black hover:text-terracotta transition-colors flex items-center justify-center border-l border-white/10"
         aria-label="Close announcement"
       >
