@@ -64,7 +64,7 @@ export default function AboutPage() {
             </h2>
             <div className="space-y-5 text-muted text-[11px] uppercase tracking-widest leading-[1.9] font-medium">
               <p>
-                Kalotes was born from a rebellion against the disposable culture of modern fast fashion. We believe garments are artifacts — pieces of history that gain character, soul, and value over time.
+                Calotes was born from a rebellion against the disposable culture of modern fast fashion. We believe garments are artifacts — pieces of history that gain character, soul, and value over time.
               </p>
               <p>
                 Every piece in our archive is hand-selected, authenticated, and carefully inspected. We source the rarest denim, perfectly broken-in outerwear, and t-shirts that carry decades of character.
@@ -83,7 +83,7 @@ export default function AboutPage() {
               <p className="font-serif italic text-xl md:text-2xl leading-relaxed text-text mb-8 font-light">
                 {"\"True style cannot be manufactured on an assembly line. It must be discovered — in thrift stores, flea markets, and forgotten wardrobes.\""}
               </p>
-              <p className="section-label text-terracotta">— The Founders, Kalotes Vintage</p>
+              <p className="section-label text-terracotta">— The Founders, Calotes Vintage</p>
             </div>
           </motion.div>
         </div>
@@ -130,4 +130,3 @@ export default function AboutPage() {
     </div>
   );
 }
-

@@ -57,7 +57,7 @@ export default async function Home() {
   }
 
   // Hero settings with fallbacks
-  const heroHeadline = settings?.heroHeadline || "Adapt. Stand Out. Be Kalotes.";
+  const heroHeadline = settings?.heroHeadline || "Adapt. Stand Out. Be Calotes.";
   const heroSubtext = settings?.heroSubtext || "Hand-picked vintage & streetwear.\nFor the Indian modern icon.";
   const rawHeroUrl = settings?.heroImageUrl || "/images/hero-pc.jpg";
   const heroImageUrl = rawHeroUrl === "/images/hero-pc.png" ? "/images/hero-pc.jpg" : rawHeroUrl;
@@ -108,4 +108,3 @@ export default async function Home() {
     />
   );
 }
-

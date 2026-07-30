@@ -56,15 +56,15 @@ export async function POST(req: Request) {
     // Send Email via Resend gracefully
     if (process.env.RESEND_API_KEY) {
       try {
-        const fromEmail = process.env.RESEND_FROM_EMAIL || "Kalotes Vintage <onboarding@resend.dev>";
+        const fromEmail = process.env.RESEND_FROM_EMAIL || "Calotes Vintage <onboarding@resend.dev>";
         const sendResult = await resend.emails.send({
           from: fromEmail,
           to: [normalizedEmail],
-          subject: `${otpCode} is your Kalotes Verification Code`,
+          subject: `${otpCode} is your Calotes Verification Code`,
           html: `
             <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 500px; margin: 0 auto; background: #0a0a0a; color: #f0f0f0; padding: 40px; border-radius: 12px; border: 1px solid #2a2a2a;">
               <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="font-size: 28px; font-weight: 900; letter-spacing: -1px; text-transform: uppercase; margin: 0; color: #f0f0f0;">Kalotes<span style="color: #c85a32;">.</span></h1>
+                <h1 style="font-size: 28px; font-weight: 900; letter-spacing: -1px; text-transform: uppercase; margin: 0; color: #f0f0f0;">Calotes<span style="color: #c85a32;">.</span></h1>
                 <p style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; color: #777; margin-top: 6px;">Verification Code</p>
               </div>
               
@@ -105,4 +105,3 @@ export async function POST(req: Request) {
     );
   }
 }
-

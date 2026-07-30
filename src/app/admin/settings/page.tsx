@@ -184,7 +184,7 @@ export default function AdminSettingsPage() {
               type="text"
               value={heroHeadline}
               onChange={(e) => setHeroHeadline(e.target.value)}
-              placeholder="e.g., Adapt. Stand Out. Be Kalotes."
+              placeholder="e.g., Adapt. Stand Out. Be Calotes."
               className="w-full bg-bg border border-border px-4 py-3 text-xs font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
               required
             />
@@ -382,7 +382,7 @@ export default function AdminSettingsPage() {
                 type="email"
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
-                placeholder="support@Kalotes.com"
+                placeholder="support@calotes.com"
                 className="w-full bg-bg border border-border px-4 py-3 text-xs font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
                 required
               />
@@ -396,7 +396,7 @@ export default function AdminSettingsPage() {
                 type="url"
                 value={instagramUrl}
                 onChange={(e) => setInstagramUrl(e.target.value)}
-                placeholder="https://instagram.com/Kalotes.vintage"
+                placeholder="https://instagram.com/calotes.vintage"
                 className="w-full bg-bg border border-border px-4 py-3 text-xs font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
               />
             </div>
@@ -451,4 +451,3 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
-

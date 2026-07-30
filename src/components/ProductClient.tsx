@@ -54,7 +54,7 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
   };
 
   const handleWhatsApp = () => {
-    const msg = `Hi Kalotes, I'm interested in the ${product.name} (₹${product.price}). Is it available?`;
+    const msg = `Hi Calotes, I'm interested in the ${product.name} (₹${product.price}). Is it available?`;
     window.open(`https://wa.me/919999999999?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
@@ -341,4 +341,3 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
     </div>
   );
 }
-

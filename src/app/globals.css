@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* Kalotes Vintage — Luxury Cream Parchment Palette */
+  /* Calotes Vintage — Luxury Cream Parchment Palette */
   --color-bg:       #F5EDD8;
   --color-bg-warm:  #EDE0C4;
   --color-bg-card:  #E4D4AE;
@@ -69,16 +69,16 @@ img, video, canvas {
 @property --color-accent { syntax: '<color>'; inherits: true; initial-value: #E5B869; }
 @property --color-terracotta { syntax: '<color>'; inherits: true; initial-value: #E5B869; }
 
-/* ─── Kalotes Adaptive Chameleon Living Palette (Liquid Silk Morph) ─── */
-.theme-Kalotes {
-  animation: KalotesChameleonMorph 36s linear infinite;
+/* ─── Calotes Adaptive Chameleon Living Palette (Liquid Silk Morph) ─── */
+.theme-calotes {
+  animation: calotesChameleonMorph 36s linear infinite;
   background-color: var(--color-bg) !important;
   color: var(--color-text) !important;
 }
 
-/* Protect drawers from inheriting theme-Kalotes morphing variables */
-.theme-Kalotes [data-drawer],
-.theme-Kalotes [data-drawer] * {
+/* Protect drawers from inheriting theme-calotes morphing variables */
+.theme-calotes [data-drawer],
+.theme-calotes [data-drawer] * {
   --color-bg: #111111 !important;
   --color-bg-warm: #1A1A1A !important;
   --color-bg-card: #222222 !important;
@@ -93,88 +93,88 @@ img, video, canvas {
 }
 
 /* Top-to-bottom synchronous font & border theme engine */
-.theme-Kalotes header:not([data-drawer]),
-.theme-Kalotes nav:not([data-drawer]),
-.theme-Kalotes footer:not([data-drawer]),
-.theme-Kalotes section:not([data-drawer]),
-.theme-Kalotes main:not([data-drawer]) {
+.theme-calotes header:not([data-drawer]),
+.theme-calotes nav:not([data-drawer]),
+.theme-calotes footer:not([data-drawer]),
+.theme-calotes section:not([data-drawer]),
+.theme-calotes main:not([data-drawer]) {
   border-color: var(--color-border) !important;
 }
 
-.theme-Kalotes h1:not([data-drawer] *),
-.theme-Kalotes h2:not([data-drawer] *),
-.theme-Kalotes h3:not([data-drawer] *),
-.theme-Kalotes h4:not([data-drawer] *),
-.theme-Kalotes h5:not([data-drawer] *),
-.theme-Kalotes h6:not([data-drawer] *),
-.theme-Kalotes p:not(.text-muted):not(.text-terracotta):not([data-drawer] *),
-.theme-Kalotes a:not(.text-terracotta):not(.hover\:text-terracotta):not([data-drawer] *),
-.theme-Kalotes span:not(.text-muted):not(.text-terracotta):not(.bg-terracotta):not([data-drawer] *) {
+.theme-calotes h1:not([data-drawer] *),
+.theme-calotes h2:not([data-drawer] *),
+.theme-calotes h3:not([data-drawer] *),
+.theme-calotes h4:not([data-drawer] *),
+.theme-calotes h5:not([data-drawer] *),
+.theme-calotes h6:not([data-drawer] *),
+.theme-calotes p:not(.text-muted):not(.text-terracotta):not([data-drawer] *),
+.theme-calotes a:not(.text-terracotta):not(.hover\:text-terracotta):not([data-drawer] *),
+.theme-calotes span:not(.text-muted):not(.text-terracotta):not(.bg-terracotta):not([data-drawer] *) {
   color: var(--color-text);
 }
 
-.theme-Kalotes .text-muted:not([data-drawer] *),
-.theme-Kalotes .section-label:not([data-drawer] *) {
+.theme-calotes .text-muted:not([data-drawer] *),
+.theme-calotes .section-label:not([data-drawer] *) {
   color: var(--color-muted) !important;
 }
 
 /* ─── Theme Toggle Icon Visibility (CSS-only, zero React state mismatch) ─── */
 /* All 3 icons always rendered in DOM — CSS shows the correct one per theme  */
 .theme-icon-moon    { display: inline-block; }
-.theme-icon-Kalotes { display: none; }
+.theme-icon-calotes { display: none; }
 .theme-icon-light   { display: none; }
 .dark .theme-icon-moon    { display: inline-block; }
-.dark .theme-icon-Kalotes { display: none; }
+.dark .theme-icon-calotes { display: none; }
 .dark .theme-icon-light   { display: none; }
-.theme-Kalotes .theme-icon-moon    { display: none; }
-.theme-Kalotes .theme-icon-Kalotes { display: inline-block; }
-.theme-Kalotes .theme-icon-light   { display: none; }
-html:not(.dark):not(.theme-Kalotes) .theme-icon-moon    { display: none; }
-html:not(.dark):not(.theme-Kalotes) .theme-icon-Kalotes { display: none; }
-html:not(.dark):not(.theme-Kalotes) .theme-icon-light   { display: inline-block; }
+.theme-calotes .theme-icon-moon    { display: none; }
+.theme-calotes .theme-icon-calotes { display: inline-block; }
+.theme-calotes .theme-icon-light   { display: none; }
+html:not(.dark):not(.theme-calotes) .theme-icon-moon    { display: none; }
+html:not(.dark):not(.theme-calotes) .theme-icon-calotes { display: none; }
+html:not(.dark):not(.theme-calotes) .theme-icon-light   { display: inline-block; }
 
-.theme-Kalotes .text-terracotta:not([data-drawer] *) {
+.theme-calotes .text-terracotta:not([data-drawer] *) {
 
   color: var(--color-terracotta) !important;
 }
 
-.theme-Kalotes .bg-terracotta:not([data-drawer] *) {
+.theme-calotes .bg-terracotta:not([data-drawer] *) {
   background-color: var(--color-terracotta) !important;
   color: var(--color-bg) !important;
 }
 
-.theme-Kalotes .border-border:not([data-drawer] *),
-.theme-Kalotes .border-border-warm:not([data-drawer] *) {
+.theme-calotes .border-border:not([data-drawer] *),
+.theme-calotes .border-border-warm:not([data-drawer] *) {
   border-color: var(--color-border) !important;
 }
 
-.theme-Kalotes .bg-bg-warm:not([data-drawer] *) {
+.theme-calotes .bg-bg-warm:not([data-drawer] *) {
   background-color: var(--color-bg-warm) !important;
 }
 
-.theme-Kalotes .bg-bg-card:not([data-drawer] *),
-.theme-Kalotes .bg-card:not([data-drawer] *) {
+.theme-calotes .bg-bg-card:not([data-drawer] *),
+.theme-calotes .bg-card:not([data-drawer] *) {
   background-color: var(--color-bg-card) !important;
 }
 
-.theme-Kalotes .btn-outline:not([data-drawer] *) {
+.theme-calotes .btn-outline:not([data-drawer] *) {
   border-color: var(--color-border-warm) !important;
   color: var(--color-text) !important;
   background-color: transparent !important;
 }
 
-.theme-Kalotes .btn-outline:not([data-drawer] *):hover {
+.theme-calotes .btn-outline:not([data-drawer] *):hover {
   background-color: var(--color-text) !important;
   color: var(--color-bg) !important;
 }
 
-.theme-Kalotes .btn-primary:not([data-drawer] *) {
+.theme-calotes .btn-primary:not([data-drawer] *) {
   background-color: var(--color-text) !important;
   color: var(--color-bg) !important;
   border-color: var(--color-text) !important;
 }
 
-@keyframes KalotesChameleonMorph {
+@keyframes calotesChameleonMorph {
   /* 🌿 0%: Bottega Forest Emerald & Antique Brass Gold */
   0% {
     --color-bg: #0A1913;
@@ -512,5 +512,4 @@ body {
   color: var(--color-terracotta);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
 }
-
 

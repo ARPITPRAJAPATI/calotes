@@ -102,7 +102,7 @@ export default function CheckoutPage() {
         key: orderData.keyId,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: "Kalotes Vintage",
+        name: "Calotes Vintage",
         description: "Archive Collection Purchase",
         order_id: orderData.razorpayOrderId,
         // On successful payment collection: send transaction token to verification endpoints
@@ -340,5 +340,4 @@ export default function CheckoutPage() {
     </div>
   );
 }
-
 

@@ -63,7 +63,7 @@ export async function POST(req: Request) {
 
     // 2. Upload raw Base64 PNG image stream string to Cloudinary
     const uploadResult = await cloudinary.uploader.upload(cutoutBase64, {
-      folder: 'Kalotes-cutouts', // Target folder name
+      folder: 'calotes-cutouts', // Target folder name
       resource_type: 'image',
       format: 'png', // Force PNG format to preserve transparent backgrounds
       transformation: [{ quality: 'auto', fetch_format: 'auto' }], // Optimizes files size
@@ -82,5 +82,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
-
 

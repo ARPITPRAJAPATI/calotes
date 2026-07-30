@@ -138,7 +138,7 @@ export default function RegisterPage() {
           <div>
             <Link href="/" className="inline-block">
               <h1 className="text-4xl font-display font-black tracking-tighter uppercase italic">
-                Kalotes<span className="text-terracotta">.</span>
+                Calotes<span className="text-terracotta">.</span>
               </h1>
             </Link>
           </div>
@@ -187,7 +187,7 @@ export default function RegisterPage() {
               </div>
               <h3 className="text-xl font-bold uppercase tracking-tight">Account Verified!</h3>
               <p className="text-muted text-xs uppercase tracking-widest font-medium">
-                Logging you into Kalotes Vintage...
+                Logging you into Calotes Vintage...
               </p>
               <div className="flex justify-center pt-4">
                 <Loader2 className="w-6 h-6 animate-spin text-text" />
@@ -369,4 +369,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-

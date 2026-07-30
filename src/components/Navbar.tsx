@@ -41,13 +41,13 @@ function ChameleonIcon({ size = 18, className = "" }: { size?: number; className
       strokeLinejoin="round"
       className={className}
     >
-      {/* Kalotes Lizard Contour: Head, Spine Crest, Body & Legs */}
+      {/* Calotes Lizard Contour: Head, Spine Crest, Body & Legs */}
       <path d="M19.5 7c-1-1.2-2.5-2-4.2-2C12 5 9 7 7.5 10H5a2 2 0 0 0-2 2v.5A2.5 2.5 0 0 0 5.5 15H7c1.4 0 2.6.7 3.3 1.8.6 1 1.4 1.8 2.4 2.2" />
       {/* Dorsal Spine Spikes */}
       <path d="M10.5 5.2L11.5 6.8" />
       <path d="M13 4.5L14 6.3" />
       <path d="M15.5 4.8L16.2 6.5" />
-      {/* Kalotes Lizard Eye */}
+      {/* Calotes Lizard Eye */}
       <circle cx="17.8" cy="7.8" r="0.9" fill="currentColor" />
       {/* Spiral Curled Chameleon Tail */}
       <path d="M12.7 19c1.6.8 3.5.5 4.5-.6 1.3-1.3.9-3.4-.7-4.1-1.3-.5-2.5.2-2.7 1.3-.2 1.1.7 1.8 1.6 1.6" />
@@ -65,7 +65,7 @@ function CSSThemeIcons({ size = 18 }: { size?: number }) {
       <span className="theme-icon-moon">
         <Moon size={size} strokeWidth={1.5} />
       </span>
-      <span className="theme-icon-Kalotes">
+      <span className="theme-icon-calotes">
         <ChameleonIcon size={size} className="text-terracotta animate-pulse" />
       </span>
       <span className="theme-icon-light">
@@ -84,37 +84,37 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark" | "Kalotes">("dark");
+  const [theme, setTheme] = useState<"light" | "dark" | "calotes">("dark");
   // clientReady: false during SSR and hydration, true only after first client paint
   // useEffect with [] fires ONCE after hydration is complete — never during SSR
   const [clientReady, setClientReady] = useState(false);
 
   useEffect(() => {
     // Read actual theme from localStorage after hydration
-    const stored = (localStorage.getItem("theme") as "light" | "dark" | "Kalotes" | null) || "dark";
+    const stored = (localStorage.getItem("theme") as "light" | "dark" | "calotes" | null) || "dark";
     setTheme(stored);
     setClientReady(true);
   }, []); // Empty: runs exactly once after mount, never during hydration
 
-  // Sync DOM classes on pathname changes (Kalotes mode only applies on home page)
+  // Sync DOM classes on pathname changes (calotes mode only applies on home page)
   useEffect(() => {
-    const stored = (localStorage.getItem("theme") as "light" | "dark" | "Kalotes" | null) || "dark";
-    document.documentElement.classList.remove("dark", "theme-Kalotes");
-    if (stored === "Kalotes") {
-      document.documentElement.classList.add(pathname === "/" ? "theme-Kalotes" : "dark");
+    const stored = (localStorage.getItem("theme") as "light" | "dark" | "calotes" | null) || "dark";
+    document.documentElement.classList.remove("dark", "theme-calotes");
+    if (stored === "calotes") {
+      document.documentElement.classList.add(pathname === "/" ? "theme-calotes" : "dark");
     } else if (stored === "dark") {
       document.documentElement.classList.add("dark");
     }
   }, [pathname]);
 
-  // Callback to cycle theme options: Dark -> Kalotes Adaptive (Home Only) -> Light -> Dark
+  // Callback to cycle theme options: Dark -> Calotes Adaptive (Home Only) -> Light -> Dark
   const toggleTheme = () => {
-    document.documentElement.classList.remove("dark", "theme-Kalotes");
+    document.documentElement.classList.remove("dark", "theme-calotes");
     if (theme === "dark") {
-      setTheme("Kalotes");
-      document.documentElement.classList.add(pathname === "/" ? "theme-Kalotes" : "dark");
-      localStorage.setItem("theme", "Kalotes");
-    } else if (theme === "Kalotes") {
+      setTheme("calotes");
+      document.documentElement.classList.add(pathname === "/" ? "theme-calotes" : "dark");
+      localStorage.setItem("theme", "calotes");
+    } else if (theme === "calotes") {
       setTheme("light");
       localStorage.setItem("theme", "light");
     } else {
@@ -265,7 +265,7 @@ export default function Navbar() {
             >
               <CSSThemeIcons size={18} />
               <span className="hidden sm:block theme-icon-moon">Dark</span>
-              <span className="hidden sm:block theme-icon-Kalotes">Kalotes</span>
+              <span className="hidden sm:block theme-icon-calotes">Calotes</span>
               <span className="hidden sm:block theme-icon-light">Light</span>
             </button>
           </div>
@@ -428,4 +428,3 @@ export default function Navbar() {
     </>
   );
 }
-

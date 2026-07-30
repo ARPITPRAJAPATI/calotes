@@ -101,13 +101,13 @@ export async function POST() {
     // 2. Clear pre-existing collection entries to ensure fresh state
     await Category.deleteMany({});
     await Product.deleteMany({});
-    await User.deleteMany({ email: 'admin@Kalotes.com' }); // Delete matching admin record
+    await User.deleteMany({ email: 'admin@calotes.com' }); // Delete matching admin record
 
     // 3. Seed default Admin User credentials
     const hashedPassword = await bcrypt.hash('admin123', 10); // Hash default password 'admin123'
     await User.create({
-      name: 'Admin Kalotes',
-      email: 'admin@Kalotes.com',
+      name: 'Admin Calotes',
+      email: 'admin@calotes.com',
       password: hashedPassword,
       role: 'admin', // Allocate admin privileges
     });
@@ -130,5 +130,4 @@ export async function POST() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-
 

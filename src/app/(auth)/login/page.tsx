@@ -67,7 +67,7 @@ function LoginFormInner() {
       {/* Top Branding Navigation Header */}
       <div className="flex justify-between items-center mb-16">
         <Link href="/" className="block">
-          <span className="font-display font-black text-3xl uppercase tracking-tighter">Kalotes</span>
+          <span className="font-display font-black text-3xl uppercase tracking-tighter">Calotes</span>
         </Link>
         <button 
           onClick={() => router.back()} // Go back
@@ -168,12 +168,12 @@ export default function LoginPage() {
       <div className="hidden lg:block relative overflow-hidden border-r border-border/50">
         <img
           src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2000&auto=format&fit=crop"
-          alt="Kalotes Editorial"
+          alt="Calotes Editorial"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/30" />
         <div className="absolute bottom-12 left-12 text-white">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-2 text-accent">Kalotes — Since 2026</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-2 text-accent">Calotes — Since 2026</p>
           <p className="font-display font-black text-5xl uppercase tracking-tighter leading-[0.9]">
             The Items<br />are Waiting.
           </p>
@@ -197,4 +197,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

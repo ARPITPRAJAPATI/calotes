@@ -17,9 +17,9 @@ export async function POST(req: Request) {
 
     // Call Resend email send method
     const data = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'Kalotes Vintage <onboarding@resend.dev>', // Fallback to onboarding@resend.dev if domain not verified
+      from: process.env.RESEND_FROM_EMAIL || 'Calotes Vintage <onboarding@resend.dev>', // Fallback to onboarding@resend.dev if domain not verified
       to: [to], // Receiver email
-      subject: subject || 'Order Confirmation - Kalotes Vintage',
+      subject: subject || 'Order Confirmation - Calotes Vintage',
       // Inline styling HTML email template
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background: #F2EDE6; color: #111010; padding: 40px;">
@@ -38,5 +38,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-
 
