@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Black rounded-square background -->
+  <rect width="512" height="512" rx="112.64" ry="112.64" fill="#0a0a0a"/>
+  <!-- Bold "C" in brand green -->
+  <text
+    x="50%"
+    y="368.64"
+    text-anchor="middle"
+    font-family="'Arial Black', 'Helvetica Neue', Arial, sans-serif"
+    font-weight="900"
+    font-size="317.44"
+    fill="#5BBD4A"
+    letter-spacing="-1"
+  >C</text>
+</svg>

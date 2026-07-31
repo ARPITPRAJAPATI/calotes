@@ -1,11 +1,11 @@
 'use client'; // Flags this file as a client component to handle form controls, live presets color binding, files uploads, and client toasts
 
 // Import React hooks
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 // Import hot toast notification alerts
 import toast from 'react-hot-toast';
 // Import UI vector graphics icons
-import { Loader2, Save, Upload } from 'lucide-react';
+import { Loader2, Save, Upload, Plus, Trash2, GripVertical, ImageIcon } from 'lucide-react';
 import ImageCropperModal from '@/components/ImageCropperModal';
 
 export default function AdminSettingsPage() {
@@ -29,6 +29,20 @@ export default function AdminSettingsPage() {
   const [cropperFile, setCropperFile] = useState<File | null>(null);
   const [cropTarget, setCropTarget] = useState<'desktop' | 'mobile'>('desktop');
   const [isCropperOpen, setIsCropperOpen] = useState<boolean>(false);
+
+  // Lookbook images state
+  type LookbookImage = { url: string; title: string; desc: string };
+  const [lookbookImages, setLookbookImages] = useState<LookbookImage[]>([]);
+  const [uploadingLookbookIdx, setUploadingLookbookIdx] = useState<number | null>(null);
+  const lookbookFileInputRef = useRef<HTMLInputElement>(null);
+  const [pendingLookbookIdx, setPendingLookbookIdx] = useState<number | null>(null);
+
+  // Brand story images state
+  type BrandStoryImage = { url: string; alt: string };
+  const [brandStoryImages, setBrandStoryImages] = useState<BrandStoryImage[]>([]);
+  const [uploadingBrandIdx, setUploadingBrandIdx] = useState<number | null>(null);
+  const brandFileInputRef = useRef<HTMLInputElement>(null);
+  const [pendingBrandIdx, setPendingBrandIdx] = useState<number | null>(null);
 
   // Preset accent configurations matching brand palettes
   const presets = [
@@ -54,6 +68,8 @@ export default function AdminSettingsPage() {
         setHeroImageUrl(data.heroImageUrl || '/images/hero-pc.png');
         setHeroImageMobileUrl(data.heroImageMobileUrl || '/images/hero-mobile.jpg');
         setAccentColor(data.accentColor || '#C85a32');
+        setLookbookImages(data.lookbookImages || []);
+        setBrandStoryImages(data.brandStoryImages || []);
       } else {
         toast.error('Failed to load settings');
       }
@@ -124,6 +140,8 @@ export default function AdminSettingsPage() {
       heroImageUrl,
       heroImageMobileUrl,
       accentColor,
+      lookbookImages,
+      brandStoryImages,
     };
 
     try {
@@ -422,6 +440,241 @@ export default function AdminSettingsPage() {
               required
             />
           </div>
+        </div>
+
+        {/* Section 6: Lookbook Images */}
+        <div className="bg-card border border-border p-8 space-y-6">
+          <div className="border-b border-border pb-2 flex items-center justify-between">
+            <div>
+              <h2 className="text-xs font-black uppercase tracking-[0.2em] text-text">
+                Lookbook Images
+              </h2>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-muted mt-1">
+                Manage the images shown in the Lookbook page & homepage teaser (up to 12 images)
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setLookbookImages(prev => [...prev, { url: '', title: `Look ${String(prev.length + 1).padStart(2, '0')}`, desc: '' }])}
+              className="flex items-center gap-2 border border-dashed border-terracotta px-4 py-2 text-[9px] font-black uppercase tracking-widest text-terracotta hover:bg-terracotta/10 transition-colors"
+            >
+              <Plus size={12} /> Add Image
+            </button>
+          </div>
+
+          {/* Hidden file input for lookbook uploads */}
+          <input
+            ref={lookbookFileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              e.target.value = '';
+              if (!file || pendingLookbookIdx === null) return;
+              const idx = pendingLookbookIdx;
+              setUploadingLookbookIdx(idx);
+              const formData = new FormData();
+              formData.append('file', file);
+              try {
+                const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (res.ok && data.url) {
+                  setLookbookImages(prev => prev.map((img, i) => i === idx ? { ...img, url: data.url } : img));
+                  toast.success('Lookbook image uploaded!');
+                } else {
+                  toast.error(data.error || 'Upload failed');
+                }
+              } catch { toast.error('Upload error'); }
+              finally { setUploadingLookbookIdx(null); setPendingLookbookIdx(null); }
+            }}
+          />
+
+          {lookbookImages.length === 0 ? (
+            <div className="border border-dashed border-border flex flex-col items-center justify-center py-12 text-center text-muted">
+              <ImageIcon size={32} className="mb-3 opacity-30" />
+              <p className="text-[10px] font-black uppercase tracking-widest">No Lookbook Images Yet</p>
+              <p className="text-[9px] font-medium uppercase tracking-widest mt-1">Click "Add Image" to get started</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {lookbookImages.map((img, i) => (
+                <div key={i} className="flex gap-3 items-start bg-bg border border-border p-3">
+                  {/* Drag handle + index */}
+                  <div className="flex flex-col items-center gap-1 pt-1 shrink-0">
+                    <GripVertical size={14} className="text-muted/40" />
+                    <span className="text-[9px] font-black text-muted/50 font-mono">{String(i + 1).padStart(2, '0')}</span>
+                  </div>
+                  {/* Thumbnail */}
+                  <div className="w-14 h-20 shrink-0 bg-bg-warm border border-border overflow-hidden flex items-center justify-center">
+                    {img.url ? (
+                      <img src={img.url} alt={img.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <ImageIcon size={16} className="text-muted/30" />
+                    )}
+                  </div>
+                  {/* Fields */}
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <input
+                      type="text"
+                      value={img.url}
+                      onChange={(e) => setLookbookImages(prev => prev.map((x, j) => j === i ? { ...x, url: e.target.value } : x))}
+                      placeholder="Image URL or upload below"
+                      className="w-full bg-card border border-border px-3 py-2 text-[10px] font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
+                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        value={img.title}
+                        onChange={(e) => setLookbookImages(prev => prev.map((x, j) => j === i ? { ...x, title: e.target.value } : x))}
+                        placeholder="Title (e.g. Look 01)"
+                        className="bg-card border border-border px-3 py-2 text-[10px] font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
+                      />
+                      <input
+                        type="text"
+                        value={img.desc}
+                        onChange={(e) => setLookbookImages(prev => prev.map((x, j) => j === i ? { ...x, desc: e.target.value } : x))}
+                        placeholder="Desc (e.g. 90s Grunge)"
+                        className="bg-card border border-border px-3 py-2 text-[10px] font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
+                      />
+                    </div>
+                  </div>
+                  {/* Actions */}
+                  <div className="flex flex-col gap-2 shrink-0">
+                    <button
+                      type="button"
+                      disabled={uploadingLookbookIdx === i}
+                      onClick={() => { setPendingLookbookIdx(i); lookbookFileInputRef.current?.click(); }}
+                      className="flex items-center gap-1.5 border border-border px-2.5 py-1.5 text-[9px] font-black uppercase tracking-widest hover:bg-card transition-colors disabled:opacity-40"
+                    >
+                      {uploadingLookbookIdx === i ? <Loader2 size={11} className="animate-spin" /> : <Upload size={11} />}
+                      {uploadingLookbookIdx === i ? 'Uploading' : 'Upload'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLookbookImages(prev => prev.filter((_, j) => j !== i))}
+                      className="flex items-center gap-1.5 border border-red-800/40 px-2.5 py-1.5 text-[9px] font-black uppercase tracking-widest text-red-500 hover:bg-red-950/20 transition-colors"
+                    >
+                      <Trash2 size={11} /> Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Section 7: Brand Story Images */}
+        <div className="bg-card border border-border p-8 space-y-6">
+          <div className="border-b border-border pb-2 flex items-center justify-between">
+            <div>
+              <h2 className="text-xs font-black uppercase tracking-[0.2em] text-text">
+                Brand Story Images
+              </h2>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-muted mt-1">
+                Images displayed in the About / Brand Story page hero grid & philosophy section
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setBrandStoryImages(prev => [...prev, { url: '', alt: '' }])}
+              className="flex items-center gap-2 border border-dashed border-terracotta px-4 py-2 text-[9px] font-black uppercase tracking-widest text-terracotta hover:bg-terracotta/10 transition-colors"
+            >
+              <Plus size={12} /> Add Image
+            </button>
+          </div>
+
+          {/* Hidden file input for brand story uploads */}
+          <input
+            ref={brandFileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              e.target.value = '';
+              if (!file || pendingBrandIdx === null) return;
+              const idx = pendingBrandIdx;
+              setUploadingBrandIdx(idx);
+              const formData = new FormData();
+              formData.append('file', file);
+              try {
+                const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (res.ok && data.url) {
+                  setBrandStoryImages(prev => prev.map((img, i) => i === idx ? { ...img, url: data.url } : img));
+                  toast.success('Brand story image uploaded!');
+                } else {
+                  toast.error(data.error || 'Upload failed');
+                }
+              } catch { toast.error('Upload error'); }
+              finally { setUploadingBrandIdx(null); setPendingBrandIdx(null); }
+            }}
+          />
+
+          {brandStoryImages.length === 0 ? (
+            <div className="border border-dashed border-border flex flex-col items-center justify-center py-12 text-center text-muted">
+              <ImageIcon size={32} className="mb-3 opacity-30" />
+              <p className="text-[10px] font-black uppercase tracking-widest">No Brand Story Images Yet</p>
+              <p className="text-[9px] font-medium uppercase tracking-widest mt-1">Click "Add Image" to get started</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {brandStoryImages.map((img, i) => (
+                <div key={i} className="flex gap-3 items-start bg-bg border border-border p-3">
+                  {/* Index badge */}
+                  <div className="flex flex-col items-center gap-1 pt-1 shrink-0">
+                    <GripVertical size={14} className="text-muted/40" />
+                    <span className="text-[9px] font-black text-muted/50 font-mono">{String(i + 1).padStart(2, '0')}</span>
+                  </div>
+                  {/* Thumbnail */}
+                  <div className="w-14 h-16 shrink-0 bg-bg-warm border border-border overflow-hidden flex items-center justify-center">
+                    {img.url ? (
+                      <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
+                    ) : (
+                      <ImageIcon size={16} className="text-muted/30" />
+                    )}
+                  </div>
+                  {/* Fields */}
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <input
+                      type="text"
+                      value={img.url}
+                      onChange={(e) => setBrandStoryImages(prev => prev.map((x, j) => j === i ? { ...x, url: e.target.value } : x))}
+                      placeholder="Image URL or upload below"
+                      className="w-full bg-card border border-border px-3 py-2 text-[10px] font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
+                    />
+                    <input
+                      type="text"
+                      value={img.alt}
+                      onChange={(e) => setBrandStoryImages(prev => prev.map((x, j) => j === i ? { ...x, alt: e.target.value } : x))}
+                      placeholder="Alt text (e.g. Vintage Sourcing)"
+                      className="w-full bg-card border border-border px-3 py-2 text-[10px] font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
+                    />
+                  </div>
+                  {/* Actions */}
+                  <div className="flex flex-col gap-2 shrink-0">
+                    <button
+                      type="button"
+                      disabled={uploadingBrandIdx === i}
+                      onClick={() => { setPendingBrandIdx(i); brandFileInputRef.current?.click(); }}
+                      className="flex items-center gap-1.5 border border-border px-2.5 py-1.5 text-[9px] font-black uppercase tracking-widest hover:bg-card transition-colors disabled:opacity-40"
+                    >
+                      {uploadingBrandIdx === i ? <Loader2 size={11} className="animate-spin" /> : <Upload size={11} />}
+                      {uploadingBrandIdx === i ? 'Uploading' : 'Upload'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBrandStoryImages(prev => prev.filter((_, j) => j !== i))}
+                      className="flex items-center gap-1.5 border border-red-800/40 px-2.5 py-1.5 text-[9px] font-black uppercase tracking-widest text-red-500 hover:bg-red-950/20 transition-colors"
+                    >
+                      <Trash2 size={11} /> Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Submit Save changes buttons */}

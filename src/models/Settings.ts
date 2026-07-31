@@ -22,6 +22,23 @@ const SettingsSchema = new Schema(
     heroImageMobileUrl: { type: String, default: "/images/hero-mobile.jpg" },
     // Hex code string variable used to style UI components dynamically (defaults to terracotta orange)
     accentColor: { type: String, default: "#C85a32" },
+    // Array of image URLs displayed in the Lookbook page/section (ordered list)
+    lookbookImages: {
+      type: [{
+        url: { type: String, required: true },
+        title: { type: String, default: '' },
+        desc: { type: String, default: '' },
+      }],
+      default: [],
+    },
+    // Array of image URLs used in the About / Brand Story page
+    brandStoryImages: {
+      type: [{
+        url: { type: String, required: true },
+        alt: { type: String, default: '' },
+      }],
+      default: [],
+    },
   },
   // Automatically track createdAt and updatedAt stamps for audit changes
   { timestamps: true }

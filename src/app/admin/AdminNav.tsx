@@ -5,7 +5,7 @@ import Link from "next/link";
 // Import hook to fetch current browser path configurations
 import { usePathname } from "next/navigation";
 // Import UI vector icons
-import { LayoutDashboard, ShoppingBag, FolderOpen, Tag, Package, Users, Settings } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, FolderOpen, Tag, Package, Users, Settings, Images } from "lucide-react";
 
 export default function AdminNav() {
   const pathname = usePathname(); // Track active path names
@@ -18,6 +18,7 @@ export default function AdminNav() {
     { name: "Promo Codes", href: "/admin/promo", icon: <Tag size={18} /> },
     { name: "Orders", href: "/admin/orders", icon: <Package size={18} /> },
     { name: "Customers", href: "/admin/customers", icon: <Users size={18} /> },
+    { name: "Media", href: "/admin/settings", icon: <Images size={18} /> },
     { name: "Settings", href: "/admin/settings", icon: <Settings size={18} /> },
   ];
 
