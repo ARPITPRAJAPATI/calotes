@@ -124,13 +124,20 @@ export default function ImageCropperModal({
     ctx.fillStyle = '#141414';
     ctx.fillRect(cropX, cropY, cropW, cropH);
 
+    // Calculate base scale to fit entire image inside crop box without auto zooming in
+    const isRotated90 = rotation === 90 || rotation === 270;
+    const displayedWidth = isRotated90 ? imageEl.height : imageEl.width;
+    const displayedHeight = isRotated90 ? imageEl.width : imageEl.height;
+    const baseScale = Math.min(cropW / displayedWidth, cropH / displayedHeight);
+    const currentScale = baseScale * zoom;
+
     // Center & transform image
     const centerX = cropX + cropW / 2 + offset.x;
     const centerY = cropY + cropH / 2 + offset.y;
 
     ctx.translate(centerX, centerY);
     ctx.rotate((rotation * Math.PI) / 180);
-    ctx.scale(flipX ? -zoom : zoom, flipY ? -zoom : zoom);
+    ctx.scale(flipX ? -currentScale : currentScale, flipY ? -currentScale : currentScale);
 
     // Draw image centered
     ctx.drawImage(
@@ -278,10 +285,16 @@ export default function ImageCropperModal({
 
     const scale = dims.width / cropW;
 
+    const isRotated90 = rotation === 90 || rotation === 270;
+    const displayedWidth = isRotated90 ? imageEl.height : imageEl.width;
+    const displayedHeight = isRotated90 ? imageEl.width : imageEl.height;
+    const baseScale = Math.min(cropW / displayedWidth, cropH / displayedHeight);
+    const exportScale = baseScale * zoom * scale;
+
     ctx.save();
     ctx.translate(dims.width / 2 + offset.x * scale, dims.height / 2 + offset.y * scale);
     ctx.rotate((rotation * Math.PI) / 180);
-    ctx.scale(flipX ? -zoom * scale : zoom * scale, flipY ? -zoom * scale : zoom * scale);
+    ctx.scale(flipX ? -exportScale : exportScale, flipY ? -exportScale : exportScale);
 
     ctx.drawImage(
       imageEl,

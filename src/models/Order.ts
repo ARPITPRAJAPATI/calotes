@@ -1,5 +1,7 @@
 // Import mongoose utilities, Schema builder, model, and models caching registry from mongoose library
 import mongoose, { Schema, model, models } from 'mongoose';
+import './User';
+import './Product';
 
 // Define a schema for individual items added to a specific checkout purchase order
 const OrderItemSchema = new Schema({

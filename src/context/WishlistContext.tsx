@@ -61,8 +61,8 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   // Evaluator function returning boolean value checking if an item exists in wishlist
   // Wrapped in useCallback to prevent child components re-rendering on parent updates
   const isInWishlist = useCallback(
-    (productId: string) => items.some((i) => i.productId === productId),
-    [items]
+    (productId: string) => isMounted && items.some((i) => i.productId === productId),
+    [items, isMounted]
   );
 
   // Main action callback that adds or removes an item based on current saved status

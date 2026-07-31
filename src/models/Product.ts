@@ -1,5 +1,6 @@
 // Import mongoose, Schema builder, model, and models caching registry from mongoose library
 import mongoose, { Schema, model, models } from 'mongoose';
+import './Category';
 
 // Define the ProductSchema configuration mapping the properties of items in the store
 const ProductSchema = new Schema(

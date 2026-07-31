@@ -21,9 +21,9 @@ interface AboutClientProps {
 }
 
 export default function AboutClient({ brandImages, philosophyImage }: AboutClientProps) {
-  // Use up to 2 brand images for the hero grid; fill rest with defaults if fewer than 2
+  // Use uploaded story image or fallback graphic
   const heroImages = [
-    brandImages[0] ?? { url: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1200", alt: "Vintage Sourcing" },
+    brandImages[0] ?? { url: "/images/our-story.jpg", alt: "Calotes Vintage Our Story" },
     brandImages[1] ?? { url: "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=800", alt: "Vintage Style" },
   ];
 
@@ -50,17 +50,15 @@ export default function AboutClient({ brandImages, philosophyImage }: AboutClien
         </motion.h1>
       </section>
 
-      {/* ── Hero image grid ────────────────────────────── */}
+      {/* ── Hero image banner ────────────────────────────── */}
       <section className="px-6 md:px-12 max-w-[1800px] mx-auto mb-24 md:mb-40">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 h-[50vh] md:h-[70vh]">
-          <div className="md:col-span-2 relative overflow-hidden bg-bg-warm border border-border">
-            <img src={heroImages[0].url} alt={heroImages[0].alt} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-br from-bg/40 to-transparent" />
-          </div>
-          <div className="relative overflow-hidden bg-bg-warm border border-border">
-            <img src={heroImages[1].url} alt={heroImages[1].alt} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-br from-bg/40 to-transparent" />
-          </div>
+        <div className="relative w-full aspect-[16/9] max-h-[85vh] overflow-hidden bg-black/90 border border-border rounded-xl shadow-2xl">
+          <img
+            src={heroImages[0].url}
+            alt={heroImages[0].alt || "Calotes Vintage Story Banner"}
+            className="w-full h-full object-cover md:object-contain object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-bg/40 via-transparent to-transparent pointer-events-none" />
         </div>
       </section>
 

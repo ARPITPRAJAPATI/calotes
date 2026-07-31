@@ -24,6 +24,8 @@ interface HomeClientProps {
   heroSubtext: string;
   heroImageUrl: string;
   heroImageMobileUrl: string;
+  lookbookList?: { url: string; title?: string; desc?: string }[];
+  storyImageUrl?: string;
 }
 
 export default function HomeClient({
@@ -33,13 +35,23 @@ export default function HomeClient({
   heroSubtext,
   heroImageUrl,
   heroImageMobileUrl,
+  lookbookList,
+  storyImageUrl,
 }: HomeClientProps) {
   const { toggleWishlist, isInWishlist } = useWishlist();
 
   const headlineParts = heroHeadline.split('.').map(x => x.trim()).filter(Boolean);
 
+  // Story image: storyImageUrl prop or custom Cloudinary story image
+  const storyImg = storyImageUrl || "https://res.cloudinary.com/dyyrgid3b/image/upload/v1785506516/calotes-vintage/uwqzmhlwua6vlvnnmber.png";
+
+  // Lookbook images: lookbookList from admin settings / DB or fallback to INSTA_IMGS
+  const activeLookbook = (lookbookList && lookbookList.length > 0)
+    ? lookbookList
+    : INSTA_IMGS.map((url, i) => ({ url, title: `Look ${String(i + 1).padStart(2, '0')}`, desc: '' }));
+
   return (
-    <div className="w-full flex flex-col">
+    <div suppressHydrationWarning className="w-full flex flex-col">
       {/* ══════════════════════════════════════════════════
           1 · HERO
       ══════════════════════════════════════════════════ */}
@@ -115,39 +127,40 @@ export default function HomeClient({
         <div className="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory pl-6 md:pl-12 pr-6">
           {arrivalsList.map((item, i) => (
             <div
-              key={i}
-              className="product-card group snap-start shrink-0 w-[48vw] sm:w-[36vw] md:w-[26vw] lg:w-[20vw] xl:w-[17vw]"
+              key={item.productId || i}
+              suppressHydrationWarning
+              className="product-card group relative snap-start shrink-0 w-[48vw] sm:w-[36vw] md:w-[26vw] lg:w-[20vw] xl:w-[17vw]"
             >
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleWishlist({
+                    productId: item.productId,
+                    name: item.name,
+                    price: item.price,
+                    image: item.img,
+                    slug: item.slug,
+                    category: item.tag,
+                  });
+                }}
+                className="absolute top-1 right-1 z-20 w-11 h-11 flex items-center justify-center text-text hover:text-terracotta hover:scale-110 transition-all duration-300 cursor-pointer min-w-[44px] min-h-[44px]"
+                style={{ border: 'none', background: 'transparent', outline: 'none', boxShadow: 'none' }}
+                title={isInWishlist(item.productId) ? "Remove from Wishlist" : "Add to Wishlist"}
+                aria-label={isInWishlist(item.productId) ? "Remove from Wishlist" : "Add to Wishlist"}
+              >
+                <Heart 
+                  size={15} 
+                  className={isInWishlist(item.productId) ? "fill-terracotta text-terracotta" : "text-text"} 
+                  strokeWidth={2}
+                />
+              </button>
               <Link href={item.href}>
                 <div className="relative aspect-[3/4] overflow-hidden bg-bg-warm">
                   <ProductImageSlider images={item.imgs} productName={item.name} />
                   <span className="absolute top-3 left-3 text-[7px] font-bold uppercase tracking-[0.25em] bg-terracotta/90 text-bg px-2 py-1 z-10">
                     Pre-Loved
                   </span>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleWishlist({
-                        productId: item.productId,
-                        name: item.name,
-                        price: item.price,
-                        image: item.img,
-                        slug: item.slug,
-                        category: item.tag,
-                      });
-                    }}
-                    className="absolute top-1 right-1 z-20 w-11 h-11 flex items-center justify-center text-text hover:text-terracotta hover:scale-110 transition-all duration-300 cursor-pointer min-w-[44px] min-h-[44px]"
-                    style={{ border: 'none', background: 'transparent', outline: 'none', boxShadow: 'none' }}
-                    title={isInWishlist(item.productId) ? "Remove from Wishlist" : "Add to Wishlist"}
-                    aria-label={isInWishlist(item.productId) ? "Remove from Wishlist" : "Add to Wishlist"}
-                  >
-                    <Heart 
-                      size={15} 
-                      className={isInWishlist(item.productId) ? "fill-terracotta text-terracotta" : "text-text"} 
-                      strokeWidth={2}
-                    />
-                  </button>
                 </div>
                 <div className="p-3 md:p-4 flex justify-between items-start gap-2">
                   <div className="min-w-0">
@@ -213,20 +226,16 @@ export default function HomeClient({
       </section>
 
       {/* ══════════════════════════════════════════════════
-          4 · WHY CALOTES (Brand Philosophy)
+          4 · WHY CALOTES (Brand Philosophy / Story)
       ══════════════════════════════════════════════════ */}
       <section className="py-12 md:py-20 px-6 md:px-12 max-w-[1800px] mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
-          <div className="relative aspect-[4/5] overflow-hidden bg-bg-warm group">
-            <Image
-              src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=70&w=600&auto=format"
-              alt="Vintage Philosophy"
-              fill
+          <div className="relative aspect-[4/5] overflow-hidden bg-bg-warm group border border-border">
+            <img
+              src="/images/story-image.png"
+              alt="Calotes Story - Brand Philosophy"
               loading="lazy"
-              placeholder="blur"
-              blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDQiPjxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjQiIGZpbGw9IiNGQUY3RjIiLz48L3N2Zz4="
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover transition-transform duration-[2s] group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-105"
             />
             <div className="absolute bottom-6 right-6 w-28 h-28 bg-bg/95 border border-border-warm rounded-full flex flex-col items-center justify-center text-center shadow-2xl">
               <p className="font-display font-black text-2xl uppercase tracking-tight leading-none">100%</p>
@@ -271,11 +280,11 @@ export default function HomeClient({
           </Link>
         </div>
         <div className="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pl-6 md:pl-12 pr-6">
-          {INSTA_IMGS.map((img, i) => (
+          {activeLookbook.map((item, i) => (
             <Link key={i} href="/lookbook" className="shrink-0 w-40 md:w-52 aspect-[3/4] relative group overflow-hidden bg-bg border border-border">
-              <img src={img} alt={`Look ${i + 1}`} loading="lazy" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+              <img src={item.url} alt={item.title || `Look ${i + 1}`} loading="lazy" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
               <div className="absolute inset-0 bg-bg/50 opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex items-center justify-center">
-                <span className="text-[8px] font-bold uppercase tracking-widest text-text border border-text/50 px-3 py-1.5">Look {i + 1}</span>
+                <span className="text-[8px] font-bold uppercase tracking-widest text-text border border-text/50 px-3 py-1.5">{item.title || `Look ${i + 1}`}</span>
               </div>
             </Link>
           ))}
@@ -292,9 +301,9 @@ export default function HomeClient({
           <p className="text-muted text-[11px] uppercase tracking-widest font-medium">@calotes.vintage — Show us how you style your pieces.</p>
         </div>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3">
-          {INSTA_IMGS.map((img, i) => (
+          {activeLookbook.slice(0, 6).map((item, i) => (
             <a key={i} href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="relative aspect-square group overflow-hidden bg-bg-warm border border-border">
-              <img src={img} alt="Community post" loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105" />
+              <img src={item.url} alt="Community post" loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-bg/60 opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex items-center justify-center">
                 <span className="text-[7px] font-bold uppercase tracking-widest text-text">View</span>
               </div>

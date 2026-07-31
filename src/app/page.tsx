@@ -97,6 +97,19 @@ export default async function Home() {
       }))
     : CATEGORIES;
 
+  // Format lookbook images list from settings
+  const rawLookbook = (settings?.lookbookImages || []).filter((l: any) => l.url?.trim());
+  const lookbookList = rawLookbook.length > 0
+    ? rawLookbook.map((l: any) => ({
+        url: optimizeCloudinaryUrl(l.url),
+        title: l.title || '',
+        desc: l.desc || '',
+      }))
+    : [];
+
+  // Story image: custom Cloudinary image or brandStoryImages[0] settings fallback
+  const storyImageUrl = (settings?.brandStoryImages?.[0]?.url ? optimizeCloudinaryUrl(settings.brandStoryImages[0].url) : '') || "https://res.cloudinary.com/dyyrgid3b/image/upload/v1785506516/calotes-vintage/uwqzmhlwua6vlvnnmber.png";
+
   return (
     <HomeClient
       arrivalsList={arrivalsList}
@@ -105,6 +118,8 @@ export default async function Home() {
       heroSubtext={heroSubtext}
       heroImageUrl={heroImageUrl}
       heroImageMobileUrl={heroImageMobileUrl}
+      lookbookList={lookbookList}
+      storyImageUrl={storyImageUrl}
     />
   );
 }

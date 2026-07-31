@@ -6,12 +6,12 @@ export const dynamic = "force-dynamic";
 
 // Default brand story images used as fallback
 const DEFAULT_BRAND_IMAGES = [
-  { url: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1200", alt: "Vintage Sourcing" },
+  { url: "/images/our-story.jpg", alt: "Calotes Vintage Our Story" },
   { url: "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=800", alt: "Vintage Style" },
 ];
 
 // Default philosophy image fallback
-const DEFAULT_PHILOSOPHY_IMAGE = "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=70&w=600&auto=format";
+const DEFAULT_PHILOSOPHY_IMAGE = "/images/our-story.jpg";
 
 export default async function AboutPage() {
   await connectDB();
