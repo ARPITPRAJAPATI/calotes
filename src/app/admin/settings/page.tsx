@@ -44,6 +44,11 @@ export default function AdminSettingsPage() {
   const brandFileInputRef = useRef<HTMLInputElement>(null);
   const [pendingBrandIdx, setPendingBrandIdx] = useState<number | null>(null);
 
+  // Generic Cropper Modal state for Settings page
+  const [activeCropFile, setActiveCropFile] = useState<File | null>(null);
+  const [activeCropTarget, setActiveCropTarget] = useState<'desktop' | 'mobile' | 'lookbook' | 'brand'>('desktop');
+  const [isCropModalOpen, setIsCropModalOpen] = useState<boolean>(false);
+
   // Preset accent configurations matching brand palettes
   const presets = [
     { name: 'Terracotta', color: '#C85a32' },
@@ -88,16 +93,16 @@ export default function AdminSettingsPage() {
   const handleFileSelect = (target: 'desktop' | 'mobile', e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setCropTarget(target);
-    setCropperFile(file);
-    setIsCropperOpen(true);
+    setActiveCropTarget(target);
+    setActiveCropFile(file);
+    setIsCropModalOpen(true);
     e.target.value = '';
   };
 
-  // Upload cropped or original hero banner image using multipart/form-data POST endpoints
-  const handleCropComplete = async (fileToUpload: File) => {
+  // Process uploaded file (cropped or skipped original) for active section
+  const processUploadedFile = async (fileToUpload: File) => {
     setIsUploading(true);
-    setIsCropperOpen(false);
+    setIsCropModalOpen(false);
     const formData = new FormData();
     formData.append('file', fileToUpload);
 
@@ -108,12 +113,20 @@ export default function AdminSettingsPage() {
       });
       const data = await res.json();
       if (res.ok && data.url) {
-        if (cropTarget === 'desktop') {
+        if (activeCropTarget === 'desktop') {
           setHeroImageUrl(data.url);
-          toast.success('Desktop Hero image uploaded successfully!');
-        } else {
+          toast.success('Desktop Hero image uploaded!');
+        } else if (activeCropTarget === 'mobile') {
           setHeroImageMobileUrl(data.url);
-          toast.success('Mobile Hero image uploaded successfully!');
+          toast.success('Mobile Hero image uploaded!');
+        } else if (activeCropTarget === 'lookbook' && pendingLookbookIdx !== null) {
+          const idx = pendingLookbookIdx;
+          setLookbookImages(prev => prev.map((img, i) => i === idx ? { ...img, url: data.url } : img));
+          toast.success('Lookbook image uploaded!');
+        } else if (activeCropTarget === 'brand' && pendingBrandIdx !== null) {
+          const idx = pendingBrandIdx;
+          setBrandStoryImages(prev => prev.map((img, i) => i === idx ? { ...img, url: data.url } : img));
+          toast.success('Brand story image uploaded!');
         }
       } else {
         toast.error(data.error || 'Failed to upload image');
@@ -122,6 +135,11 @@ export default function AdminSettingsPage() {
       toast.error('An error occurred during upload');
     } finally {
       setIsUploading(false);
+      setUploadingLookbookIdx(null);
+      setUploadingBrandIdx(null);
+      setPendingLookbookIdx(null);
+      setPendingBrandIdx(null);
+      setActiveCropFile(null);
     }
   };
 
@@ -468,25 +486,13 @@ export default function AdminSettingsPage() {
             type="file"
             accept="image/*"
             className="hidden"
-            onChange={async (e) => {
+            onChange={(e) => {
               const file = e.target.files?.[0];
               e.target.value = '';
               if (!file || pendingLookbookIdx === null) return;
-              const idx = pendingLookbookIdx;
-              setUploadingLookbookIdx(idx);
-              const formData = new FormData();
-              formData.append('file', file);
-              try {
-                const res = await fetch('/api/upload', { method: 'POST', body: formData });
-                const data = await res.json();
-                if (res.ok && data.url) {
-                  setLookbookImages(prev => prev.map((img, i) => i === idx ? { ...img, url: data.url } : img));
-                  toast.success('Lookbook image uploaded!');
-                } else {
-                  toast.error(data.error || 'Upload failed');
-                }
-              } catch { toast.error('Upload error'); }
-              finally { setUploadingLookbookIdx(null); setPendingLookbookIdx(null); }
+              setActiveCropTarget('lookbook');
+              setActiveCropFile(file);
+              setIsCropModalOpen(true);
             }}
           />
 
@@ -590,25 +596,13 @@ export default function AdminSettingsPage() {
             type="file"
             accept="image/*"
             className="hidden"
-            onChange={async (e) => {
+            onChange={(e) => {
               const file = e.target.files?.[0];
               e.target.value = '';
               if (!file || pendingBrandIdx === null) return;
-              const idx = pendingBrandIdx;
-              setUploadingBrandIdx(idx);
-              const formData = new FormData();
-              formData.append('file', file);
-              try {
-                const res = await fetch('/api/upload', { method: 'POST', body: formData });
-                const data = await res.json();
-                if (res.ok && data.url) {
-                  setBrandStoryImages(prev => prev.map((img, i) => i === idx ? { ...img, url: data.url } : img));
-                  toast.success('Brand story image uploaded!');
-                } else {
-                  toast.error(data.error || 'Upload failed');
-                }
-              } catch { toast.error('Upload error'); }
-              finally { setUploadingBrandIdx(null); setPendingBrandIdx(null); }
+              setActiveCropTarget('brand');
+              setActiveCropFile(file);
+              setIsCropModalOpen(true);
             }}
           />
 
@@ -690,16 +684,24 @@ export default function AdminSettingsPage() {
 
       {/* Image Cropper Modal */}
       <ImageCropperModal
-        file={cropperFile}
-        isOpen={isCropperOpen}
+        file={activeCropFile}
+        isOpen={isCropModalOpen}
         onClose={() => {
-          setIsCropperOpen(false);
-          setCropperFile(null);
+          setIsCropModalOpen(false);
+          setActiveCropFile(null);
         }}
-        onCropComplete={handleCropComplete}
-        onSkipCrop={handleCropComplete}
-        defaultAspectRatio={cropTarget === 'desktop' ? 16 / 9 : 3 / 4}
-        title={cropTarget === 'desktop' ? 'Crop PC / Desktop Widescreen Banner (16:9)' : 'Crop Mobile Device Banner (3:4)'}
+        onCropComplete={processUploadedFile}
+        onSkipCrop={processUploadedFile}
+        defaultAspectRatio={
+          activeCropTarget === 'desktop' ? 16 / 9 :
+          activeCropTarget === 'mobile' ? 3 / 4 :
+          activeCropTarget === 'lookbook' ? 3 / 4 : 4 / 3
+        }
+        title={
+          activeCropTarget === 'desktop' ? 'Crop PC / Desktop Banner (16:9)' :
+          activeCropTarget === 'mobile' ? 'Crop Mobile Banner (3:4)' :
+          activeCropTarget === 'lookbook' ? 'Crop Lookbook Photo (3:4)' : 'Crop Brand Story Image'
+        }
       />
     </div>
   );
