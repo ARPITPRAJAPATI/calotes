@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server'; // Import response helper
-import connectDB from '@/lib/db'; // Import DB connection singleton
-import Product from '@/models/Product'; // Import Product schema model
-import Category from '@/models/Category'; // Import Category schema model
-import User from '@/models/User'; // Import User schema model
-import bcrypt from 'bcryptjs'; // Import bcryptjs password hashing library
+import { NextResponse } from 'next/server';
+import connectDB from '@/lib/db';
+import Product from '@/models/Product';
+import Category from '@/models/Category';
+import User from '@/models/User';
+import bcrypt from 'bcryptjs';
 
 // Predefined mock category arrays to seed the collections
 const SAMPLE_CATEGORIES = [
@@ -27,7 +27,7 @@ const SAMPLE_PRODUCTS = [
       'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=1000&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1000&auto=format&fit=crop'
     ],
-    category_slug: 'mens', // temporary field to link categories
+    category_slug: 'mens',
     measurements: { pitToPit: '22"', length: '28"' }
   },
   {
@@ -43,7 +43,7 @@ const SAMPLE_PRODUCTS = [
       'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1000&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=1000&auto=format&fit=crop'
     ],
-    category_slug: 'outerwear', // temporary field to link categories
+    category_slug: 'outerwear',
     measurements: { pitToPit: '23"', length: '26"' }
   },
   {
@@ -58,7 +58,7 @@ const SAMPLE_PRODUCTS = [
       'https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=1000&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?q=80&w=1000&auto=format&fit=crop'
     ],
-    category_slug: 'mens', // temporary field to link categories
+    category_slug: 'mens',
     measurements: { waist: '32"', length: '30"' }
   },
   {
@@ -73,7 +73,7 @@ const SAMPLE_PRODUCTS = [
       'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1000&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1000&auto=format&fit=crop'
     ],
-    category_slug: 'mens', // temporary field to link categories
+    category_slug: 'mens',
     measurements: { pitToPit: '25"', length: '29"' }
   },
   {
@@ -88,46 +88,47 @@ const SAMPLE_PRODUCTS = [
       'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=1000&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1000&auto=format&fit=crop'
     ],
-    category_slug: 'outerwear', // temporary field to link categories
+    category_slug: 'outerwear',
   }
 ];
 
-// POST seed handler: resets and populates database collection tables with mockup items (Development helper)
+// POST seed handler: resets and populates database collection tables with mockup items (Development ONLY)
 export async function POST() {
   try {
-    // 1. Establish connection to MongoDB database
+    // SECURITY: Strictly restrict database seeding to development environment
+    if (process.env.NODE_ENV === 'production') {
+      return NextResponse.json({ error: 'Database seeding is disabled in production' }, { status: 403 });
+    }
+
     await connectDB();
     
-    // 2. Clear pre-existing collection entries to ensure fresh state
     await Category.deleteMany({});
     await Product.deleteMany({});
-    await User.deleteMany({ email: 'admin@calotes.com' }); // Delete matching admin record
+    await User.deleteMany({ email: 'admin@calotes.com' });
 
-    // 3. Seed default Admin User credentials
-    const hashedPassword = await bcrypt.hash('admin123', 10); // Hash default password 'admin123'
+    const hashedPassword = await bcrypt.hash('admin123', 10);
     await User.create({
       name: 'Admin Calotes',
       email: 'admin@calotes.com',
       password: hashedPassword,
-      role: 'admin', // Allocate admin privileges
+      role: 'admin',
     });
     
-    // 4. Seed default categories list in bulk
     const createdCategories = await Category.insertMany(SAMPLE_CATEGORIES);
     
-    // 5. Seed default products by mapping category ObjectIds based on slugs matching
     const productsToSeed = SAMPLE_PRODUCTS.map(p => {
       const cat = createdCategories.find(c => c.slug === p.category_slug);
       const { category_slug, ...productData } = p;
-      return { ...productData, category: cat?._id }; // Assign actual category ObjectId reference
+      return { ...productData, category: cat?._id };
     });
     
-    // Bulk insert products list
     await Product.insertMany(productsToSeed);
 
     return NextResponse.json({ message: 'Database seeded successfully' });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Seed error:', error);
+    return NextResponse.json({ error: 'Failed to seed database' }, { status: 500 });
   }
 }
+
 

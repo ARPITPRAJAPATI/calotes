@@ -1,85 +1,100 @@
-import { NextResponse } from 'next/server'; // Import next router response helpers
-import connectDB from '@/lib/db'; // Import database connection pool caching helper
-import Product from '@/models/Product'; // Import Product mongoose model
-import Category from '@/models/Category'; // Import Category mongoose model
-import { auth } from '@/auth'; // Import NextAuth instance to check user sessions
-import { ProductInputSchema } from '@/lib/validations'; // Import Zod validation schema
+import { NextResponse } from 'next/server';
+import connectDB from '@/lib/db';
+import Product from '@/models/Product';
+import { auth } from '@/auth';
+import { ProductInputSchema } from '@/lib/validations';
+import { isValidObjectId, sanitizeProductSort } from '@/lib/sanitize';
 
-export const dynamic = 'force-dynamic'; // Prevent static route caching to get fresh catalog changes
-
-// GET products API route: queries catalog listings matching search terms or category filters
+// GET products API route: returns products list with filtering, pagination, and sorting (public)
 export async function GET(req: Request) {
   try {
-    await connectDB(); // Initial database connection
-    
-    // Parse target request search query parameters
+    await connectDB();
     const { searchParams } = new URL(req.url);
-    const categorySlug = searchParams.get('category'); // Filter category
-    const brand = searchParams.get('brand');          // Filter brand
-    const searchTerm = searchParams.get('q');         // Filter keyword
-    const slug = searchParams.get('slug');             // Filter slug
-    const sort = searchParams.get('sort') || '-createdAt'; // Sort criteria
-    
-    let query: any = {}; // Construct dynamic query clauses object
 
-    // If slug parameter is passed, match specific product slug
-    if (slug) {
-      query.slug = slug;
+    // Pagination
+    const page  = Math.max(1, parseInt(searchParams.get('page')  || '1', 10));
+    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '12', 10)));
+    const skip  = (page - 1) * limit;
+
+    // Filtering parameters
+    const category = searchParams.get('category');
+    const search   = searchParams.get('search');
+    const minPrice = searchParams.get('minPrice');
+    const maxPrice = searchParams.get('maxPrice');
+    const sizes    = searchParams.get('sizes');
+    const featured = searchParams.get('featured');
+
+    // ── Sort whitelist ─────────────────────────────────────────────────────────
+    // NEVER pass user-supplied sort strings directly to Mongoose — MongoDB can
+    // use them for timing attacks or to cause unexpected query behavior.
+    const rawSort = searchParams.get('sort');
+    const sort    = sanitizeProductSort(rawSort);
+
+    // Build query filter object
+    const filter: Record<string, any> = {};
+
+    if (category && isValidObjectId(category)) filter.category = category;
+    if (featured === 'true') filter.isFeatured = true;
+
+    // Price range filter
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = parseFloat(minPrice);
+      if (maxPrice) filter.price.$lte = parseFloat(maxPrice);
     }
 
-    // If search term is present, use high-performance text index search with regex fallback
-    if (searchTerm) {
-      query.$or = [
-        { $text: { $search: searchTerm } },
-        { name: { $regex: searchTerm, $options: 'i' } },
-        { brand: { $regex: searchTerm, $options: 'i' } },
-        { description: { $regex: searchTerm, $options: 'i' } }
+    // Text search — escape special regex characters before constructing the regex
+    // to prevent ReDoS (regex denial of service) attacks.
+    if (search) {
+      const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').slice(0, 100);
+      filter.$or = [
+        { name:        { $regex: escapedSearch, $options: 'i' } },
+        { description: { $regex: escapedSearch, $options: 'i' } },
+        { brand:       { $regex: escapedSearch, $options: 'i' } },
       ];
     }
-    
-    // Query category ObjectID matching slug parameters
-    if (categorySlug) {
-      const category = await Category.findOne({ slug: categorySlug }).select('_id').lean();
-      if (category) {
-        query.category = category._id;
+
+    // Size filter
+    if (sizes) {
+      const sizeArray = sizes.split(',').map((s) => s.trim()).filter(Boolean).slice(0, 20);
+      if (sizeArray.length > 0) {
+        filter.sizes = { $in: sizeArray };
       }
     }
-    
-    // Filter by specific brand names
-    if (brand) {
-      query.brand = brand;
-    }
 
-    // Execute query with populate, sorting parameters, and limit records to prevent payload bloating
-    const products = await Product.find(query)
-      .select('name slug price compareAtPrice images category brand stock condition sizes description')
-      .populate('category', 'name slug')
-      .sort(sort)
-      .limit(24)
-      .lean(); // Return plain javascript objects to optimize serialization speeds
+    // Execute paginated query
+    const [products, total] = await Promise.all([
+      Product.find(filter).sort(sort).skip(skip).limit(limit).lean(),
+      Product.countDocuments(filter),
+    ]);
 
-    return NextResponse.json(products, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=600',
+    return NextResponse.json({
+      products,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasMore: page * limit < total,
       },
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Products fetch failed:', error);
+    return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
   }
 }
 
-// POST products API route: creates a new product record in collections (Admin protected)
+// POST product API route: creates a new product (Admin protected)
 export async function POST(req: Request) {
   try {
-    // 1. Confirm session credentials of requesting user matches role authorization privileges
     const session = await auth();
-    if (!session || !session.user || (session.user as any).role !== 'admin') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 }); // Terminate unauthorized requests
+    if (!session?.user || (session.user as any).role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    await connectDB(); // Connect database
-    const body = await req.json(); // Read request payload json
-    
+    await connectDB();
+    const body = await req.json();
+
     // Auto-generate SKUs if parameters are not present or blank
     if (!body.sku || body.sku.trim() === '' || body.sku === 'null') {
       const brandPrefix = (body.brand || 'VINT').replace(/[^a-zA-Z0-9]/g, '').substring(0, 4).toUpperCase();
@@ -87,18 +102,16 @@ export async function POST(req: Request) {
       body.sku = `CV-${brandPrefix}-${randHex}`;
     }
 
-    // Validate body data against Zod validation schemas
-    const validatedData = ProductInputSchema.parse(body);
+    const parsed = ProductInputSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0]?.message || 'Invalid product data' }, { status: 400 });
+    }
 
-    // Create item record in MongoDB collections
-    const product = await Product.create(validatedData);
+    const product = await Product.create(parsed.data);
     return NextResponse.json(product.toObject(), { status: 201 });
   } catch (error: any) {
-    // Return explicit field errors if Zod validations crash
-    if (error.name === 'ZodError') {
-      return NextResponse.json({ error: error.errors[0]?.message || 'Invalid product data' }, { status: 400 });
-    }
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    console.error('Product create failed:', error);
+    return NextResponse.json({ error: 'Failed to create product' }, { status: 500 });
   }
 }
 

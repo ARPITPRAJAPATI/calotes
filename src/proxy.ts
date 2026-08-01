@@ -4,73 +4,81 @@ import NextAuth from "next-auth";
 // Import authConfig configuration options to supply settings to NextAuth middleware
 import { authConfig } from "./auth.config";
 
-// Import NextResponse to customize and send HTTP response actions (e.g. rate limit JSON payloads)
+// Import NextResponse to customize and send HTTP response actions
 import { NextResponse } from "next/server";
+
+// Import our rate limiter utility
+import { checkRateLimit, getRateLimitConfig } from "@/lib/rateLimit";
+
+// Import safe redirect validator
+import { isSafeRedirectUrl } from "@/lib/sanitize";
 
 // Destructure the main edge-compatible auth wrapper function from NextAuth
 const { auth } = NextAuth(authConfig);
 
-// A simple in-memory Map store for rate limiting (Note: clears on server restart or edge function cold start)
-// Key: Client IP string, Value: Object tracking requests count and when the window reset timer started
-const rateLimitMap = new Map<string, { count: number; lastReset: number }>();
-
-// Rate limit evaluator function that checks if an IP has exceeded the allowed query limit within a timeframe
-function applyRateLimit(ip: string, limit: number, windowMs: number): boolean {
-  const now = Date.now(); // Get current timestamp in milliseconds
-  const record = rateLimitMap.get(ip); // Retrieve history of this IP
-  
-  // If no entry exists, or the current time exceeds the reset window threshold
-  if (!record || (now - record.lastReset) > windowMs) {
-    // Reset/initialize tracking for this IP
-    rateLimitMap.set(ip, { count: 1, lastReset: now });
-    return true; // Request allowed
-  }
-
-  // If request count has reached or exceeded the configured limit
-  if (record.count >= limit) {
-    return false; // Request blocked (rate limited)
-  }
-
-  // Increment request count by 1
-  record.count += 1;
-  return true; // Request allowed
-}
-
 // Export the NextAuth middleware wrapper, wrapping our custom request processing function
-export default auth((req) => {
+export default auth(async (req) => {
   const { nextUrl } = req; // Destructure the requested URL details
   const isLoggedIn = !!req.auth; // Boolean flag checking if session token is validated
 
-  // 1. Rate Limiting for API Endpoints (Excluding the default NextAuth internal endpoints)
+  // ── 1. Rate Limiting for API Endpoints ─────────────────────────────────────
+  // Exclude internal NextAuth auth flow endpoints from rate limiting
   if (nextUrl.pathname.startsWith('/api') && !nextUrl.pathname.startsWith('/api/auth')) {
-    // Extract IP address from request metadata, custom proxy headers, or fallback to localhost loopback
-    const ip = (req as any).ip ?? req.headers.get("x-forwarded-for")?.split(",")[0] ?? '127.0.0.1';
-    
-    let limit = 120; // Default API limit (raised to 120 to ensure seamless high-speed browsing)
-    
-    // Set a much lower limit for the register endpoint to mitigate bot account creation scripts
-    if (nextUrl.pathname.startsWith('/api/register')) {
-      limit = 15; // Stricter for register route
-    }
+    // Extract IP address from request metadata, proxy headers, or fallback to loopback
+    // Note: On Vercel, x-forwarded-for is injected by the edge network and is reliable
+    const rawIp = (req as any).ip ?? req.headers.get("x-forwarded-for") ?? '127.0.0.1';
+    // Take only the first IP if multiple are in the chain (leftmost = client IP)
+    const ip = rawIp.split(",")[0].trim();
 
-    // Apply rate limit check over a 1-minute (60,000ms) sliding window
-    const allowed = applyRateLimit(ip, limit, 60 * 1000); // 1 minute window
-    
-    // If rate limit checks fail, block request and return HTTP 429 Too Many Requests response
+    // Get the tightest applicable rate limit config for this route
+    const { limit, windowMs } = getRateLimitConfig(nextUrl.pathname);
+
+    // Build a namespaced key so different endpoints don't share quotas
+    const rateLimitKey = `${nextUrl.pathname}:${ip}`;
+    const { allowed, remaining, resetAt } = await checkRateLimit(rateLimitKey, limit, windowMs);
+
     if (!allowed) {
-      return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(Math.ceil((resetAt - Date.now()) / 1000)),
+            'X-RateLimit-Limit': String(limit),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': String(resetAt),
+          },
+        }
+      );
     }
   }
 
-  // 2. NextAuth Routing & Access Control Rules
-  const isApiRoute = nextUrl.pathname.startsWith("/api"); // True if calling backend API routes
-  const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth"); // True if calling auth controller handlers
-  
+
+  // ── 2. callbackUrl Open-Redirect Protection ─────────────────────────────────
+  // Validate any callbackUrl in query params to ensure it is same-origin.
+  // This prevents attackers from crafting `/login?callbackUrl=https://evil.com`
+  // links that redirect victims to phishing sites after they authenticate.
+  const callbackUrl = nextUrl.searchParams.get('callbackUrl');
+  if (callbackUrl && !isSafeRedirectUrl(callbackUrl)) {
+    // Strip the dangerous callbackUrl and redirect to safe default
+    const safeUrl = new URL('/login', nextUrl);
+    return Response.redirect(safeUrl);
+  }
+
+  // ── 3. NextAuth Routing & Access Control Rules ──────────────────────────────
+  const isApiRoute = nextUrl.pathname.startsWith("/api");
+  const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
+
   // Array matching of public pages that guests are permitted to view without active login session
-  const isPublicRoute = ["/", "/shop", "/products"].some(path => nextUrl.pathname === path || nextUrl.pathname.startsWith("/shop/product/"));
-  
+  const isPublicRoute = ["/", "/shop", "/about"].some(
+    (path) => nextUrl.pathname === path || nextUrl.pathname.startsWith("/shop/product/")
+  );
+
   // Routes reserved specifically for unauthenticated users (login and registration forms)
   const isAuthRoute = ["/login", "/register"].includes(nextUrl.pathname);
+
+  // Webhooks must bypass auth entirely (they use their own signature verification)
+  if (nextUrl.pathname.startsWith('/api/webhooks')) return;
 
   // If the target is an API endpoint or internal auth controller, allow Next.js to route normally
   if (isApiRoute || isApiAuthRoute) return;
@@ -87,7 +95,9 @@ export default auth((req) => {
   // If user is guest (not logged in) and attempting to request private routes (e.g. checkout or profile)
   if (!isLoggedIn && !isPublicRoute) {
     // Redirect user to login page, appending original route as a callback redirect query param
-    return Response.redirect(new URL("/login", nextUrl));
+    const loginUrl = new URL("/login", nextUrl);
+    loginUrl.searchParams.set('callbackUrl', nextUrl.pathname);
+    return Response.redirect(loginUrl);
   }
 
   return; // Allow standard routing to proceed
@@ -95,7 +105,8 @@ export default auth((req) => {
 
 // Configure matcher settings specifying which paths will trigger this middleware execution
 export const config = {
-  // Run middleware on all sub-paths except for webhooks, static files, next image optimizers, and favicon
-  matcher: ["/((?!api/webhooks|_next/static|_next/image|favicon.ico).*)"],
+  // Run middleware on all sub-paths except for webhooks (own auth), static files, image optimizer, favicon
+  matcher: ["/((?!api/webhooks|_next/static|_next/image|favicon.ico).*)" ],
 };
+
 

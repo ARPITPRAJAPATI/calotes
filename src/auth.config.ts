@@ -7,6 +7,9 @@ import Google from "next-auth/providers/google";
 // Import Credentials provider helper to define credentials authentication interface matching
 import Credentials from "next-auth/providers/credentials";
 
+// Import safe redirect validator
+import { isSafeRedirectUrl } from "@/lib/sanitize";
+
 // Export the edge-compatible NextAuth configuration object
 export const authConfig = {
   trustHost: true,
@@ -15,16 +18,20 @@ export const authConfig = {
   providers: [
     // Configure standard Google Sign-In provider using environment credentials
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,         // Read Google Client ID from environment variables
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET, // Read Google Client Secret from environment variables
-      allowDangerousEmailAccountLinking: true,       // Allow linking Google OAuth accounts with existing email user records
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      // SECURITY: allowDangerousEmailAccountLinking has been intentionally removed.
+      // With it enabled, an attacker who knows a victim's email could create a Google OAuth
+      // account that auto-links to their existing credentials account, bypassing password auth.
+      // Users who registered with credentials must use credentials to sign in.
     }),
-    
-    // Register credentials provider stub here (Edge middleware doesn't support direct Node.js DB connections, so the logic is in full auth.ts)
+
+    // Register credentials provider stub here (Edge middleware doesn't support direct Node.js DB connections,
+    // so the logic is in the full auth.ts)
     Credentials({
       // Provide a dummy authorization method returning null to avoid initialization crash in Edge runtime
-      authorize: async () => null 
-    })
+      authorize: async () => null,
+    }),
   ],
 
   // Configure middleware-compatible callbacks that execute during login/session verification
@@ -34,30 +41,43 @@ export const authConfig = {
       // If user object exists (this block executes only during the initial sign-in phase)
       if (user) {
         token.id = user.id || (user as any)._id?.toString(); // Persist the custom database user ID inside the encrypted JWT token
-        token.role = (user as any).role || "customer"; // Persist the user role (customer/admin) in the JWT token
+        token.role = (user as any).role || "customer";       // Persist the user role (customer/admin) in the JWT token
       }
-      return token;                                   // Return the updated token object
+      return token; // Return the updated token object
     },
 
     // The session callback runs whenever a session is verified (e.g., when useSession() is called in UI)
     async session({ session, token }) {
       // If the session object contains a user object (which is standard)
       if (session.user) {
-        (session.user as any).id = token.id;          // Map user ID from JWT token metadata back into the current session user object
-        (session.user as any).role = token.role;      // Map user role from JWT token metadata back into the current session user object
+        (session.user as any).id = token.id;     // Map user ID from JWT token metadata back into the current session user object
+        (session.user as any).role = token.role; // Map user role from JWT token metadata back into the current session user object
       }
-      return session;                                 // Return the session object for client-side usage
+      return session; // Return the session object for client-side usage
+    },
+
+    // The authorized callback runs for every middleware check — validates callbackUrl to prevent open-redirect
+    authorized({ auth, request }) {
+      // Validate the callbackUrl if present in the request query params
+      const callbackUrl = request.nextUrl.searchParams.get('callbackUrl');
+      if (callbackUrl && !isSafeRedirectUrl(callbackUrl)) {
+        // Reject requests with external/malformed callback URLs
+        return false;
+      }
+      return true;
     },
   },
 
   // Map customized authentication page routes
   pages: {
-    signIn: "/login", // Redirect unauthorized page requests to our custom login route instead of default /api/auth/signin
+    signIn: "/login", // Redirect unauthorized page requests to our custom login route
   },
 
   // Session storage settings
   session: {
-    strategy: "jwt",  // Use secure client-side JSON Web Token cookie storage instead of database session records
+    strategy: "jwt",  // Use secure client-side JSON Web Token cookie storage
+    maxAge: 30 * 24 * 60 * 60, // 30 days maximum session lifetime
   },
 } satisfies NextAuthConfig; // Enforce typing validation against NextAuthConfig shape
+
 

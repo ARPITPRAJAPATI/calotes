@@ -1,10 +1,29 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Heart } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
 import ProductImageSlider from "@/components/ProductImageSlider";
+
+const InstagramIcon = ({ size = 14, className = "" }: { size?: number; className?: string }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+  </svg>
+);
 
 // Insta lookbook teaser assets
 const INSTA_IMGS = [
@@ -16,6 +35,33 @@ const INSTA_IMGS = [
   "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=70&w=350&auto=format",
 ];
 
+const INSTAGRAM_POSTS = [
+  {
+    url: "/images/insta-1.jpg",
+    link: "https://www.instagram.com/p/Dbdy-PPyxNl/",
+  },
+  {
+    url: "/images/insta-2.jpg",
+    link: "https://www.instagram.com/p/DbdyrpTycjz/",
+  },
+  {
+    url: "/images/insta-3.jpg",
+    link: "https://www.instagram.com/p/Dbdx0eXSV4v/",
+  },
+  {
+    url: "/images/insta-4.jpg",
+    link: "https://www.instagram.com/p/DbdwGs7SMzR/",
+  },
+  {
+    url: "/images/insta-5.jpg",
+    link: "https://www.instagram.com/p/Dbdv_Q1yAmi/",
+  },
+  {
+    url: "/images/insta-6.jpg",
+    link: "https://www.instagram.com/p/DbdfgEhkgaa/",
+  },
+];
+
 // Props received from server component
 interface HomeClientProps {
   arrivalsList: any[];
@@ -23,9 +69,10 @@ interface HomeClientProps {
   heroHeadline: string;
   heroSubtext: string;
   heroImageUrl: string;
-  heroImageMobileUrl: string;
-  lookbookList?: { url: string; title?: string; desc?: string }[];
+  heroImageMobileUrl?: string;
+  lookbookList?: any[];
   storyImageUrl?: string;
+  communityPostsList?: any[];
 }
 
 export default function HomeClient({
@@ -37,8 +84,14 @@ export default function HomeClient({
   heroImageMobileUrl,
   lookbookList,
   storyImageUrl,
+  communityPostsList,
 }: HomeClientProps) {
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const headlineParts = heroHeadline.split('.').map(x => x.trim()).filter(Boolean);
 
@@ -49,6 +102,9 @@ export default function HomeClient({
   const activeLookbook = (lookbookList && lookbookList.length > 0)
     ? lookbookList
     : INSTA_IMGS.map((url, i) => ({ url, title: `Look ${String(i + 1).padStart(2, '0')}`, desc: '' }));
+
+  // Community posts: always use static INSTAGRAM_POSTS (local assets) to avoid SSR/client mismatch
+  const activeCommunity = INSTAGRAM_POSTS;
 
   return (
     <div suppressHydrationWarning className="w-full flex flex-col">
@@ -128,34 +184,9 @@ export default function HomeClient({
           {arrivalsList.map((item, i) => (
             <div
               key={item.productId || i}
-              suppressHydrationWarning
               className="product-card group relative snap-start shrink-0 w-[48vw] sm:w-[36vw] md:w-[26vw] lg:w-[20vw] xl:w-[17vw]"
             >
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  toggleWishlist({
-                    productId: item.productId,
-                    name: item.name,
-                    price: item.price,
-                    image: item.img,
-                    slug: item.slug,
-                    category: item.tag,
-                  });
-                }}
-                className="absolute top-1 right-1 z-20 w-11 h-11 flex items-center justify-center text-text hover:text-terracotta hover:scale-110 transition-all duration-300 cursor-pointer min-w-[44px] min-h-[44px]"
-                style={{ border: 'none', background: 'transparent', outline: 'none', boxShadow: 'none' }}
-                title={isInWishlist(item.productId) ? "Remove from Wishlist" : "Add to Wishlist"}
-                aria-label={isInWishlist(item.productId) ? "Remove from Wishlist" : "Add to Wishlist"}
-              >
-                <Heart 
-                  size={15} 
-                  className={isInWishlist(item.productId) ? "fill-terracotta text-terracotta" : "text-text"} 
-                  strokeWidth={2}
-                />
-              </button>
-              <Link href={item.href}>
+              <Link href={item.href} className="block w-full">
                 <div className="relative aspect-[3/4] overflow-hidden bg-bg-warm">
                   <ProductImageSlider images={item.imgs} productName={item.name} />
                   <span className="absolute top-3 left-3 text-[7px] font-bold uppercase tracking-[0.25em] bg-terracotta/90 text-bg px-2 py-1 z-10">
@@ -170,6 +201,31 @@ export default function HomeClient({
                   <p className="text-[9px] md:text-[10px] font-black text-terracotta shrink-0">{item.priceFormatted}</p>
                 </div>
               </Link>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleWishlist({
+                    productId: item.productId,
+                    name: item.name,
+                    price: item.price,
+                    image: item.img,
+                    slug: item.slug,
+                    category: item.tag,
+                  });
+                }}
+                className="absolute top-1 right-1 z-30 w-11 h-11 flex items-center justify-center text-text hover:text-terracotta hover:scale-110 transition-all duration-300 cursor-pointer min-w-[44px] min-h-[44px]"
+                style={{ border: 'none', background: 'transparent', outline: 'none', boxShadow: 'none' }}
+                title={mounted && isInWishlist(item.productId) ? "Remove from Wishlist" : "Add to Wishlist"}
+                aria-label={mounted && isInWishlist(item.productId) ? "Remove from Wishlist" : "Add to Wishlist"}
+              >
+                <Heart 
+                  size={15} 
+                  className={mounted && isInWishlist(item.productId) ? "fill-terracotta text-terracotta" : "text-text"} 
+                  strokeWidth={2}
+                />
+              </button>
             </div>
           ))}
           <div className="snap-start shrink-0 w-[48vw] sm:w-[36vw] md:w-[26vw] lg:w-[20vw] xl:w-[17vw] aspect-[3/4] bg-bg-warm border border-border flex flex-col items-center justify-center gap-4 group hover:border-terracotta transition-colors cursor-pointer">
@@ -235,7 +291,7 @@ export default function HomeClient({
               src="/images/story-image.png"
               alt="Calotes Story - Brand Philosophy"
               loading="lazy"
-              className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-105"
+              className="w-full h-full object-cover md:object-contain object-center transition-transform duration-[2s] group-hover:scale-105"
             />
             <div className="absolute bottom-6 right-6 w-28 h-28 bg-bg/95 border border-border-warm rounded-full flex flex-col items-center justify-center text-center shadow-2xl">
               <p className="font-display font-black text-2xl uppercase tracking-tight leading-none">100%</p>
@@ -282,7 +338,7 @@ export default function HomeClient({
         <div className="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pl-6 md:pl-12 pr-6">
           {activeLookbook.map((item, i) => (
             <Link key={i} href="/lookbook" className="shrink-0 w-40 md:w-52 aspect-[3/4] relative group overflow-hidden bg-bg border border-border">
-              <img src={item.url} alt={item.title || `Look ${i + 1}`} loading="lazy" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+              <img src={item.url} alt={item.title || `Look ${i + 1}`} loading="lazy" className="w-full h-full object-cover object-center transition-transform duration-1000 group-hover:scale-110" />
               <div className="absolute inset-0 bg-bg/50 opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex items-center justify-center">
                 <span className="text-[8px] font-bold uppercase tracking-widest text-text border border-text/50 px-3 py-1.5">{item.title || `Look ${i + 1}`}</span>
               </div>
@@ -292,28 +348,46 @@ export default function HomeClient({
       </section>
 
       {/* ══════════════════════════════════════════════════
-          6 · COMMUNITY / INSTAGRAM FOOTER
+          6 · COMMUNITY / INSTAGRAM FOOTER (EXACT SAME STRUCTURE AS LOOKBOOK)
       ══════════════════════════════════════════════════ */}
-      <section className="py-10 md:py-16 px-6 md:px-12 max-w-[1800px] mx-auto w-full cv-auto">
-        <div className="text-center max-w-lg mx-auto mb-16">
-          <p className="section-label mb-4">Community</p>
-          <h2 className="font-display font-black text-4xl md:text-5xl uppercase tracking-tighter leading-tight mb-4">Wear It. Tag It.</h2>
-          <p className="text-muted text-[11px] uppercase tracking-widest font-medium">@calotes.vintage — Show us how you style your pieces.</p>
+      <section suppressHydrationWarning className="py-10 md:py-16 bg-bg border-t border-border overflow-hidden cv-auto">
+        <div className="max-w-[1800px] mx-auto px-6 md:px-12 mb-10 flex justify-between items-end">
+          <div>
+            <p className="section-label mb-3">Community</p>
+            <h2 className="font-display font-black text-4xl md:text-6xl uppercase tracking-tighter leading-none">Wear It. Tag It.</h2>
+          </div>
+          <a
+            href="https://instagram.com/calotes.vintage"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:flex items-center gap-3 section-label text-muted hover:text-terracotta transition-colors group"
+          >
+            Follow @calotes.vintage
+            <span className="block w-8 h-px bg-muted group-hover:bg-terracotta group-hover:w-12 transition-all duration-500" />
+          </a>
         </div>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3">
-          {activeLookbook.slice(0, 6).map((item, i) => (
-            <a key={i} href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="relative aspect-square group overflow-hidden bg-bg-warm border border-border">
-              <img src={item.url} alt="Community post" loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-bg/60 opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex items-center justify-center">
-                <span className="text-[7px] font-bold uppercase tracking-widest text-text">View</span>
+        <div suppressHydrationWarning className="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pl-6 md:pl-12 pr-6">
+          {activeCommunity.map((item: any, i: number) => (
+            <a
+              key={i}
+              href={item.link || 'https://instagram.com/calotes.vintage'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 w-40 md:w-52 aspect-[3/4] relative group overflow-hidden bg-bg-warm border border-border flex items-center justify-center"
+            >
+              <img
+                src={item.url}
+                alt={`Community look ${i + 1}`}
+                loading="lazy"
+                className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-bg/60 opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex items-center justify-center z-10">
+                <span className="text-[8px] font-bold uppercase tracking-widest text-text border border-text/50 px-3 py-1.5 bg-bg/90">
+                  View Post ↗
+                </span>
               </div>
             </a>
           ))}
-        </div>
-        <div className="mt-10 flex justify-center">
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="btn-outline flex items-center gap-3">
-            Follow @calotes.vintage <ArrowRight size={12} />
-          </a>
         </div>
       </section>
     </div>

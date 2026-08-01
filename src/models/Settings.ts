@@ -39,6 +39,15 @@ const SettingsSchema = new Schema(
       }],
       default: [],
     },
+    // Array of Instagram community post cards (Wear It. Tag It. section)
+    communityPosts: {
+      type: [{
+        url: { type: String, required: true },
+        link: { type: String, default: 'https://instagram.com/calotes.vintage' },
+        objectPosition: { type: String, default: 'object-center' },
+      }],
+      default: [],
+    },
   },
   // Automatically track createdAt and updatedAt stamps for audit changes
   { timestamps: true }

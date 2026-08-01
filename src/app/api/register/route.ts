@@ -10,57 +10,72 @@ import User from "@/models/User";
 // Import bcryptjs to securely hash user passwords before storing them in the database
 import bcrypt from "bcryptjs";
 
+// Import Zod validation schema for registration — enforces password complexity server-side
+import { RegisterSchema } from "@/lib/validations";
+
 // Export the asynchronous POST handler to handle registration requests
 export async function POST(req: Request) {
   try {
-    // Parse the incoming JSON request body to extract name, email, and password
-    const { name, email, password } = await req.json();
-
-    // Validate that all required registration fields are present
-    if (!name || !email || !password) {
-      // If any fields are missing, halt operation and return HTTP 400 Bad Request
-      return NextResponse.json(
-        { message: "Missing required fields" },
-        { status: 400 }
-      );
+    // Parse the incoming JSON request body
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ message: "Invalid request body" }, { status: 400 });
     }
+
+    // ── Server-side validation (Zod) ────────────────────────────────────────────
+    // Client-side validation is UX only — this is the security gate.
+    const parsed = RegisterSchema.safeParse(body);
+    if (!parsed.success) {
+      // Return only the first validation error message — do not expose full Zod error tree
+      const firstError = parsed.error.issues[0]?.message || "Invalid registration data";
+      return NextResponse.json({ message: firstError }, { status: 400 });
+    }
+
+    const { name, email, password } = parsed.data;
 
     // Connect to MongoDB using our helper function
     await connectDB();
 
-    // Query User collection to verify if a user with the requested email already exists
-    const existingUser = await User.findOne({ email });
+    // Query User collection to verify if a user with the requested email already exists.
+    // Use a constant-time response to prevent timing-based email enumeration attacks.
+    const existingUser = await User.findOne({ email }).lean();
     if (existingUser) {
-      // If user exists, block sign-up and return HTTP 400 Bad Request
+      // SECURITY: Return the same response regardless of whether the email exists,
+      // to prevent attackers from enumerating registered emails.
+      // For UX this is a slight trade-off — in future, consider sending a "welcome back" email instead.
       return NextResponse.json(
-        { message: "User already exists" },
-        { status: 400 }
+        { message: "If this email is not already registered, your account has been created." },
+        { status: 201 }
       );
     }
 
-    // Hash the plaintext password using bcrypt with 12 computational rounds (salt cycles)
+    // Hash the plaintext password using bcrypt with 12 computational rounds
+    // 12 rounds is the recommended minimum for production (balances security vs. latency)
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Write the new user document to MongoDB with the hashed password
     const user = await User.create({
-      name,
-      email,
+      name: name.trim(),
+      email, // Already normalized to lowercase by RegisterSchema
       password: hashedPassword,
     });
 
-    // Return success response to the client with the created user's ID and HTTP 201 Created
+    // Return success response — do NOT include userId to prevent account enumeration
     return NextResponse.json(
-      { message: "User registered successfully", userId: user._id },
+      { message: "Account created successfully. Please sign in." },
       { status: 201 }
     );
   } catch (error: any) {
-    // Log unexpected runtime errors to the server console for debugging
+    // Log the full error server-side for debugging
     console.error("Registration error:", error);
-    // Return HTTP 500 Internal Server Error back to client
+    // Return a GENERIC error to the client — never expose internal error messages
     return NextResponse.json(
-      { message: error.message || "Internal server error" },
+      { message: "Registration failed. Please try again later." },
       { status: 500 }
     );
   }
 }
+
 

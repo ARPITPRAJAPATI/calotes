@@ -1,23 +1,18 @@
 import type { NextConfig } from "next";
 
-// PWA support using next-pwa
-const withPWA = require('next-pwa')({
+// PWA support using @ducanh2912/next-pwa
+const withPWA = require('@ducanh2912/next-pwa').default({
   dest: 'public',
   register: false,
   skipWaiting: true,
-  runtimeCaching: [
-    {
-      urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|avif)$/,
-      handler: 'CacheFirst',
-      options: {
-        cacheName: 'image-cache',
-        expiration: { maxEntries: 200, maxAgeSeconds: 30 * 24 * 60 * 60 },
-      },
-    },
-  ],
+  disable: process.env.NODE_ENV === 'development',
 });
 
+
 const nextConfig: NextConfig = {
+  // Remove the X-Powered-By: Next.js header to prevent framework fingerprinting
+  poweredByHeader: false,
+
   compress: true,
   turbopack: {},
   experimental: {
@@ -35,12 +30,77 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      // ── Static asset caching ────────────────────────────────────────────────
       {
         source: '/:all*(svg|jpg|png|webp|avif|js|css)',
-        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+
+      // ── Security headers applied to every route ────────────────────────────
+      {
+        source: '/:path*',
+        headers: [
+          // Prevent MIME type sniffing — must-have to block content-type confusion attacks
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          // Block the page from being embedded in an iframe (clickjacking protection)
+          // Critical for checkout and login pages where users enter credentials/payment info
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          // Strict Transport Security — forces HTTPS for 2 years, includes subdomains
+          // Add to HSTS preload list at hstspreload.org once deployed to production
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
+          // Control referrer information sent with outbound requests
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          // Disable unused browser features to reduce attack surface
+          // Camera/mic/geolocation not needed for an e-commerce site
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
+          },
+          // Content Security Policy — restricts what resources can load on the page
+          // This is a baseline policy; tighten further once all inline scripts are removed
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              // Scripts: self + Razorpay SDK + Google APIs (required for OAuth popup)
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://apis.google.com",
+              // Styles: self + inline styles (required for framer-motion and tailwind)
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              // Fonts
+              "font-src 'self' https://fonts.gstatic.com data:",
+              // Images: self + cloudinary + unsplash + data URIs (for favicons/avatars)
+              "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://assets.mixkit.co https://cdn.pixabay.com https://lh3.googleusercontent.com https://checkout.razorpay.com",
+              // API fetch targets: self + Razorpay + Google OAuth
+              "connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com https://accounts.google.com",
+              // Razorpay payment iframe
+              "frame-src https://api.razorpay.com https://checkout.razorpay.com",
+              // Objects/embeds disabled
+              "object-src 'none'",
+              // Base URI locked to self (prevent base-tag injection)
+              "base-uri 'self'",
+              // Only allow form submissions to self
+              "form-action 'self'",
+            ].join('; '),
+          },
+        ],
       },
     ];
   },
 };
 
 module.exports = withPWA(nextConfig);
+

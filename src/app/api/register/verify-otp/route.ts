@@ -2,16 +2,32 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
 import OTP from "@/models/OTP";
+import bcrypt from "bcryptjs";
+import { RegisterSchema } from "@/lib/validations";
+import { sanitizeMongoOperators } from "@/lib/sanitize";
 
 export async function POST(req: Request) {
   try {
-    const { email, otp } = await req.json();
+    let rawBody: unknown;
+    try {
+      rawBody = await req.json();
+    } catch {
+      return NextResponse.json({ message: "Invalid request body" }, { status: 400 });
+    }
 
-    if (!email || !otp) {
-      return NextResponse.json(
-        { message: "Email and verification code are required" },
-        { status: 400 }
-      );
+    const sanitizedBody = sanitizeMongoOperators(rawBody);
+    const parsed = RegisterSchema.safeParse(sanitizedBody);
+    if (!parsed.success) {
+      const firstError = parsed.error.issues[0]?.message || "Invalid registration data";
+      return NextResponse.json({ message: firstError }, { status: 400 });
+    }
+
+    const { name, email, password } = parsed.data;
+    const body = sanitizedBody as Record<string, string>;
+    const otp = body.otp;
+
+    if (!otp || typeof otp !== 'string') {
+      return NextResponse.json({ message: "Verification code is required" }, { status: 400 });
     }
 
     await connectDB();
@@ -19,16 +35,11 @@ export async function POST(req: Request) {
     const normalizedEmail = email.toLowerCase().trim();
     const cleanOtp = otp.trim();
 
-    // Query OTP document (supports real OTP or master test code 123456)
-    let otpRecord = await OTP.findOne({
+    // Query OTP document
+    const otpRecord = await OTP.findOne({
       email: normalizedEmail,
       otp: cleanOtp,
     });
-
-    // Master test code fallback during testing
-    if (!otpRecord && cleanOtp === "123456") {
-      otpRecord = await OTP.findOne({ email: normalizedEmail }).sort({ createdAt: -1 });
-    }
 
     if (!otpRecord) {
       return NextResponse.json(
@@ -38,7 +49,7 @@ export async function POST(req: Request) {
     }
 
     // Double-check if user exists
-    const existingUser = await User.findOne({ email: normalizedEmail });
+    const existingUser = await User.findOne({ email: normalizedEmail }).lean();
     if (existingUser) {
       await OTP.deleteMany({ email: normalizedEmail });
       return NextResponse.json(
@@ -47,25 +58,29 @@ export async function POST(req: Request) {
       );
     }
 
-    // Create User record with pre-hashed password stored in OTP document
-    const newUser = await User.create({
-      name: otpRecord.name,
-      email: otpRecord.email,
-      password: otpRecord.password,
+    // Hash user password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Create User record with hashed password
+    await User.create({
+      name: name.trim(),
+      email: normalizedEmail,
+      password: hashedPassword,
     });
 
     // Clear used OTP record
     await OTP.deleteMany({ email: normalizedEmail });
 
     return NextResponse.json(
-      { message: "Account created successfully", userId: newUser._id },
+      { message: "Account created successfully. Please sign in." },
       { status: 201 }
     );
   } catch (error: any) {
     console.error("Verify OTP error:", error);
     return NextResponse.json(
-      { message: error.message || "Failed to verify code" },
+      { message: "Failed to verify code" },
       { status: 500 }
     );
   }
 }
+

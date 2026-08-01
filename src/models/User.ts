@@ -67,6 +67,21 @@ const UserSchema = new Schema(
     image: {
       type: String,
     },
+    // ── Security fields ────────────────────────────────────────────────────────
+    // Tracks consecutive failed login attempts to enable per-account lockout.
+    // Reset to 0 on successful login; incremented in the credentials authorize function.
+    loginAttempts: {
+      type: Number,
+      default: 0,
+      select: false, // Hidden from standard queries — only fetched when explicitly needed
+    },
+    // Timestamp until which this account is locked out. null means account is active.
+    // Lockout is triggered after 5 consecutive failed credential login attempts.
+    lockUntil: {
+      type: Date,
+      default: null,
+      select: false, // Hidden from standard queries
+    },
   },
   // Automatically manage createdAt and updatedAt timestamps for users
   { timestamps: true }

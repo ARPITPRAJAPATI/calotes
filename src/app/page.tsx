@@ -110,6 +110,15 @@ export default async function Home() {
   // Story image: custom Cloudinary image or brandStoryImages[0] settings fallback
   const storyImageUrl = (settings?.brandStoryImages?.[0]?.url ? optimizeCloudinaryUrl(settings.brandStoryImages[0].url) : '') || "https://res.cloudinary.com/dyyrgid3b/image/upload/v1785506516/calotes-vintage/uwqzmhlwua6vlvnnmber.png";
 
+  // Format community posts list from settings (kept for future use, not active on client)
+  const rawCommunity = (settings?.communityPosts || []).filter((c: any) => c.url?.trim());
+  const communityPostsList = rawCommunity.length > 0
+    ? rawCommunity.map((c: any) => ({
+        url: optimizeCloudinaryUrl(c.url),
+        link: c.link || 'https://instagram.com/calotes.vintage',
+      }))
+    : [];
+
   return (
     <HomeClient
       arrivalsList={arrivalsList}
@@ -120,6 +129,7 @@ export default async function Home() {
       heroImageMobileUrl={heroImageMobileUrl}
       lookbookList={lookbookList}
       storyImageUrl={storyImageUrl}
+      communityPostsList={communityPostsList}
     />
   );
 }

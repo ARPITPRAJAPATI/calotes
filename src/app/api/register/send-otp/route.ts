@@ -4,53 +4,50 @@ import User from "@/models/User";
 import OTP from "@/models/OTP";
 import bcrypt from "bcryptjs";
 import { Resend } from "resend";
+import { RegisterSchema } from "@/lib/validations";
+import { sanitizeMongoOperators } from "@/lib/sanitize";
 
 const resend = new Resend(process.env.RESEND_API_KEY || "re_mock_key");
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json();
-
-    if (!name || !email || !password) {
-      return NextResponse.json(
-        { message: "All fields are required" },
-        { status: 400 }
-      );
+    let rawBody: unknown;
+    try {
+      rawBody = await req.json();
+    } catch {
+      return NextResponse.json({ message: "Invalid request body" }, { status: 400 });
     }
 
-    if (password.length < 6) {
-      return NextResponse.json(
-        { message: "Password must be at least 6 characters" },
-        { status: 400 }
-      );
+    const sanitizedBody = sanitizeMongoOperators(rawBody);
+    const parsed = RegisterSchema.safeParse(sanitizedBody);
+    if (!parsed.success) {
+      const firstError = parsed.error.issues[0]?.message || "Invalid registration data";
+      return NextResponse.json({ message: firstError }, { status: 400 });
     }
+
+    const { name, email } = parsed.data;
+    const normalizedEmail = email.toLowerCase().trim();
 
     await connectDB();
 
-    const normalizedEmail = email.toLowerCase().trim();
-
     // Check if user already exists
-    const existingUser = await User.findOne({ email: normalizedEmail });
+    const existingUser = await User.findOne({ email: normalizedEmail }).lean();
     if (existingUser) {
       return NextResponse.json(
-        { message: "An account with this email already exists" },
-        { status: 400 }
+        { message: "If this email is not already registered, a verification code has been sent." },
+        { status: 200 }
       );
     }
 
     // Generate 6-digit numeric OTP code
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    // Remove any existing OTP for this email and create fresh OTP record
+    // Remove any existing OTP for this email and create fresh OTP record without password field
     await OTP.deleteMany({ email: normalizedEmail });
     await OTP.create({
       email: normalizedEmail,
       otp: otpCode,
       name: name.trim(),
-      password: hashedPassword,
     });
 
     // Send Email via Resend gracefully
@@ -85,23 +82,20 @@ export async function POST(req: Request) {
       } catch (emailErr: any) {
         console.warn("[Resend Exception]:", emailErr.message);
       }
-    } else {
-      console.log(`[DEV OTP LOG] Email: ${normalizedEmail}, OTP: ${otpCode}`);
     }
 
     return NextResponse.json(
       { 
-        message: "Verification code sent to your email",
-        // In development/test mode without verified domain, provide helper notice
-        testHint: process.env.NODE_ENV !== "production" ? `Test OTP: ${otpCode}` : undefined
+        message: "Verification code sent to your email"
       },
       { status: 200 }
     );
   } catch (error: any) {
     console.error("Send OTP error:", error);
     return NextResponse.json(
-      { message: error.message || "Failed to send verification code" },
+      { message: "Failed to send verification code" },
       { status: 500 }
     );
   }
 }
+

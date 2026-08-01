@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 // Import hot toast notification alerts
 import toast from 'react-hot-toast';
 // Import UI vector graphics icons
-import { Loader2, Save, Upload, Plus, Trash2, GripVertical, ImageIcon } from 'lucide-react';
+import { Loader2, Save, Upload, Plus, Trash2, GripVertical, ImageIcon, Crop } from 'lucide-react';
 import ImageCropperModal from '@/components/ImageCropperModal';
 
 export default function AdminSettingsPage() {
@@ -44,10 +44,47 @@ export default function AdminSettingsPage() {
   const brandFileInputRef = useRef<HTMLInputElement>(null);
   const [pendingBrandIdx, setPendingBrandIdx] = useState<number | null>(null);
 
+  // Community Posts state
+  type CommunityPostItem = { url: string; link: string; objectPosition: string };
+  const DEFAULT_COMMUNITY: CommunityPostItem[] = [
+    { url: "/images/insta-1.jpg", link: "https://www.instagram.com/p/Dbdy-PPyxNl/", objectPosition: "object-center" },
+    { url: "/images/insta-2.jpg", link: "https://www.instagram.com/p/DbdyrpTycjz/", objectPosition: "object-center" },
+    { url: "/images/insta-3.jpg", link: "https://www.instagram.com/p/Dbdx0eXSV4v/", objectPosition: "object-center" },
+    { url: "/images/insta-4.jpg", link: "https://www.instagram.com/p/DbdwGs7SMzR/", objectPosition: "object-center" },
+    { url: "/images/insta-5.jpg", link: "https://www.instagram.com/p/Dbdv_Q1yAmi/", objectPosition: "object-center" },
+    { url: "/images/insta-6.jpg", link: "https://www.instagram.com/p/DbdfgEhkgaa/", objectPosition: "object-center" },
+  ];
+  const [communityPosts, setCommunityPosts] = useState<CommunityPostItem[]>(DEFAULT_COMMUNITY);
+  const [uploadingCommunityIdx, setUploadingCommunityIdx] = useState<number | null>(null);
+  const communityFileInputRef = useRef<HTMLInputElement>(null);
+  const [pendingCommunityIdx, setPendingCommunityIdx] = useState<number | null>(null);
+
   // Generic Cropper Modal state for Settings page
   const [activeCropFile, setActiveCropFile] = useState<File | null>(null);
-  const [activeCropTarget, setActiveCropTarget] = useState<'desktop' | 'mobile' | 'lookbook' | 'brand'>('desktop');
+  const [activeCropTarget, setActiveCropTarget] = useState<'desktop' | 'mobile' | 'lookbook' | 'brand' | 'community'>('desktop');
   const [isCropModalOpen, setIsCropModalOpen] = useState<boolean>(false);
+
+  // Helper: Load an existing image URL into the interactive cropper
+  const cropExistingUrl = async (url: string, index: number) => {
+    if (!url) {
+      toast.error('Please enter or upload an Image URL first');
+      return;
+    }
+    const tId = toast.loading('Loading photo into interactive cropper...');
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const file = new File([blob], `community-crop-${index + 1}.jpg`, { type: blob.type || 'image/jpeg' });
+      toast.dismiss(tId);
+      setPendingCommunityIdx(index);
+      setActiveCropTarget('community');
+      setActiveCropFile(file);
+      setIsCropModalOpen(true);
+    } catch {
+      toast.dismiss(tId);
+      toast.error('Could not load image URL directly into cropper. Try uploading the image file.');
+    }
+  };
 
   // Preset accent configurations matching brand palettes
   const presets = [
@@ -75,6 +112,7 @@ export default function AdminSettingsPage() {
         setAccentColor(data.accentColor || '#C85a32');
         setLookbookImages(data.lookbookImages || []);
         setBrandStoryImages(data.brandStoryImages || []);
+        setCommunityPosts(data.communityPosts && data.communityPosts.length > 0 ? data.communityPosts : DEFAULT_COMMUNITY);
       } else {
         toast.error('Failed to load settings');
       }
@@ -127,6 +165,10 @@ export default function AdminSettingsPage() {
           const idx = pendingBrandIdx;
           setBrandStoryImages(prev => prev.map((img, i) => i === idx ? { ...img, url: data.url } : img));
           toast.success('Brand story image uploaded!');
+        } else if (activeCropTarget === 'community' && pendingCommunityIdx !== null) {
+          const idx = pendingCommunityIdx;
+          setCommunityPosts(prev => prev.map((post, i) => i === idx ? { ...post, url: data.url } : post));
+          toast.success('Community photo adjusted & saved!');
         }
       } else {
         toast.error(data.error || 'Failed to upload image');
@@ -137,8 +179,10 @@ export default function AdminSettingsPage() {
       setIsUploading(false);
       setUploadingLookbookIdx(null);
       setUploadingBrandIdx(null);
+      setUploadingCommunityIdx(null);
       setPendingLookbookIdx(null);
       setPendingBrandIdx(null);
+      setPendingCommunityIdx(null);
       setActiveCropFile(null);
     }
   };
@@ -160,6 +204,7 @@ export default function AdminSettingsPage() {
       accentColor,
       lookbookImages,
       brandStoryImages,
+      communityPosts,
     };
 
     try {
@@ -694,8 +739,7 @@ export default function AdminSettingsPage() {
         onSkipCrop={processUploadedFile}
         defaultAspectRatio={
           activeCropTarget === 'desktop' ? 16 / 9 :
-          activeCropTarget === 'mobile' ? 3 / 4 :
-          activeCropTarget === 'lookbook' ? 3 / 4 : 4 / 3
+          activeCropTarget === 'mobile' ? 3 / 4 : 3 / 4
         }
         title={
           activeCropTarget === 'desktop' ? 'Crop PC / Desktop Banner (16:9)' :

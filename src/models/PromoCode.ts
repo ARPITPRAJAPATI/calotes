@@ -14,14 +14,31 @@ const PromoCodeSchema = new Schema(
     isActive: { type: Boolean, default: true },
     // Minimum cart total value requirement for coupon application eligibility (e.g. order total must be > ₹2999)
     minOrderAmount: { type: Number, default: 0 },
+
+    // ── Usage Enforcement Fields ───────────────────────────────────────────────
+    // Maximum total uses across all users (0 = unlimited)
+    usageLimit: { type: Number, default: 0 },
+    // Running count of how many times this code has been successfully used.
+    // Must be incremented atomically with findOneAndUpdate + $inc to prevent race conditions.
+    usageCount: { type: Number, default: 0 },
+    // Maximum uses per individual user account (undefined = unlimited per user)
+    perUserLimit: { type: Number, default: 1 },
+    // Array of user ObjectIds that have redeemed this code (used for per-user limit enforcement)
+    usedBy: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    // Optional expiry date — code is invalid after this timestamp
+    expiresAt: { type: Date, default: null },
   },
   // Automatically manage createdAt and updatedAt fields for tracking creation timestamps
   { timestamps: true }
 );
+
+// Index for fast lookup by active status + expiry for the validate endpoint
+PromoCodeSchema.index({ code: 1, isActive: 1 });
 
 // Cache compiled model instance or compile a new model matching 'PromoCode' key
 const PromoCode = models.PromoCode || model('PromoCode', PromoCodeSchema);
 
 // Export compiled PromoCode model
 export default PromoCode;
+
 

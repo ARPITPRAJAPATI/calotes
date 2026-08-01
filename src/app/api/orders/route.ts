@@ -1,78 +1,200 @@
-import { NextResponse } from 'next/server'; // Import next router response helpers
-import Razorpay from 'razorpay'; // Import Razorpay payment gateway Node.js SDK
-import connectDB from '@/lib/db'; // Import connection cache helper
-import Order from '@/models/Order'; // Import Order mongoose schema model
-import { auth } from '@/auth'; // Import NextAuth session helper
+import { NextResponse } from 'next/server';
+import Razorpay from 'razorpay';
+import connectDB from '@/lib/db';
+import Order from '@/models/Order';
+import Product from '@/models/Product';
+import { auth } from '@/auth';
+import { OrderCreateSchema } from '@/lib/validations';
+import { isValidObjectId, sanitizeMongoOperators } from '@/lib/sanitize';
 
-// POST order API route: initiates order verification, logs pending transaction in MongoDB, and triggers Razorpay payment order
+// POST order API route: validates cart server-side, recomputes total from DB prices,
+// creates pending order record, and initialises Razorpay transaction.
 export async function POST(req: Request) {
   try {
-    // 1. Instantiate Razorpay API SDK client using environment secrets
-    const razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID || "",
-      key_secret: process.env.RAZORPAY_KEY_SECRET || "",
-    });
-    // 2. Validate session credentials
+    // 1. Validate session credentials — unauthenticated users cannot place orders
     const session = await auth();
-    if (!session || !session.user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // 2. Parse and validate request body with Zod
+    let rawBody: unknown;
+    try {
+      rawBody = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    }
+
+    // Sanitize to strip MongoDB operator keys before passing to Zod
+    const sanitizedBody = sanitizeMongoOperators(rawBody);
+    const parsed = OrderCreateSchema.safeParse(sanitizedBody);
+    if (!parsed.success) {
+      const firstError = parsed.error.issues[0]?.message || 'Invalid order data';
+      return NextResponse.json({ error: firstError }, { status: 400 });
+    }
+
+    const { items, shippingAddress, couponCode } = parsed.data;
+
     await connectDB();
-    const { items, totalAmount, shippingAddress } = await req.json();
 
-    // Map frontend product reference IDs to target database product ObjectID keys
-    const mappedItems = (items || []).map((item: any) => ({
-      product: item.product || item.productId,
-      name: item.name,
-      price: item.price,
-      quantity: item.quantity,
-      size: item.size,
-      image: item.image,
-    }));
+    // 3. ─── SERVER-SIDE PRICE RECOMPUTATION ─────────────────────────────────────
+    // CRITICAL: We NEVER trust the client-supplied price.
+    // Every product price and availability is fetched fresh from the database.
+    // This is the primary defence against price manipulation attacks.
+    let serverComputedTotal = 0;
+    const validatedItems: Array<{
+      product: string;
+      name: string;
+      price: number;
+      quantity: number;
+      size: string;
+      image: string;
+    }> = [];
 
-    // 3. Create order log record in MongoDB database with Pending status
-    const newOrder = await Order.create({
-      user: session.user.id,
-      items: mappedItems,
-      totalAmount,
-      shippingAddress,
-      paymentStatus: 'Pending',
+    for (const item of items) {
+      // Validate each product ID is a proper ObjectId before querying
+      if (!isValidObjectId(item.product)) {
+        return NextResponse.json(
+          { error: `Invalid product ID: ${item.product}` },
+          { status: 400 }
+        );
+      }
+
+      // Fetch product directly from DB — authoritative source for price and stock
+      const product = await Product.findById(item.product)
+        .select('name price stock images')
+        .lean();
+
+      if (!product) {
+        return NextResponse.json(
+          { error: `Product not found: ${item.product}` },
+          { status: 404 }
+        );
+      }
+
+      // ── Stock check ───────────────────────────────────────────────────────────
+      // NOTE: This is a pre-check only. Actual atomic stock decrement happens in
+      // the payment verify route AFTER payment is confirmed. This prevents
+      // users from placing orders on out-of-stock items before paying.
+      if (product.stock < item.quantity) {
+        return NextResponse.json(
+          { error: `Insufficient stock for "${product.name}". Only ${product.stock} available.` },
+          { status: 409 }
+        );
+      }
+
+      // Use DB price, completely ignoring client-supplied price
+      const lineTotal = product.price * item.quantity;
+      serverComputedTotal += lineTotal;
+
+      validatedItems.push({
+        product: item.product,
+        name: product.name,
+        price: product.price,  // DB price — authoritative
+        quantity: item.quantity,
+        size: item.size,
+        image: (product.images as string[])[0] || '',
+      });
+    }
+
+    // 4. ─── COUPON APPLICATION (server-side) ─────────────────────────────────
+    // Coupon is applied server-side here, not trusted from the client.
+    let discountAmount = 0;
+    let appliedCouponCode: string | undefined;
+
+    if (couponCode) {
+      const PromoCode = (await import('@/models/PromoCode')).default;
+      const promo = await PromoCode.findOne({
+        code: couponCode.toUpperCase().trim(),
+        isActive: true,
+      }).lean() as any;
+
+      if (promo) {
+        // Check expiry
+        const isExpired = promo.expiresAt && new Date(promo.expiresAt) < new Date();
+        // Check global usage limit (0 = unlimited)
+        const isOverGlobalLimit = promo.usageLimit > 0 && promo.usageCount >= promo.usageLimit;
+        // Check per-user limit
+        const userUsageCount = (promo.usedBy || []).filter(
+          (uid: any) => uid.toString() === (session.user?.id ?? '')
+        ).length;
+        const isOverUserLimit = promo.perUserLimit && userUsageCount >= promo.perUserLimit;
+        // Check minimum order amount
+        const meetsMinOrder = serverComputedTotal >= (promo.minOrderAmount || 0);
+
+        if (!isExpired && !isOverGlobalLimit && !isOverUserLimit && meetsMinOrder) {
+          if (promo.discountType === 'percentage') {
+            discountAmount = Math.floor((serverComputedTotal * promo.discountValue) / 100);
+          } else {
+            discountAmount = promo.discountValue;
+          }
+          // Floor discount to prevent negative totals
+          discountAmount = Math.min(discountAmount, serverComputedTotal);
+          appliedCouponCode = promo.code;
+        }
+      }
+    }
+
+    const finalAmount = Math.max(1, serverComputedTotal - discountAmount); // Minimum ₹1
+
+    // 5. Guard against zero/negative amounts (should never happen after the above, but belt+suspenders)
+    if (finalAmount <= 0) {
+      return NextResponse.json({ error: 'Invalid order total' }, { status: 400 });
+    }
+
+    // 6. Instantiate Razorpay SDK client using environment secrets
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID || '',
+      key_secret: process.env.RAZORPAY_KEY_SECRET || '',
     });
 
-    // 4. Initialize transaction on Razorpay gateway
-    const options = {
-      amount: totalAmount * 100, // Razorpay gateway processes amounts scaled in smallest currency units (paise for INR)
-      currency: "INR",
-      receipt: newOrder._id.toString(), // Link MongoDB order ID as reference receipt key
-    };
+    // 7. Create order log record in MongoDB database with Pending status
+    const newOrder = await Order.create({
+      user: session.user.id,
+      items: validatedItems,         // Server-validated items with DB prices
+      totalAmount: finalAmount,      // Server-computed total — NOT from client
+      shippingAddress,
+      paymentStatus: 'Pending',
+      appliedCoupon: appliedCouponCode,
+      discountAmount,
+    });
 
-    const razorpayOrder = await razorpay.orders.create(options);
+    // 8. Initialize Razorpay transaction using server-computed amount
+    const razorpayOrder = await razorpay.orders.create({
+      amount: finalAmount * 100, // Razorpay expects paise (smallest currency unit)
+      currency: 'INR',
+      receipt: newOrder._id.toString(),
+    });
 
-    // 5. Update local database order record with target Razorpay token identifier
+    // 9. Store Razorpay order ID on our order record for later verification
     newOrder.razorpayOrderId = razorpayOrder.id;
     await newOrder.save();
 
-    // Return reference pointers to launch Razorpay checkout screens on client browsers
+    // Return only what the client needs to open the Razorpay checkout
+    // NOTE: We return `razorpayOrder.amount` (the server-authoritative amount) not `finalAmount`
     return NextResponse.json({
       orderId: newOrder._id,
       razorpayOrderId: razorpayOrder.id,
-      amount: razorpayOrder.amount,
+      amount: razorpayOrder.amount,   // Paise — Razorpay echoes back the server amount
       currency: razorpayOrder.currency,
-      keyId: process.env.RAZORPAY_KEY_ID
+      keyId: process.env.RAZORPAY_KEY_ID,
+      // Return the server-computed total for display — client must use this, not its own calculation
+      serverTotal: finalAmount,
+      discountApplied: discountAmount,
     });
   } catch (error: any) {
-    console.error("Order creation failed:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Order creation failed:', error);
+    // Never expose internal error details to the client
+    return NextResponse.json({ error: 'Order creation failed. Please try again.' }, { status: 500 });
   }
 }
 
 // GET orders API route: returns lists of all transaction logs globally (Admin protected)
-export async function GET(req: Request) {
+export async function GET() {
   try {
     // 1. Confirm administrative authorization session role privileges
     const session = await auth();
-    if (!session || !session.user || (session.user as any).role !== 'admin') {
+    if (!session?.user || (session.user as any).role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -85,7 +207,9 @@ export async function GET(req: Request) {
 
     return NextResponse.json(orders);
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Orders fetch failed:', error);
+    return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 });
   }
 }
+
 

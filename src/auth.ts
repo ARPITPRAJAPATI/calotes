@@ -72,6 +72,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
 
-  // Enable debug logging in development to output authentication events, warnings, and errors to the console
-  debug: true,
+  // Enable debug logging in development ONLY to prevent JWT internals from leaking in production logs
+  debug: process.env.NODE_ENV !== 'production',
 });
