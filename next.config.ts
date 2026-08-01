@@ -22,10 +22,8 @@ const nextConfig: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 31536000,
     remotePatterns: [
-      { protocol: 'https', hostname: 'images.unsplash.com' },
-      { protocol: 'https', hostname: 'assets.mixkit.co' },
-      { protocol: 'https', hostname: 'cdn.pixabay.com' },
-      { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: '**' },
+      { protocol: 'http', hostname: '**' },
     ],
   },
   async headers() {
@@ -82,8 +80,8 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               // Fonts
               "font-src 'self' https://fonts.gstatic.com data:",
-              // Images: self + cloudinary + unsplash + data URIs (for favicons/avatars)
-              "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://assets.mixkit.co https://cdn.pixabay.com https://lh3.googleusercontent.com https://checkout.razorpay.com",
+              // Images: self + all remote images + data URIs + blobs
+              "img-src 'self' data: blob: https: http:",
               // API fetch targets: self + Razorpay + Google OAuth + IMG.LY CDN
               "connect-src 'self' blob: https://api.razorpay.com https://lumberjack.razorpay.com https://accounts.google.com https://staticimgly.com",
               // Web Worker sources
