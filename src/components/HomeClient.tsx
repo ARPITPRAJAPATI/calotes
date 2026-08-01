@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ArrowRight, Heart } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
 import ProductImageSlider from "@/components/ProductImageSlider";
+import SafeImage from "@/components/SafeImage";
 
 const InstagramIcon = ({ size = 14, className = "" }: { size?: number; className?: string }) => (
   <svg
@@ -287,8 +288,9 @@ export default function HomeClient({
       <section className="py-12 md:py-20 px-6 md:px-12 max-w-[1800px] mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
           <div className="relative aspect-[4/5] overflow-hidden bg-bg-warm group border border-border">
-            <img
+            <SafeImage
               src="/images/story-image.png"
+              fallbackSrc="https://images.unsplash.com/photo-1550614000-4b95d4ebfa24?q=80&w=800&auto=format&fit=crop"
               alt="Calotes Story - Brand Philosophy"
               loading="lazy"
               className="w-full h-full object-cover md:object-contain object-center transition-transform duration-[2s] group-hover:scale-105"
@@ -338,7 +340,13 @@ export default function HomeClient({
         <div className="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pl-6 md:pl-12 pr-6">
           {activeLookbook.map((item, i) => (
             <Link key={i} href="/lookbook" className="shrink-0 w-40 md:w-52 aspect-[3/4] relative group overflow-hidden bg-bg border border-border">
-              <img src={item.url} alt={item.title || `Look ${i + 1}`} loading="lazy" className="w-full h-full object-cover object-center transition-transform duration-1000 group-hover:scale-110" />
+              <SafeImage
+                src={item.url}
+                fallbackSrc={INSTA_IMGS[i % INSTA_IMGS.length]}
+                alt={item.title || `Look ${i + 1}`}
+                loading="lazy"
+                className="w-full h-full object-cover object-center transition-transform duration-1000 group-hover:scale-110"
+              />
               <div className="absolute inset-0 bg-bg/50 opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex items-center justify-center">
                 <span className="text-[8px] font-bold uppercase tracking-widest text-text border border-text/50 px-3 py-1.5">{item.title || `Look ${i + 1}`}</span>
               </div>
@@ -375,8 +383,9 @@ export default function HomeClient({
               rel="noopener noreferrer"
               className="shrink-0 w-40 md:w-52 aspect-[3/4] relative group overflow-hidden bg-bg-warm border border-border flex items-center justify-center"
             >
-              <img
+              <SafeImage
                 src={item.url}
+                fallbackSrc={INSTA_IMGS[i % INSTA_IMGS.length]}
                 alt={`Community look ${i + 1}`}
                 loading="lazy"
                 className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"

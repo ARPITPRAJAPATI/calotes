@@ -11,6 +11,8 @@ import Link from "next/link";
 // Import useRouter to control direct programmatic redirection actions
 import { useRouter } from "next/navigation";
 
+import SafeImage from "@/components/SafeImage";
+
 export default function CartDrawer() {
   // Extract state properties and callback actions from useCart context hook
   const { isCartOpen, setIsCartOpen, items, removeFromCart, updateQuantity, cartTotal } = useCart();
@@ -66,7 +68,7 @@ export default function CartDrawer() {
                   <div key={`${item.productId}-${item.size}`} className="flex gap-6 border-b border-border pb-8">
                     {/* Item Thumbnail Frame */}
                     <div className="w-20 h-28 bg-card shrink-0 overflow-hidden">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <SafeImage src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                     {/* Item Text Metadata & Count Adjustment triggers */}
                     <div className="flex-1 flex flex-col justify-between">

@@ -1,5 +1,7 @@
 "use client";
 
+import SafeImage from "@/components/SafeImage";
+
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -325,7 +327,7 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
               {relatedProducts.map((item, idx) => (
                 <Link href={`/shop/product/${item.slug}`} key={idx} className="group block">
                   <div className="aspect-[3/4] overflow-hidden bg-card mb-4 border border-border/50 relative">
-                    <img src={item.images[0]} alt={item.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+                    <SafeImage src={item.images[0]} alt={item.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
                     <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-bg-dark/90 text-center">
                        <span className="text-text text-[10px] font-black uppercase tracking-widest">View details</span>
                     </div>

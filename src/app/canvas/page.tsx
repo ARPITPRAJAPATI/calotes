@@ -1,4 +1,6 @@
-"use client"; // Flags this file as client rendering only (uses local canvas triggers, client-side AI modules, and drag gestures)
+"use client";
+
+import SafeImage from "@/components/SafeImage"; // Flags this file as client rendering only (uses local canvas triggers, client-side AI modules, and drag gestures)
 
 // Import React hooks for managing state variables, side effect triggers, and canvas element refs
 import React, { useState, useEffect, useRef } from "react";
@@ -340,7 +342,7 @@ export default function FitCanvasPage() {
                   className="flex gap-2.5 p-1.5 sm:p-2 bg-bg border border-border group hover:border-terracotta transition-all duration-300 w-[62vw] sm:w-[280px] md:w-full shrink-0 shadow-[2px_2px_0px_rgba(0,0,0,0.05)] hover:shadow-[4px_4px_0px_rgba(0,0,0,0.1)]"
                 >
                   <div className="w-12 h-16 sm:w-16 sm:h-20 bg-card shrink-0 border border-border/50 overflow-hidden">
-                    <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    <SafeImage src={product.images[0]} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   </div>
                   <div className="flex flex-col justify-between flex-1 py-0.5 min-w-0">
                     <div>

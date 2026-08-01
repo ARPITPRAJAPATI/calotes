@@ -1,4 +1,6 @@
-"use client"; // Flags this file as a client component to support browser API scripts (Razorpay), user forms, and alerts
+"use client";
+
+import SafeImage from "@/components/SafeImage"; // Flags this file as a client component to support browser API scripts (Razorpay), user forms, and alerts
 
 // Import React state and lifecycle hooks
 import { useState, useEffect } from "react";
@@ -220,7 +222,7 @@ export default function CheckoutPage() {
                 {items.map((item) => (
                   <div key={`${item.productId}-${item.size}`} className="flex gap-4 border-b border-border/50 pb-6 items-center">
                     <div className="w-16 h-20 bg-bg shrink-0 border border-border/30">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <SafeImage src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 py-1">
                       <h3 className="text-[10px] font-black uppercase tracking-wider line-clamp-1 text-text">{item.name}</h3>
