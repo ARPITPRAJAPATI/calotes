@@ -18,6 +18,7 @@ const SAMPLE_PRODUCTS = [
   {
     name: 'VINTAGE HARLEY DAVIDSON TEE',
     slug: 'harley-davidson-tee-90s',
+    sku: 'CV-HD-001',
     description: 'Authentic 90s Harley Davidson graphic tee. Single stitch, perfectly faded.',
     price: 2499,
     brand: 'Harley Davidson',
@@ -33,6 +34,7 @@ const SAMPLE_PRODUCTS = [
   {
     name: '90S CARHARTT DETROIT JACKET',
     slug: 'carhartt-detroit-jacket-brown',
+    sku: 'CV-CJ-002',
     description: 'Classic Detroit jacket in tan canvas. Beautiful wear and patina.',
     price: 7999,
     compareAtPrice: 9999,
@@ -49,6 +51,7 @@ const SAMPLE_PRODUCTS = [
   {
     name: 'LEVIS 501 ORIGINAL FIT',
     slug: 'levis-501-light-wash',
+    sku: 'CV-LV-003',
     description: 'Vintage 501s in a perfect light wash. Classic straight leg.',
     price: 3499,
     brand: 'Levis',
@@ -64,6 +67,7 @@ const SAMPLE_PRODUCTS = [
   {
     name: 'NIKE SPELLOUT SWEATSHIRT',
     slug: 'nike-spellout-navy',
+    sku: 'CV-NK-004',
     description: 'Navy blue Nike sweatshirt with white spellout embroidery on the chest.',
     price: 4299,
     brand: 'Nike',
@@ -79,6 +83,7 @@ const SAMPLE_PRODUCTS = [
   {
     name: 'VINTAGE BURBERRY TRENCH',
     slug: 'burberry-trench-beige',
+    sku: 'CV-BB-005',
     description: 'Iconic beige trench coat with Nova check lining. Timeless piece.',
     price: 18999,
     brand: 'Burberry',
