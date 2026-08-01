@@ -76,7 +76,7 @@ export default function FitCanvasPage() {
       const productList = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
       if (res.ok) {
         // Filter out out-of-stock items for the canvas fit workspace
-        setProducts(productList.filter(p => p.stock === undefined || p.stock > 0));
+        setProducts((productList as Product[]).filter((p: Product) => p.stock === undefined || p.stock > 0));
       }
     } catch (e) {
       console.error(e);
