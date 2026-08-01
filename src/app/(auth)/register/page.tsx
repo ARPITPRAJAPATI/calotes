@@ -98,7 +98,12 @@ export default function RegisterPage() {
       const res = await fetch("/api/register/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.email, otp }),
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          otp: otp.trim(),
+        }),
       });
 
       const data = await res.json();
