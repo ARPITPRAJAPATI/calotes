@@ -84,7 +84,7 @@ export async function GET(req: Request) {
 
     // Execute paginated query
     const [products, total] = await Promise.all([
-      Product.find(filter).sort(sort).skip(skip).limit(limit).lean(),
+      Product.find(filter).sort(sort).skip(skip).limit(limit).populate('category', 'slug name').lean(),
       Product.countDocuments(filter),
     ]);
 

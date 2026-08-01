@@ -60,6 +60,7 @@ export default function FitCanvasPage() {
   const [products, setProducts] = useState<Product[]>([]); // Wardrobe catalog options
   const [loading, setLoading] = useState(true);            // Wardrobe query progress spinner loader toggle
   const [activeCategory, setActiveCategory] = useState("all"); // Filter state variables for wardrobe listing tray
+  const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]); // DB-driven category list
   
   // Fit Canvas state management
   const [canvasItems, setCanvasItems] = useState<CanvasItem[]>([]); // Tracks current items active in the workspace
@@ -72,9 +73,10 @@ export default function FitCanvasPage() {
     try {
       const res = await fetch("/api/products");
       const data = await res.json();
-      if (res.ok && Array.isArray(data)) {
+      const productList = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
+      if (res.ok) {
         // Filter out out-of-stock items for the canvas fit workspace
-        setProducts(data.filter(p => p.stock === undefined || p.stock > 0));
+        setProducts(productList.filter(p => p.stock === undefined || p.stock > 0));
       }
     } catch (e) {
       console.error(e);
@@ -85,6 +87,17 @@ export default function FitCanvasPage() {
 
   useEffect(() => {
     fetchProducts();
+
+    // Fetch real categories from DB to power wardrobe filter tabs
+    fetch("/api/categories")
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setCategories(data.map((c: any) => ({ slug: c.slug, name: c.name })));
+        }
+      })
+      .catch(() => {});
+
     // Preload the WASM modules for @imgly/background-removal client-side in the background to prevent loading lags
     preload({
       model: "isnet_quint8", // Quantized 8-bit lightweight image segmentation model layout
@@ -270,19 +283,31 @@ export default function FitCanvasPage() {
         
         {/* Wardrobe inventory selection list */}
         <div className="w-full md:w-80 lg:w-[400px] shrink-0 border-b md:border-b-0 md:border-r border-border bg-bg-warm flex flex-col z-10 shadow-[0_4px_24px_rgba(0,0,0,0.03)] md:shadow-[4px_0_24px_rgba(0,0,0,0.05)] h-auto md:h-full">
-          {/* Wardrobe Category Tabs */}
+          {/* Wardrobe Category Tabs — dynamically loaded from DB */}
           <div className="flex overflow-x-auto no-scrollbar border-b border-border/50 p-2 sm:p-3 md:p-4 gap-1.5 md:gap-2 justify-start shrink-0 bg-bg">
-            {["all", "outerwear", "tops", "bottoms", "accessories"].map(cat => (
+            {/* "All" tab always first */}
+            <button
+              onClick={() => setActiveCategory("all")}
+              className={`shrink-0 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 sm:px-4 sm:py-2 border transition-colors ${
+                activeCategory === "all"
+                  ? "bg-text text-bg border-text"
+                  : "border-border text-muted hover:border-text bg-bg-warm"
+              }`}
+            >
+              All
+            </button>
+            {/* DB-driven category tabs */}
+            {categories.map(cat => (
               <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
+                key={cat.slug}
+                onClick={() => setActiveCategory(cat.slug)}
                 className={`shrink-0 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 sm:px-4 sm:py-2 border transition-colors ${
-                  activeCategory === cat 
-                    ? "bg-text text-bg border-text" 
+                  activeCategory === cat.slug
+                    ? "bg-text text-bg border-text"
                     : "border-border text-muted hover:border-text bg-bg-warm"
                 }`}
               >
-                {cat}
+                {cat.name}
               </button>
             ))}
           </div>

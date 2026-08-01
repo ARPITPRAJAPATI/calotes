@@ -76,16 +76,18 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              // Scripts: self + Razorpay SDK + Google APIs (required for OAuth popup)
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://apis.google.com",
+              // Scripts: self + Razorpay SDK + Google APIs + blob: (for WASM dynamic imports)
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://checkout.razorpay.com https://apis.google.com",
               // Styles: self + inline styles (required for framer-motion and tailwind)
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               // Fonts
               "font-src 'self' https://fonts.gstatic.com data:",
               // Images: self + cloudinary + unsplash + data URIs (for favicons/avatars)
               "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://assets.mixkit.co https://cdn.pixabay.com https://lh3.googleusercontent.com https://checkout.razorpay.com",
-              // API fetch targets: self + Razorpay + Google OAuth
-              "connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com https://accounts.google.com",
+              // API fetch targets: self + Razorpay + Google OAuth + IMG.LY CDN
+              "connect-src 'self' blob: https://api.razorpay.com https://lumberjack.razorpay.com https://accounts.google.com https://staticimgly.com",
+              // Web Worker sources
+              "worker-src 'self' blob:",
               // Razorpay payment iframe
               "frame-src https://api.razorpay.com https://checkout.razorpay.com",
               // Objects/embeds disabled

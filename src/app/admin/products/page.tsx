@@ -21,8 +21,9 @@ export default function AdminProductsPage() {
     try {
       const res = await fetch('/api/products?sort=-createdAt');
       const data = await res.json();
+      const productList = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
       if (res.ok) {
-        setProducts(data); // Hydrate local state
+        setProducts(productList); // Hydrate local state
       } else {
         toast.error('Failed to load products');
       }
