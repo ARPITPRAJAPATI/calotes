@@ -366,8 +366,8 @@ export default function HomeClient({
             <span className="block w-8 h-px bg-muted group-hover:bg-terracotta group-hover:w-12 transition-all duration-500" />
           </a>
         </div>
-        <div suppressHydrationWarning className="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pl-6 md:pl-12 pr-6">
-          {activeCommunity.map((item: any, i: number) => (
+        <div className="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pl-6 md:pl-12 pr-6">
+          {INSTAGRAM_POSTS.map((item, i) => (
             <a
               key={i}
               href={item.link || 'https://instagram.com/calotes.vintage'}

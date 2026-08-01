@@ -70,7 +70,7 @@ export default auth(async (req) => {
   const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
 
   // Array matching of public pages that guests are permitted to view without active login session
-  const isPublicRoute = ["/", "/shop", "/about"].some(
+  const isPublicRoute = ["/", "/shop", "/about", "/lookbook"].some(
     (path) => nextUrl.pathname === path || nextUrl.pathname.startsWith("/shop/product/")
   );
 

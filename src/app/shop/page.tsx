@@ -64,10 +64,11 @@ function ShopContent() {
         url += (url.includes("?") ? "&" : "?") + `q=${encodeURIComponent(searchQuery)}`;
       }
       
-      const res  = await fetch(url); // Leverages 60s Cache-Control HTTP headers
+      const res  = await fetch(url);
       const data = await res.json();
-      if (res.ok && Array.isArray(data)) {
-        setProducts(data); // Bind list data
+      const productList = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
+      if (res.ok) {
+        setProducts(productList);
       } else {
         setProducts([]);
         console.error(`API error (status ${res.status}):`, data);

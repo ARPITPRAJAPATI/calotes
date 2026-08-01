@@ -107,29 +107,39 @@ export async function POST() {
 
     await connectDB();
     
-    await Category.deleteMany({});
-    await Product.deleteMany({});
-    await User.deleteMany({ email: 'admin@calotes.com' });
+    // Only seed categories if none exist
+    let createdCategories = await Category.find({});
+    if (createdCategories.length === 0) {
+      createdCategories = await Category.insertMany(SAMPLE_CATEGORIES);
+      console.log('Seeded categories.');
+    }
+    
+    // Only seed products if none exist
+    const productCount = await Product.countDocuments();
+    if (productCount === 0) {
+      const productsToSeed = SAMPLE_PRODUCTS.map(p => {
+        const cat = createdCategories.find(c => c.slug === p.category_slug);
+        const { category_slug, ...productData } = p;
+        return { ...productData, category: cat?._id };
+      });
+      await Product.insertMany(productsToSeed);
+      console.log('Seeded products.');
+    }
 
-    const hashedPassword = await bcrypt.hash('admin123', 10);
-    await User.create({
-      name: 'Admin Calotes',
-      email: 'admin@calotes.com',
-      password: hashedPassword,
-      role: 'admin',
-    });
-    
-    const createdCategories = await Category.insertMany(SAMPLE_CATEGORIES);
-    
-    const productsToSeed = SAMPLE_PRODUCTS.map(p => {
-      const cat = createdCategories.find(c => c.slug === p.category_slug);
-      const { category_slug, ...productData } = p;
-      return { ...productData, category: cat?._id };
-    });
-    
-    await Product.insertMany(productsToSeed);
+    // Only seed admin if doesn't exist
+    const adminExists = await User.findOne({ email: 'admin@calotes.com' });
+    if (!adminExists) {
+      const hashedPassword = await bcrypt.hash('admin123', 10);
+      await User.create({
+        name: 'Admin Calotes',
+        email: 'admin@calotes.com',
+        password: hashedPassword,
+        role: 'admin',
+      });
+      console.log('Seeded admin user.');
+    }
 
-    return NextResponse.json({ message: 'Database seeded successfully' });
+    return NextResponse.json({ message: 'Database seeding completed (checked existences)' });
   } catch (error: any) {
     console.error('Seed error:', error);
     return NextResponse.json({ error: 'Failed to seed database' }, { status: 500 });

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Product from '@/models/Product';
+import Category from '@/models/Category';
 import { auth } from '@/auth';
 import { ProductInputSchema } from '@/lib/validations';
 import { isValidObjectId, sanitizeProductSort } from '@/lib/sanitize';
@@ -18,7 +19,7 @@ export async function GET(req: Request) {
 
     // Filtering parameters
     const category = searchParams.get('category');
-    const search   = searchParams.get('search');
+    const search   = searchParams.get('search') || searchParams.get('q');
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
     const sizes    = searchParams.get('sizes');
@@ -33,7 +34,26 @@ export async function GET(req: Request) {
     // Build query filter object
     const filter: Record<string, any> = {};
 
-    if (category && isValidObjectId(category)) filter.category = category;
+    if (category) {
+      if (isValidObjectId(category)) {
+        filter.category = category;
+      } else {
+        const categorySlug = String(category).toLowerCase();
+        const catDoc = await Category.findOne({ slug: categorySlug }).lean();
+        if (catDoc) {
+          filter.category = catDoc._id;
+        } else {
+          // Fallback: match tags, name, brand, or description for slug keyword (e.g. "denim", "oversized")
+          const catRegex = new RegExp(categorySlug, 'i');
+          filter.$or = [
+            { tags: catRegex },
+            { name: catRegex },
+            { brand: catRegex },
+            { description: catRegex }
+          ];
+        }
+      }
+    }
     if (featured === 'true') filter.isFeatured = true;
 
     // Price range filter
