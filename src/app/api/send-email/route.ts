@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-// Initialize Resend SDK client using process environment key variable
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 // POST send-email API route: triggers transactional email updates.
 // SECURITY: This endpoint is INTERNAL-ONLY and requires the X-Internal-Secret header.
 // It must never be called directly by clients — only by server-side code in this app.
 // The secret prevents public abuse of our Resend sending quota and reputation.
+
 export async function POST(req: Request) {
   try {
     // ── Internal authentication ────────────────────────────────────────────────
@@ -45,8 +43,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, mock: true });
     }
 
+    // Instantiate Resend lazily only if API key is present
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
     // Call Resend email send method
     const data = await resend.emails.send({
+
       from: process.env.RESEND_FROM_EMAIL || 'Calotes Vintage <onboarding@resend.dev>',
       to: [to],
       subject: subject || 'Order Confirmation — Calotes Vintage',

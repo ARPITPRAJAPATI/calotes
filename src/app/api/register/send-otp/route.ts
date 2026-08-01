@@ -2,12 +2,9 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
 import OTP from "@/models/OTP";
-import bcrypt from "bcryptjs";
 import { Resend } from "resend";
 import { RegisterSchema } from "@/lib/validations";
 import { sanitizeMongoOperators } from "@/lib/sanitize";
-
-const resend = new Resend(process.env.RESEND_API_KEY || "re_mock_key");
 
 export async function POST(req: Request) {
   try {
@@ -50,9 +47,10 @@ export async function POST(req: Request) {
       name: name.trim(),
     });
 
-    // Send Email via Resend gracefully
+    // Send Email via Resend gracefully (only if API key exists)
     if (process.env.RESEND_API_KEY) {
       try {
+        const resend = new Resend(process.env.RESEND_API_KEY);
         const fromEmail = process.env.RESEND_FROM_EMAIL || "Calotes Vintage <onboarding@resend.dev>";
         const sendResult = await resend.emails.send({
           from: fromEmail,
@@ -98,4 +96,5 @@ export async function POST(req: Request) {
     );
   }
 }
+
 
