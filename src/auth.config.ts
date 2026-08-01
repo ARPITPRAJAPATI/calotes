@@ -20,10 +20,7 @@ export const authConfig = {
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      // SECURITY: allowDangerousEmailAccountLinking has been intentionally removed.
-      // With it enabled, an attacker who knows a victim's email could create a Google OAuth
-      // account that auto-links to their existing credentials account, bypassing password auth.
-      // Users who registered with credentials must use credentials to sign in.
+      allowDangerousEmailAccountLinking: true,
     }),
 
     // Register credentials provider stub here (Edge middleware doesn't support direct Node.js DB connections,

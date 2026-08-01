@@ -313,9 +313,9 @@ export default function HomeClient({
                 {"\"Every garment has a story. We help you continue it.\""}
               </p>
             </div>
-            <div className="flex gap-4 flex-wrap">
-              <Link href="/about" className="btn-outline">Our Story</Link>
-              <Link href="/lookbook" className="btn-outline">Lookbook</Link>
+            <div className="flex gap-4 flex-wrap" suppressHydrationWarning>
+              <Link href="/about" className="btn-outline" suppressHydrationWarning>Our Story</Link>
+              <Link href="/lookbook" className="btn-outline" suppressHydrationWarning>Lookbook</Link>
             </div>
           </div>
         </div>

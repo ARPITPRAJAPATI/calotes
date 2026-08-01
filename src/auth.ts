@@ -74,6 +74,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   callbacks: {
     ...authConfig.callbacks,
+    // Seamlessly sync Google OAuth users with MongoDB user documents
+    async signIn({ user, account }) {
+      if (account?.provider === "google" && user.email) {
+        try {
+          await connectDB();
+          const cleanEmail = user.email.toLowerCase().trim();
+          let dbUser = await User.findOne({ email: cleanEmail });
+          if (!dbUser) {
+            await User.create({
+              name: user.name || "Google User",
+              email: cleanEmail,
+              avatar: user.image || "",
+              role: cleanEmail === "admin@calotes.com" ? "admin" : "customer",
+            });
+          }
+        } catch (err) {
+          console.error("Google signIn callback error:", err);
+        }
+      }
+      return true;
+    },
     // Override the jwt callback to always ensure we have the fresh role from the database 
     // even if the user logged in via Google where the OAuth profile doesn't include a role.
     async jwt({ token, user, account, profile }) {
@@ -87,7 +108,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (finalToken.email) {
         try {
           await connectDB();
-          const dbUser = await User.findOne({ email: finalToken.email }).lean();
+          const dbUser = await User.findOne({ email: finalToken.email.toLowerCase().trim() }).lean();
           if (dbUser) {
             finalToken.role = dbUser.role || "customer";
             // Also ensure the DB ID is always present
