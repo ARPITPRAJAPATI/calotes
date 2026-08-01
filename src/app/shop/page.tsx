@@ -17,16 +17,6 @@ import { Product } from "@/types";
 // Import wishlist hook managers
 import { useWishlist } from "@/context/WishlistContext";
 
-// Config static category options mapping filters
-const CATEGORIES = [
-  { name: "All Items", slug: "all" },
-  { name: "Denim",       slug: "denim" },
-  { name: "Outerwear",   slug: "outerwear" },
-  { name: "Oversized",   slug: "oversized" },
-  { name: "Plus Size",   slug: "plus-size" },
-  { name: "Accessories", slug: "accessories" },
-];
-
 function ShopContent() {
   const searchParams   = useSearchParams(); // Reads active URL search parameters (requires Suspense parent container wrap)
   const initialCat     = searchParams.get("category") || "all"; // Extracted default category filter
@@ -38,6 +28,22 @@ function ShopContent() {
   const [isFilterOpen,  setIsFilterOpen]  = useState(false);         // Controls visibility of mobile filter panel drawers
   const [activeCategory, setActiveCategory] = useState(initialCat);    // Track active category filters selection
   const [searchQuery,   setSearchQuery]    = useState("");           // Holds user typed search queries
+  const [categories,    setCategories]    = useState<{ name: string; slug: string }[]>([
+    { name: "All Items", slug: "all" },
+  ]);
+
+  // Fetch real categories from database
+  useEffect(() => {
+    fetch("/api/categories")
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          const fetchedCats = data.map((c: any) => ({ name: c.name, slug: c.slug }));
+          setCategories([{ name: "All Items", slug: "all" }, ...fetchedCats]);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Fetch trigger: instant for category switches, debounced for typed search queries
   useEffect(() => { 
@@ -56,12 +62,12 @@ function ShopContent() {
     setLoading(true);
     try {
       let url = activeCategory === "all"
-        ? "/api/products"
-        : `/api/products?category=${activeCategory}`;
+        ? "/api/products?limit=500"
+        : `/api/products?category=${activeCategory}&limit=500`;
       
       // Append query parameters if search input is populated
       if (searchQuery) {
-        url += (url.includes("?") ? "&" : "?") + `q=${encodeURIComponent(searchQuery)}`;
+        url += `&q=${encodeURIComponent(searchQuery)}`;
       }
       
       const res  = await fetch(url);
@@ -137,7 +143,7 @@ function ShopContent() {
 
         {/* ── Category Horizontal Tabs (Mobile viewport layout) ── */}
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
-          {CATEGORIES.map(cat => (
+          {categories.map(cat => (
             <button
               key={cat.slug}
               onClick={() => setActiveCategory(cat.slug)}
@@ -160,7 +166,7 @@ function ShopContent() {
         <aside className="hidden lg:block w-44 shrink-0 sticky top-28 h-max">
           <h3 className="section-label mb-6 border-b border-border pb-4">Curations</h3>
           <ul className="space-y-4">
-            {CATEGORIES.map(cat => (
+            {categories.map(cat => (
               <li key={cat.slug}>
                 <button
                   onClick={() => setActiveCategory(cat.slug)}
@@ -330,7 +336,7 @@ function ShopContent() {
                 <div>
                   <h3 className="section-label mb-5">Categories</h3>
                   <div className="space-y-3">
-                    {CATEGORIES.map(cat => (
+                    {categories.map(cat => (
                       <button
                         key={cat.slug}
                         onClick={() => { setActiveCategory(cat.slug); setIsFilterOpen(false); }}

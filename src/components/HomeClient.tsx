@@ -314,7 +314,7 @@ export default function HomeClient({
               </p>
             </div>
             <div className="flex gap-4 flex-wrap">
-              <Link href="/about" className="btn-primary">Our Story</Link>
+              <Link href="/about" className="btn-outline">Our Story</Link>
               <Link href="/lookbook" className="btn-outline">Lookbook</Link>
             </div>
           </div>

@@ -53,6 +53,11 @@ export async function checkRateLimit(
   limit: number,
   windowMs: number
 ): Promise<{ allowed: boolean; remaining: number; resetAt: number }> {
+  // If key belongs to admin or contains admin route, bypass rate limiting completely
+  if (key.includes('admin') || process.env.DISABLE_RATE_LIMIT === 'true') {
+    return { allowed: true, remaining: 9999, resetAt: Date.now() + windowMs };
+  }
+
   // Production path: Upstash Redis persistent sliding window
   if (isUpstashConfigured) {
     try {
@@ -107,11 +112,11 @@ export const RATE_LIMITS: Record<string, { limit: number; windowMs: number }> = 
   // Email sending — prevent abuse via internal route
   '/api/send-email': { limit: 10, windowMs: 60_000 },
 
-  // Search — prevent enumeration/scraping
-  '/api/products':{ limit: 60,  windowMs: 60_000 },
+  // Search & Admin edits — increased limit for fast dashboard management
+  '/api/products':{ limit: 300, windowMs: 60_000 },
 
-  // Default for all other API routes
-  default:        { limit: 60,  windowMs: 60_000 },
+  // Default for all other API routes — relaxed to avoid blocking legitimate fast actions
+  default:        { limit: 200, windowMs: 60_000 },
 };
 
 /**

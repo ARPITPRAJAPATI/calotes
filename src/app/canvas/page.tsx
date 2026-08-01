@@ -71,7 +71,7 @@ export default function FitCanvasPage() {
   // Queries catalog items from database to populate wardrobe choices list
   const fetchProducts = async () => {
     try {
-      const res = await fetch("/api/products");
+      const res = await fetch("/api/products?limit=500");
       const data = await res.json();
       const productList = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
       if (res.ok) {
@@ -144,8 +144,14 @@ export default function FitCanvasPage() {
 
     setProcessingItemId(product._id); // Update loading state variable for product button
     try {
+      // Proxy image via internal endpoint and convert to Blob to eliminate format errors
+      const proxiedImageUrl = `/api/proxy-image?url=${encodeURIComponent(product.images[0])}`;
+      const imgRes = await fetch(proxiedImageUrl);
+      if (!imgRes.ok) throw new Error("Failed to fetch image via proxy");
+      const inputBlob = await imgRes.blob();
+
       // Execute background extraction using WASM model locally on client web thread context
-      const imageBlob = await removeBackground(product.images[0], {
+      const imageBlob = await removeBackground(inputBlob, {
         model: "isnet_quint8",
         debug: false
       });
@@ -236,7 +242,16 @@ export default function FitCanvasPage() {
   // Filters wardrobe inventory items matching active category tabs selection
   const filteredProducts = activeCategory === "all" 
     ? products 
-    : products.filter(p => p.category?.slug === activeCategory);
+    : products.filter(p => {
+        if (!p.category) return false;
+        if (typeof p.category === 'string') return p.category === activeCategory;
+        const catObj = p.category as { slug?: string; name?: string; _id?: any };
+        return (
+          catObj.slug === activeCategory || 
+          catObj.name?.toLowerCase() === activeCategory.toLowerCase() ||
+          catObj._id?.toString() === activeCategory
+        );
+      });
 
   // Math evaluations computing outfit bundle price totals
   const bundleTotal = canvasItems.reduce((sum, item) => sum + item.price, 0);
@@ -294,7 +309,7 @@ export default function FitCanvasPage() {
                   : "border-border text-muted hover:border-text bg-bg-warm"
               }`}
             >
-              All
+              <span suppressHydrationWarning>ALL</span>
             </button>
             {/* DB-driven category tabs */}
             {categories.map(cat => (

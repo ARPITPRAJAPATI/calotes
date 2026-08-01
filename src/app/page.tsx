@@ -21,10 +21,11 @@ const ARRIVALS = [
 ];
 
 const CATEGORIES = [
-  { title: "Denim",       img: "https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?q=70&w=400&auto=format", href: "/shop?category=denim" },
-  { title: "Outerwear",   img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=70&w=400&auto=format",   href: "/shop?category=outerwear" },
-  { title: "Oversized",   img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=70&w=400&auto=format",   href: "/shop?category=oversized" },
-  { title: "Plus Size",   img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=70&w=400&auto=format", href: "/shop?category=plus-size" },
+  { title: "Boxy Shirts", slug: "boxy-shirts", img: "https://res.cloudinary.com/dyyrgid3b/image/upload/v1785585923/calotes-vintage/niedpcsr1tztl5wilxp1.webp", href: "/shop?category=boxy-shirts" },
+  { title: "Jackets",     slug: "jackets",     img: "https://res.cloudinary.com/dyyrgid3b/image/upload/v1785574712/calotes-vintage/mh4m7tzd4gzsqrupfhvm.webp", href: "/shop?category=jackets" },
+  { title: "Jeans",       slug: "jeans",       img: "https://res.cloudinary.com/dyyrgid3b/image/upload/v1785574380/calotes-vintage/p5aivp6spr2gzpevhjmi.webp", href: "/shop?category=jeans" },
+  { title: "Shirts",      slug: "shirts",      img: "https://res.cloudinary.com/dyyrgid3b/image/upload/v1785574538/calotes-vintage/nb999wi7szmtvbluaodv.webp", href: "/shop?category=shirts" },
+  { title: "T-Shirts",    slug: "t-shirts",    img: "https://res.cloudinary.com/dyyrgid3b/image/upload/v1785574592/calotes-vintage/ptai9zalzmje4qmbfrkh.webp", href: "/shop?category=t-shirts" },
 ];
 
 /* ─────────────────────────────────────────────────────────

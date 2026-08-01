@@ -31,7 +31,7 @@ export const ProductInputSchema = z.object({
   description: z.string().min(1, 'Description is required').trim(),
   price: z.number().min(0, 'Price must be a positive number'),
   compareAtPrice: z.number().min(0, 'Compare price must be a positive number').nullable().optional(),
-  images: z.array(z.string().url('Invalid image URL')).min(1, 'At least one image is required'),
+  images: z.array(z.string().min(1)).min(1, 'At least one image is required'),
   category: z.string().min(1, 'Category is required'),
   brand: z.string().trim().default('Vintage'),
   condition: z.enum(['Excellent', 'Great', 'Good', 'Fair']).default('Great'),
@@ -54,6 +54,7 @@ export const CategoryInputSchema = z.object({
   name: z.string().min(1, 'Category name is required').trim(),
   slug: z.string().min(1, 'Slug is required').trim(),
   description: z.string().trim().optional(),
+  image: z.string().optional(),
   parent: z.string().nullable().optional(),
 });
 
@@ -73,26 +74,27 @@ export const PromoInputSchema = z.object({
 
 // ─── Order Schemas ────────────────────────────────────────────────────────────
 
-/** Single cart item sent by the client — only product reference + size + quantity.
+/** Single cart item sent by the client — product reference + size + quantity.
  *  Price is NEVER trusted from the client; it is recomputed server-side from DB. */
 export const OrderItemClientSchema = z.object({
-  product: z.string().min(1, 'Product ID is required'),  // MongoDB ObjectId string
+  product: z.string().optional(),
+  productId: z.string().optional(),
   size: z.string().min(1, 'Size is required').max(20),
   quantity: z.number().int().min(1, 'Quantity must be at least 1').max(10, 'Max 10 per item'),
-  // name/price/image are accepted for display snapshot but price is OVERWRITTEN server-side
   name: z.string().optional(),
-  image: z.string().url().optional(),
+  price: z.number().optional(),
+  image: z.string().optional(),
 });
 
 /** Shipping address schema — all fields sanitised, max lengths enforced */
 export const CheckoutAddressSchema = z.object({
-  fullName:   z.string().min(2).max(100).trim(),
-  street:     z.string().min(5).max(200).trim(),
-  city:       z.string().min(2).max(100).trim(),
-  state:      z.string().min(2).max(100).trim(),
-  postalCode: z.string().min(3).max(20).trim(),
-  country:    z.string().min(2).max(100).trim().default('India'),
-  phone:      z.string().min(7).max(20).trim(),
+  fullName:   z.string().min(1, 'Full name is required').max(100).trim(),
+  street:     z.string().min(1, 'Street is required').max(200).trim(),
+  city:       z.string().min(1, 'City is required').max(100).trim(),
+  state:      z.string().min(1, 'State is required').max(100).trim(),
+  postalCode: z.string().min(1, 'Postal code is required').max(20).trim(),
+  country:    z.string().optional().default('India'),
+  phone:      z.string().optional().default(''),
 });
 
 /** Full order creation request body */
@@ -109,11 +111,28 @@ export const OrderCreateSchema = z.object({
 
 /** Schema mapping Store settings validation rules */
 export const StoreSettingsInputSchema = z.object({
-  storeName: z.string().min(1, 'Store name is required').trim(),
-  contactEmail: z.string().email('Invalid email address').trim(),
-  supportPhone: z.string().min(1, 'Support phone is required').trim(),
-  freeShippingThreshold: z.number().min(0, 'Threshold must be at least 0'),
-  shippingFlatRate: z.number().min(0, 'Flat rate must be at least 0'),
-  featuredPromoCode: z.string().optional(),
+  heroHeadline: z.string().optional(),
+  heroSubtext: z.string().optional(),
+  announcementText: z.string().optional(),
+  contactEmail: z.string().optional(),
+  instagramUrl: z.string().optional(),
+  shippingRate: z.number().optional().default(0),
+  heroImageUrl: z.string().optional(),
+  heroImageMobileUrl: z.string().optional(),
+  accentColor: z.string().optional(),
+  lookbookImages: z.array(z.object({
+    url: z.string(),
+    title: z.string().optional().default(''),
+    desc: z.string().optional().default(''),
+  })).optional().default([]),
+  brandStoryImages: z.array(z.object({
+    url: z.string(),
+    alt: z.string().optional().default(''),
+  })).optional().default([]),
+  communityPosts: z.array(z.object({
+    url: z.string(),
+    link: z.string().optional().default(''),
+    objectPosition: z.string().optional().default('object-center'),
+  })).optional().default([]),
 });
 

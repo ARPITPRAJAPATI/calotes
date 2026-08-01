@@ -52,22 +52,23 @@ export async function POST(req: Request) {
     }> = [];
 
     for (const item of items) {
+      const productId = item.productId || item.product;
       // Validate each product ID is a proper ObjectId before querying
-      if (!isValidObjectId(item.product)) {
+      if (!productId || !isValidObjectId(productId)) {
         return NextResponse.json(
-          { error: `Invalid product ID: ${item.product}` },
+          { error: `Invalid product ID: ${productId}` },
           { status: 400 }
         );
       }
 
       // Fetch product directly from DB — authoritative source for price and stock
-      const product = await Product.findById(item.product)
+      const product = await Product.findById(productId)
         .select('name price stock images')
         .lean();
 
       if (!product) {
         return NextResponse.json(
-          { error: `Product not found: ${item.product}` },
+          { error: `Product not found: ${productId}` },
           { status: 404 }
         );
       }
@@ -76,7 +77,7 @@ export async function POST(req: Request) {
       // NOTE: This is a pre-check only. Actual atomic stock decrement happens in
       // the payment verify route AFTER payment is confirmed. This prevents
       // users from placing orders on out-of-stock items before paying.
-      if (product.stock < item.quantity) {
+      if (product.stock !== undefined && product.stock < item.quantity) {
         return NextResponse.json(
           { error: `Insufficient stock for "${product.name}". Only ${product.stock} available.` },
           { status: 409 }
@@ -88,7 +89,7 @@ export async function POST(req: Request) {
       serverComputedTotal += lineTotal;
 
       validatedItems.push({
-        product: item.product,
+        product: productId,
         name: product.name,
         price: product.price,  // DB price — authoritative
         quantity: item.quantity,

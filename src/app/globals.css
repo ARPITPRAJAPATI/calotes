@@ -108,9 +108,31 @@ img, video, canvas {
 .theme-calotes h5:not([data-drawer] *),
 .theme-calotes h6:not([data-drawer] *),
 .theme-calotes p:not(.text-muted):not(.text-terracotta):not([data-drawer] *),
-.theme-calotes a:not(.text-terracotta):not(.hover\:text-terracotta):not([data-drawer] *),
-.theme-calotes span:not(.text-muted):not(.text-terracotta):not(.bg-terracotta):not([data-drawer] *) {
+.theme-calotes a:not(.text-terracotta):not(.hover\:text-terracotta):not(.btn-primary):not(.btn-outline):not([data-drawer] *),
+.theme-calotes span:not(.text-muted):not(.text-terracotta):not(.bg-terracotta):not(.btn-primary *):not([data-drawer] *) {
   color: var(--color-text);
+}
+
+.theme-calotes .btn-primary:not([data-drawer] *) {
+  background-color: var(--color-terracotta) !important;
+  color: #0A0A0A !important;
+  border-color: var(--color-terracotta) !important;
+}
+
+.theme-calotes .btn-primary:not([data-drawer] *):hover {
+  background-color: transparent !important;
+  color: var(--color-terracotta) !important;
+}
+
+.theme-calotes .btn-outline:not([data-drawer] *) {
+  border-color: var(--color-text) !important;
+  color: var(--color-text) !important;
+  background-color: transparent !important;
+}
+
+.theme-calotes .btn-outline:not([data-drawer] *):hover {
+  background-color: var(--color-text) !important;
+  color: var(--color-bg) !important;
 }
 
 .theme-calotes .text-muted:not([data-drawer] *),
@@ -155,23 +177,6 @@ html:not(.dark):not(.theme-calotes) .theme-icon-light   { display: inline-block;
 .theme-calotes .bg-bg-card:not([data-drawer] *),
 .theme-calotes .bg-card:not([data-drawer] *) {
   background-color: var(--color-bg-card) !important;
-}
-
-.theme-calotes .btn-outline:not([data-drawer] *) {
-  border-color: var(--color-border-warm) !important;
-  color: var(--color-text) !important;
-  background-color: transparent !important;
-}
-
-.theme-calotes .btn-outline:not([data-drawer] *):hover {
-  background-color: var(--color-text) !important;
-  color: var(--color-bg) !important;
-}
-
-.theme-calotes .btn-primary:not([data-drawer] *) {
-  background-color: var(--color-text) !important;
-  color: var(--color-bg) !important;
-  border-color: var(--color-text) !important;
 }
 
 @keyframes calotesChameleonMorph {

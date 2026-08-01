@@ -21,9 +21,11 @@ export default auth(async (req) => {
   const { nextUrl } = req; // Destructure the requested URL details
   const isLoggedIn = !!req.auth; // Boolean flag checking if session token is validated
 
+  const isAdmin = (req.auth?.user as any)?.role === 'admin';
+
   // ── 1. Rate Limiting for API Endpoints ─────────────────────────────────────
-  // Exclude internal NextAuth auth flow endpoints from rate limiting
-  if (nextUrl.pathname.startsWith('/api') && !nextUrl.pathname.startsWith('/api/auth')) {
+  // Exclude internal NextAuth auth flow endpoints & Admin users completely from rate limiting
+  if (!isAdmin && nextUrl.pathname.startsWith('/api') && !nextUrl.pathname.startsWith('/api/auth') && !nextUrl.pathname.startsWith('/api/admin')) {
     // Extract IP address from request metadata, proxy headers, or fallback to loopback
     // Note: On Vercel, x-forwarded-for is injected by the edge network and is reliable
     const rawIp = (req as any).ip ?? req.headers.get("x-forwarded-for") ?? '127.0.0.1';

@@ -72,6 +72,35 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
 
+  callbacks: {
+    ...authConfig.callbacks,
+    // Override the jwt callback to always ensure we have the fresh role from the database 
+    // even if the user logged in via Google where the OAuth profile doesn't include a role.
+    async jwt({ token, user, account, profile }) {
+      // First, run the edge-compatible original jwt logic (which attaches user ID if present)
+      let finalToken = token;
+      if (authConfig.callbacks?.jwt) {
+        finalToken = (await (authConfig.callbacks.jwt as any)({ token, user, account, profile })) || token;
+      }
+      
+      // If we have an email in the token, fetch their true role from the database
+      if (finalToken.email) {
+        try {
+          await connectDB();
+          const dbUser = await User.findOne({ email: finalToken.email }).lean();
+          if (dbUser) {
+            finalToken.role = dbUser.role || "customer";
+            // Also ensure the DB ID is always present
+            finalToken.id = dbUser._id.toString();
+          }
+        } catch (error) {
+          console.error("Auth DB Fetch Error:", error);
+        }
+      }
+      return finalToken;
+    }
+  },
+
   // Enable debug logging in development ONLY to prevent JWT internals from leaking in production logs
   debug: process.env.NODE_ENV !== 'production',
 });
