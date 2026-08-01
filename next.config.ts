@@ -28,11 +28,13 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      // ── Static asset caching ────────────────────────────────────────────────
+      // ── Static asset caching & CORS ────────────────────────────────────────────────
       {
         source: '/images/:path*',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET, HEAD, OPTIONS' },
         ],
       },
 
