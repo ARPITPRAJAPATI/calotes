@@ -19,7 +19,7 @@ export default function AdminProductsPage() {
   // Query catalog API endpoint to retrieve all archive products sorted newest first
   const fetchProducts = async () => {
     try {
-      const res = await fetch('/api/products?sort=-createdAt');
+      const res = await fetch('/api/products?limit=500&sort=-createdAt');
       const data = await res.json();
       const productList = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
       if (res.ok) {
