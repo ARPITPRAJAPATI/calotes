@@ -66,7 +66,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.name,         // Attach name
           email: user.email,       // Attach email
           role: user.role,         // Attach role (important for admin page access control)
-          image: user.avatar || user.image, // Fallback profile image selection
+          image: user.avatar || user.image || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name || 'User')}`, // Fallback profile image selection
         };
       },
     }),

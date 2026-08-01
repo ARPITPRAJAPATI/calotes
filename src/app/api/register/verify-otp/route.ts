@@ -61,11 +61,14 @@ export async function POST(req: Request) {
     // Hash user password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create User record with hashed password
+    // Create User record with hashed password and initial avatar
+    const initialAvatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name.trim())}`;
     await User.create({
       name: name.trim(),
       email: normalizedEmail,
       password: hashedPassword,
+      avatar: initialAvatar,
+      image: initialAvatar,
     });
 
     // Clear used OTP record
