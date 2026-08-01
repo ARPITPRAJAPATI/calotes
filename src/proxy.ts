@@ -19,8 +19,17 @@ const { auth } = NextAuth(authConfig);
 // Export the NextAuth middleware wrapper, wrapping our custom request processing function
 export default auth(async (req) => {
   const { nextUrl } = req; // Destructure the requested URL details
-  const isLoggedIn = !!req.auth; // Boolean flag checking if session token is validated
 
+  // ── 0. Instant static asset bypass ──────────────────────────────────────────
+  if (
+    nextUrl.pathname.startsWith('/images') ||
+    nextUrl.pathname.startsWith('/_next') ||
+    /\.(png|jpg|jpeg|gif|svg|webp|ico|avif|woff|woff2|ttf|eot|css|js|map|json)$/i.test(nextUrl.pathname)
+  ) {
+    return;
+  }
+
+  const isLoggedIn = !!req.auth; // Boolean flag checking if session token is validated
   const isAdmin = (req.auth?.user as any)?.role === 'admin';
 
   // ── 1. Rate Limiting for API Endpoints ─────────────────────────────────────
@@ -113,7 +122,7 @@ export default auth(async (req) => {
 // Configure matcher settings specifying which paths will trigger this middleware execution
 export const config = {
   // Run middleware on all sub-paths except for webhooks, static files, images, favicon
-  matcher: ["/((?!api/webhooks|_next/static|_next/image|images|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|css|js)$).*)"],
+  matcher: ["/((?!api/webhooks|_next/static|_next/image|images/.*|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|css|js)$).*)"],
 };
 
 
