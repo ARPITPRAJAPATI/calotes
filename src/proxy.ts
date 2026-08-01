@@ -94,6 +94,11 @@ export default auth(async (req) => {
     return; // Allow guest access to sign-in forms
   }
 
+  // Exclude static assets, images, and public files from auth redirects
+  const isStaticFile = nextUrl.pathname.startsWith('/images') || 
+    /\.(png|jpg|jpeg|gif|svg|webp|ico|avif|woff|woff2|ttf|eot|css|js|map|json)$/i.test(nextUrl.pathname);
+  if (isStaticFile) return;
+
   // If user is guest (not logged in) and attempting to request private routes (e.g. checkout or profile)
   if (!isLoggedIn && !isPublicRoute) {
     // Redirect user to login page, appending original route as a callback redirect query param
@@ -107,8 +112,8 @@ export default auth(async (req) => {
 
 // Configure matcher settings specifying which paths will trigger this middleware execution
 export const config = {
-  // Run middleware on all sub-paths except for webhooks (own auth), static files, image optimizer, favicon
-  matcher: ["/((?!api/webhooks|_next/static|_next/image|favicon.ico).*)" ],
+  // Run middleware on all sub-paths except for webhooks, static files, images, favicon
+  matcher: ["/((?!api/webhooks|_next/static|_next/image|images|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|css|js)$).*)"],
 };
 
 
