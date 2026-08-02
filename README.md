@@ -4,7 +4,7 @@
 
 ### Adapt. Stand Out. Be Calotes.
 
-A production-oriented, full-stack e-commerce platform for curated pre-owned vintage clothing and streetwear in India.
+A production-grade, full-stack e-commerce platform for curated pre-owned vintage clothing and streetwear in India.
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_Store-111111?style=for-the-badge\&logo=vercel\&logoColor=white)](https://calotes-gamma.vercel.app/)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge\&logo=github)](https://github.com/ARPITPRAJAPATI/calotes)
@@ -34,7 +34,7 @@ The platform also includes a distinctive **Fit Canvas** experience that allows u
 
 ## Live Application
 
-**Storefront:** [calotes-gamma.vercel.app](https://calotes-gamma.vercel.app/)
+**Storefront:** [calotes.in](https://calotesvintage.vercel.app/)
 
 **Source Code:** [github.com/ARPITPRAJAPATI/calotes](https://github.com/ARPITPRAJAPATI/calotes)
 
