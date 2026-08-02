@@ -54,48 +54,6 @@ function generateCanvasItem(product: Product, isMobile: boolean, transparentUrl?
   };
 }
 
-// Helper function to scale high-res product photos to 800px max dimension before AI background removal
-// This reduces pixel processing count by 95% (from 12M pixels to 400K pixels), preventing mobile CPU lockup and browser freezes
-async function resizeImageBlobForAI(blob: Blob, maxDim = 800): Promise<Blob> {
-  return new Promise((resolve) => {
-    if (typeof window === "undefined") return resolve(blob);
-    const img = new Image();
-    const url = URL.createObjectURL(blob);
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      let width = img.width;
-      let height = img.height;
-      if (width <= maxDim && height <= maxDim) {
-        return resolve(blob);
-      }
-      if (width > height) {
-        height = Math.round((height * maxDim) / width);
-        width = maxDim;
-      } else {
-        width = Math.round((width * maxDim) / height);
-        height = maxDim;
-      }
-      const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.drawImage(img, 0, 0, width, height);
-        canvas.toBlob((resized) => {
-          resolve(resized || blob);
-        }, "image/jpeg", 0.9);
-      } else {
-        resolve(blob);
-      }
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      resolve(blob);
-    };
-    img.src = url;
-  });
-}
-
 export default function FitCanvasPage() {
   const { addToCart, setIsCartOpen, cartCount } = useCart(); // Extract cart contexts
   const { toggleWishlist, isInWishlist, count: wishlistCount, setIsOpen: setIsWishlistOpen } = useWishlist(); // Extract wishlist contexts
@@ -210,9 +168,8 @@ export default function FitCanvasPage() {
       const imgRes = await fetch(proxiedImageUrl);
       if (!imgRes.ok) throw new Error("Failed to fetch image via proxy");
       const inputBlob = await imgRes.blob();
-      const resizedBlob = await resizeImageBlobForAI(inputBlob, 800);
 
-      const imageBlob = await removeBackground(resizedBlob, {
+      const imageBlob = await removeBackground(inputBlob, {
         model: "isnet_quint8",
         debug: false
       });
