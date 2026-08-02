@@ -28,21 +28,20 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      {
-        source: '/collections/:path*',
-        destination: '/shop',
-        permanent: true,
-      },
-      {
-        source: '/collections',
-        destination: '/shop',
-        permanent: true,
-      },
-      {
-        source: '/products/:path*',
-        destination: '/shop',
-        permanent: true,
-      },
+      // ── Shopify Legacy Route 301 Redirects ────────────────────────────
+      { source: '/collections/:path*', destination: '/shop', permanent: true },
+      { source: '/collections', destination: '/shop', permanent: true },
+      { source: '/products/:path*', destination: '/shop', permanent: true },
+      { source: '/pages/:path*', destination: '/about', permanent: true },
+      { source: '/pages', destination: '/about', permanent: true },
+      { source: '/blogs/:path*', destination: '/', permanent: true },
+      { source: '/blogs', destination: '/', permanent: true },
+      { source: '/policies/:path*', destination: '/privacy', permanent: true },
+      { source: '/policies', destination: '/privacy', permanent: true },
+      { source: '/account/:path*', destination: '/profile', permanent: true },
+      { source: '/account', destination: '/profile', permanent: true },
+      { source: '/search', destination: '/shop', permanent: true },
+      { source: '/recommendations/:path*', destination: '/shop', permanent: true },
     ];
   },
   async headers() {
