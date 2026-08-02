@@ -26,6 +26,25 @@ const nextConfig: NextConfig = {
       { protocol: 'http', hostname: '**' },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/collections/:path*',
+        destination: '/shop',
+        permanent: true,
+      },
+      {
+        source: '/collections',
+        destination: '/shop',
+        permanent: true,
+      },
+      {
+        source: '/products/:path*',
+        destination: '/shop',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       // ── Static asset caching & CORS ────────────────────────────────────────────────
