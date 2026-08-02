@@ -137,7 +137,7 @@ export default function FitCanvasPage() {
       return;
     }
 
-    // Check in-memory state cutoutCache first for instant 0ms retrieval
+    // 1. Check in-memory state cutoutCache first for instant 0ms retrieval
     if (cutoutCache[product._id]) {
       const newItem = generateCanvasItem(product, isMobile, cutoutCache[product._id]);
       setCanvasItems(prev => [...prev, newItem]);
@@ -145,14 +145,27 @@ export default function FitCanvasPage() {
     }
 
     setProcessingItemId(product._id); // Update loading state variable for product button
+
     try {
-      // Proxy image via internal endpoint and convert to Blob to eliminate format errors
+      // 2. Check backend DB cache BEFORE running heavy WASM AI on client CPU
+      const dbRes = await fetch(`/api/cutout?productIds=${product._id}`);
+      if (dbRes.ok) {
+        const map = await dbRes.json();
+        if (map[product._id]) {
+          const cachedUrl = map[product._id];
+          setCutoutCache(prev => ({ ...prev, [product._id]: cachedUrl }));
+          const newItem = generateCanvasItem(product, isMobile, cachedUrl);
+          setCanvasItems(prev => [...prev, newItem]);
+          return;
+        }
+      }
+
+      // 3. Fallback: Execute WASM AI background removal if not cached in DB
       const proxiedImageUrl = `/api/proxy-image?url=${encodeURIComponent(product.images[0])}`;
       const imgRes = await fetch(proxiedImageUrl);
       if (!imgRes.ok) throw new Error("Failed to fetch image via proxy");
       const inputBlob = await imgRes.blob();
 
-      // Execute background extraction using WASM model locally on client web thread context
       const imageBlob = await removeBackground(inputBlob, {
         model: "isnet_quint8",
         debug: false
@@ -423,8 +436,8 @@ export default function FitCanvasPage() {
                 />
               </div>
               
-              {/* Floating Controls Overlay (Scale Up/Down, Remove, visible on group hover) */}
-              <div className="absolute -top-4 -right-4 bg-bg border border-border p-2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-2 z-10 pointer-events-auto shadow-xl">
+              {/* Floating Controls Overlay (Scale Up/Down, Remove, always visible on mobile, group-hover on desktop) */}
+              <div className="absolute -top-4 -right-4 bg-bg border border-border p-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex flex-col gap-2 z-10 pointer-events-auto shadow-xl">
                 <button 
                   onClick={() => handleScaleChange(item.uniqueId, 0.1)}
                   className="p-1.5 text-muted hover:text-terracotta hover:bg-terracotta/10 transition-colors"
@@ -451,7 +464,7 @@ export default function FitCanvasPage() {
 
               {/* Floating Size Selector dropdown */}
               {item.sizes.length > 0 && (
-                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-bg border border-border px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto flex gap-2 shadow-xl w-max">
+                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-bg border border-border px-3 py-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity pointer-events-auto flex gap-2 shadow-xl w-max">
                   <span className="text-[8px] font-black uppercase tracking-widest text-muted border-r border-border pr-2">Size</span>
                   <select 
                     value={item.selectedSize}
