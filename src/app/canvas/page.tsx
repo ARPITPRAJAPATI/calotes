@@ -66,6 +66,7 @@ export default function FitCanvasPage() {
   
   // Fit Canvas state management
   const [canvasItems, setCanvasItems] = useState<CanvasItem[]>([]); // Tracks current items active in the workspace
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null); // Tracks actively selected item for clean canvas controls UX
   const [cutoutCache, setCutoutCache] = useState<Record<string, string>>({}); // Maps product IDs to cutout transparent image URLs
   const canvasRef = useRef<HTMLDivElement>(null); // Ref referencing parent workspace container bounding constraints
   const [isMobile, setIsMobile] = useState(false); // Mobile screen size indicator check
@@ -141,6 +142,7 @@ export default function FitCanvasPage() {
     if (cutoutCache[product._id]) {
       const newItem = generateCanvasItem(product, isMobile, cutoutCache[product._id]);
       setCanvasItems(prev => [...prev, newItem]);
+      setSelectedItemId(newItem.uniqueId);
       return;
     }
 
@@ -156,6 +158,7 @@ export default function FitCanvasPage() {
           setCutoutCache(prev => ({ ...prev, [product._id]: cachedUrl }));
           const newItem = generateCanvasItem(product, isMobile, cachedUrl);
           setCanvasItems(prev => [...prev, newItem]);
+          setSelectedItemId(newItem.uniqueId);
           return;
         }
       }
@@ -175,6 +178,10 @@ export default function FitCanvasPage() {
       // Cache cutout base locally in memory state variables
       setCutoutCache(prev => ({ ...prev, [product._id]: transparentUrl }));
 
+      const newItem = generateCanvasItem(product, isMobile, transparentUrl);
+      setCanvasItems(prev => [...prev, newItem]);
+      setSelectedItemId(newItem.uniqueId);
+
       // Send generated transparent base64 image data to DB api routes to persistent server caches
       const reader = new FileReader();
       reader.readAsDataURL(imageBlob);
@@ -192,21 +199,24 @@ export default function FitCanvasPage() {
           });
           const serverData = await res.json();
           if (res.ok && serverData.cutoutUrl) {
-            // Update cache pointers to use the persistent Cloudinary URL returned from backend API
+            // Update cache pointers & live item images to use persistent Cloudinary URL
             setCutoutCache(prev => ({ ...prev, [product._id]: serverData.cutoutUrl }));
+            setCanvasItems(prev => prev.map(item => 
+              item._id === product._id 
+                ? { ...item, images: [serverData.cutoutUrl, ...item.images.slice(1)] }
+                : item
+            ));
           }
         } catch (e) {
           console.error("Failed to upload cutout to global server-side cache:", e);
         }
       };
-
-      const newItem = generateCanvasItem(product, isMobile, transparentUrl);
-      setCanvasItems(prev => [...prev, newItem]);
     } catch (err) {
       console.error("AI Background Removal failed:", err);
       // Fallback to loading original product photo if WASM segmentation crashes
       const newItem = generateCanvasItem(product, isMobile);
       setCanvasItems(prev => [...prev, newItem]);
+      setSelectedItemId(newItem.uniqueId);
     } finally {
       setProcessingItemId(null);
     }
@@ -400,6 +410,7 @@ export default function FitCanvasPage() {
         <div 
           className="flex-1 relative bg-[#EBEBEB] overflow-hidden" 
           ref={canvasRef}
+          onClick={() => setSelectedItemId(null)}
           style={{ backgroundImage: 'radial-gradient(#d1d1d1 1px, transparent 1px)', backgroundSize: '20px 20px' }}
         >
           {canvasItems.length === 0 && (
@@ -411,72 +422,80 @@ export default function FitCanvasPage() {
           )}
 
           {/* Draggable Cutout Items rendered with Framer Motion drag gestures */}
-          {canvasItems.map((item) => (
-            <motion.div
-              key={item.uniqueId}
-              drag
-              dragConstraints={canvasRef} // Restrict drag motion boundaries inside canvas coordinates box
-              dragMomentum={false}
-              whileDrag={{ scale: 1.05, cursor: "grabbing", zIndex: 50 }}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              className="absolute cursor-grab group drop-shadow-2xl"
-              style={{ x: item.x, y: item.y }}
-            >
-              {/* Item Image Cutout */}
-              <div 
-                className="relative overflow-hidden pointer-events-none drop-shadow-2xl transition-all duration-150"
-                style={{ width: `${(isMobile ? 128 : 208) * item.scale}px` }}
+          {canvasItems.map((item) => {
+            const isSelected = selectedItemId === item.uniqueId;
+            return (
+              <motion.div
+                key={item.uniqueId}
+                drag
+                dragConstraints={canvasRef} // Restrict drag motion boundaries inside canvas coordinates box
+                dragMomentum={false}
+                onPointerDown={() => setSelectedItemId(item.uniqueId)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedItemId(item.uniqueId);
+                }}
+                whileDrag={{ scale: 1.05, cursor: "grabbing", zIndex: 50 }}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                className={`absolute cursor-grab group drop-shadow-2xl ${isSelected ? "z-30" : "z-10"}`}
+                style={{ x: item.x, y: item.y }}
               >
-                <img 
-                  src={item.images[0]} 
-                  draggable={false} 
-                  className="w-full h-auto object-contain" 
-                />
-              </div>
-              
-              {/* Floating Controls Overlay (Scale Up/Down, Remove, always visible on mobile, group-hover on desktop) */}
-              <div className="absolute -top-4 -right-4 bg-bg border border-border p-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex flex-col gap-2 z-10 pointer-events-auto shadow-xl">
-                <button 
-                  onClick={() => handleScaleChange(item.uniqueId, 0.1)}
-                  className="p-1.5 text-muted hover:text-terracotta hover:bg-terracotta/10 transition-colors"
-                  title="Scale Up"
+                {/* Item Image Cutout */}
+                <div 
+                  className={`relative overflow-hidden pointer-events-none drop-shadow-2xl transition-all duration-150 ${isSelected ? "ring-1 ring-terracotta/70 ring-offset-2 ring-offset-bg/50 rounded-sm" : ""}`}
+                  style={{ width: `${(isMobile ? 128 : 208) * item.scale}px` }}
                 >
-                  <ZoomIn size={12} />
-                </button>
-                <button 
-                  onClick={() => handleScaleChange(item.uniqueId, -0.1)}
-                  className="p-1.5 text-muted hover:text-terracotta hover:bg-terracotta/10 transition-colors"
-                  title="Scale Down"
-                >
-                  <ZoomOut size={12} />
-                </button>
-                <div className="h-[1px] bg-border my-0.5" />
-                <button 
-                  onClick={() => handleRemoveFromCanvas(item.uniqueId)}
-                  className="p-1.5 text-muted hover:text-red-500 hover:bg-red-500/10 transition-colors"
-                  title="Remove"
-                >
-                  <Trash2 size={12} />
-                </button>
-              </div>
-
-              {/* Floating Size Selector dropdown */}
-              {item.sizes.length > 0 && (
-                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-bg border border-border px-3 py-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity pointer-events-auto flex gap-2 shadow-xl w-max">
-                  <span className="text-[8px] font-black uppercase tracking-widest text-muted border-r border-border pr-2">Size</span>
-                  <select 
-                    value={item.selectedSize}
-                    onChange={(e) => handleSizeChange(item.uniqueId, e.target.value)}
-                    className="text-[9px] font-bold uppercase tracking-widest bg-transparent focus:outline-none cursor-pointer pl-1 text-terracotta"
-                  >
-                    {item.sizes.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                  <img 
+                    src={item.images[0]} 
+                    draggable={false} 
+                    className="w-full h-auto object-contain" 
+                  />
                 </div>
-              )}
-            </motion.div>
-          ))}
+                
+                {/* Floating Controls Overlay (Scale Up/Down, Remove — visible when selected or group hovered) */}
+                <div className={`absolute -top-4 -right-4 bg-bg border border-border p-2 transition-opacity flex flex-col gap-2 z-20 pointer-events-auto shadow-xl ${isSelected ? "opacity-100" : "opacity-0 md:group-hover:opacity-100"}`}>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleScaleChange(item.uniqueId, 0.1); }}
+                    className="p-1.5 text-muted hover:text-terracotta hover:bg-terracotta/10 transition-colors"
+                    title="Scale Up"
+                  >
+                    <ZoomIn size={12} />
+                  </button>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleScaleChange(item.uniqueId, -0.1); }}
+                    className="p-1.5 text-muted hover:text-terracotta hover:bg-terracotta/10 transition-colors"
+                    title="Scale Down"
+                  >
+                    <ZoomOut size={12} />
+                  </button>
+                  <div className="h-[1px] bg-border my-0.5" />
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleRemoveFromCanvas(item.uniqueId); }}
+                    className="p-1.5 text-muted hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                    title="Remove"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
+
+                {/* Floating Size Selector dropdown */}
+                {item.sizes.length > 0 && (
+                  <div className={`absolute -bottom-4 left-1/2 -translate-x-1/2 bg-bg border border-border px-3 py-1.5 transition-opacity pointer-events-auto flex gap-2 shadow-xl w-max z-20 ${isSelected ? "opacity-100" : "opacity-0 md:group-hover:opacity-100"}`}>
+                    <span className="text-[8px] font-black uppercase tracking-widest text-muted border-r border-border pr-2">Size</span>
+                    <select 
+                      value={item.selectedSize}
+                      onChange={(e) => handleSizeChange(item.uniqueId, e.target.value)}
+                      className="text-[9px] font-bold uppercase tracking-widest bg-transparent focus:outline-none cursor-pointer pl-1 text-terracotta"
+                    >
+                      {item.sizes.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                )}
+              </motion.div>
+            );
+          })}
         </div>
       </div>
 
