@@ -13,7 +13,7 @@ const SettingsSchema = new Schema(
     // Primary support mailbox contact email address
     contactEmail: { type: String, default: "contact@calotesvintage.com" },
     // Redirection URL linked to Instagram profile page
-    instagramUrl: { type: String, default: "https://instagram.com/calotes.vintage" },
+    instagramUrl: { type: String, default: "https://www.instagram.com/calotes.live/" },
     // Shipping cost applied to checkout order totals (0 represents free shipping)
     shippingRate: { type: Number, default: 0 },
     // Main image file URL displayed as the homepage background on desktop/PC
@@ -43,7 +43,7 @@ const SettingsSchema = new Schema(
     communityPosts: {
       type: [{
         url: { type: String, required: true },
-        link: { type: String, default: 'https://instagram.com/calotes.vintage' },
+        link: { type: String, default: 'https://www.instagram.com/calotes.live/' },
         objectPosition: { type: String, default: 'object-center' },
       }],
       default: [],

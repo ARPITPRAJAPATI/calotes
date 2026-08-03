@@ -477,7 +477,7 @@ export default function AdminSettingsPage() {
                 type="url"
                 value={instagramUrl}
                 onChange={(e) => setInstagramUrl(e.target.value)}
-                placeholder="https://instagram.com/calotes.vintage"
+                placeholder="https://www.instagram.com/calotes.live/"
                 className="w-full bg-bg border border-border px-4 py-3 text-xs font-bold tracking-widest focus:outline-none focus:border-text transition-colors"
               />
             </div>

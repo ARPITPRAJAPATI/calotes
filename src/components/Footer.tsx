@@ -54,13 +54,21 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2 md:col-start-7">
             <h4 className="section-label mb-6">Shop</h4>
             <ul className="space-y-3">
-              {["All Items", "Denim", "Outerwear", "Oversized", "Plus Size", "Accessories"].map(l => (
-                <li key={l}>
+              {[
+                { name: "All Items", href: "/shop" },
+                { name: "Jackets", href: "/shop?category=jackets" },
+                { name: "Shirts", href: "/shop?category=shirts" },
+                { name: "Outerwear", href: "/shop?category=outerwear" },
+                { name: "T-Shirts", href: "/shop?category=t-shirts" },
+                { name: "Sweaters", href: "/shop?category=sweaters" },
+                { name: "Bottoms", href: "/shop?category=bottoms" },
+              ].map(l => (
+                <li key={l.name}>
                   <Link
-                    href={`/shop?category=${l.toLowerCase().replace(" ", "-")}`}
+                    href={l.href}
                     className="text-[9px] font-bold uppercase tracking-widest text-muted hover:text-terracotta transition-colors"
                   >
-                    {l}
+                    {l.name}
                   </Link>
                 </li>
               ))}
@@ -88,26 +96,24 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <h4 className="section-label mb-6">Follow</h4>
             <ul className="space-y-3">
-              <li>
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[9px] font-bold uppercase tracking-widest text-muted hover:text-terracotta transition-colors flex items-center gap-1"
-                >
-                  Instagram <ArrowUpRight size={9} />
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://wa.me/919999999999"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[9px] font-bold uppercase tracking-widest text-muted hover:text-terracotta transition-colors flex items-center gap-1"
-                >
-                  WhatsApp <ArrowUpRight size={9} />
-                </a>
-              </li>
+              {[
+                { label: "Instagram", url: "https://www.instagram.com/calotes.live/" },
+                { label: "Facebook", url: "https://www.facebook.com/profile.php?id=61592831425206" },
+                { label: "Threads", url: "https://www.threads.net/@calotes.live" },
+                { label: "X (Twitter)", url: "https://x.com/caloteslive" },
+                { label: "WhatsApp", url: "https://api.whatsapp.com/send?phone=919953861654" },
+              ].map(social => (
+                <li key={social.label}>
+                  <a
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[9px] font-bold uppercase tracking-widest text-muted hover:text-terracotta transition-colors flex items-center gap-1"
+                  >
+                    {social.label} <ArrowUpRight size={9} />
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

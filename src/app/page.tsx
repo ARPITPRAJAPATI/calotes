@@ -116,7 +116,7 @@ export default async function Home() {
   const communityPostsList = rawCommunity.length > 0
     ? rawCommunity.map((c: any) => ({
         url: optimizeCloudinaryUrl(c.url),
-        link: c.link || 'https://instagram.com/calotes.vintage',
+        link: c.link || 'https://www.instagram.com/calotes.live/',
       }))
     : [];
 

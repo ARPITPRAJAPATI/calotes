@@ -16,7 +16,7 @@ export default function WhatsAppButton() {
 
   // Pre-filled WhatsApp message details
   const message = "Hi Calotes, I am looking for pre-loved vintage pieces!";
-  const whatsappUrl = `https://wa.me/919999999999?text=${encodeURIComponent(message)}`;
+  const whatsappUrl = `https://api.whatsapp.com/send?phone=919953861654&text=${encodeURIComponent(message)}`;
 
   return (
     // Floating CTA button link positioned fixed in the bottom-right corner

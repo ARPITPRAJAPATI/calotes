@@ -418,8 +418,8 @@ export default function Navbar() {
                 {session ? "My Archive" : "Sign In / Register"}
               </Link>
               <div className="flex justify-center gap-6 text-[9px] font-bold uppercase tracking-[0.3em] text-muted pt-2">
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-terracotta transition-colors">Instagram</a>
-                <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="hover:text-terracotta transition-colors">WhatsApp</a>
+                <a href="https://www.instagram.com/calotes.live/" target="_blank" rel="noopener noreferrer" className="hover:text-terracotta transition-colors">Instagram</a>
+                <a href="https://api.whatsapp.com/send?phone=919953861654" target="_blank" rel="noopener noreferrer" className="hover:text-terracotta transition-colors">WhatsApp</a>
               </div>
             </div>
           </motion.div>

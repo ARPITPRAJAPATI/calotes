@@ -363,12 +363,12 @@ export default function HomeClient({
             <h2 className="font-display font-black text-4xl md:text-6xl uppercase tracking-tighter leading-none">Wear It. Tag It.</h2>
           </div>
           <a
-            href="https://instagram.com/calotes.vintage"
+            href="https://www.instagram.com/calotes.live/"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex items-center gap-3 section-label text-muted hover:text-terracotta transition-colors group"
           >
-            Follow @calotes.vintage
+            Follow @calotes.live
             <span className="block w-8 h-px bg-muted group-hover:bg-terracotta group-hover:w-12 transition-all duration-500" />
           </a>
         </div>
@@ -376,7 +376,7 @@ export default function HomeClient({
           {INSTAGRAM_POSTS.map((item, i) => (
             <a
               key={i}
-              href={item.link || 'https://instagram.com/calotes.vintage'}
+              href={item.link || 'https://www.instagram.com/calotes.live/'}
               target="_blank"
               rel="noopener noreferrer"
               className="shrink-0 w-40 md:w-52 aspect-[3/4] relative group overflow-hidden bg-bg-warm border border-border flex items-center justify-center"

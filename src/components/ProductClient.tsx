@@ -57,7 +57,7 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
 
   const handleWhatsApp = () => {
     const msg = `Hi Calotes, I'm interested in the ${product.name} (₹${product.price}). Is it available?`;
-    window.open(`https://wa.me/919999999999?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?phone=919953861654&text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   return (

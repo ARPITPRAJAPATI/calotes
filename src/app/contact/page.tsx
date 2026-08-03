@@ -24,8 +24,8 @@ export default function ContactPage() {
             <h3 className="font-display font-bold uppercase tracking-tight text-text text-sm">Customer Support Email</h3>
           </div>
           <p className="text-xs text-muted font-mono">
-            <a href="mailto:orders@calotes.in" className="hover:text-terracotta transition-colors">
-              orders@calotes.in
+            <a href="mailto:calotes.in@gmail.com" className="hover:text-terracotta transition-colors block">
+              calotes.in@gmail.com
             </a>
           </p>
           <p className="text-[10px] uppercase text-muted tracking-widest">Responds within 24 hours</p>
@@ -33,13 +33,15 @@ export default function ContactPage() {
 
         <div className="p-6 bg-bg-warm border border-border space-y-3">
           <div className="flex items-center gap-3 text-terracotta">
-            <MapPin size={20} />
-            <h3 className="font-display font-bold uppercase tracking-tight text-text text-sm">Location</h3>
+            <Phone size={20} />
+            <h3 className="font-display font-bold uppercase tracking-tight text-text text-sm">WhatsApp & Direct Support</h3>
           </div>
-          <p className="text-xs text-muted uppercase tracking-wider font-medium">
-            Calotes Vintage Studio, India
+          <p className="text-xs text-muted font-mono">
+            <a href="https://api.whatsapp.com/send?phone=919953861654" target="_blank" rel="noopener noreferrer" className="hover:text-terracotta transition-colors">
+              +91 9953861654
+            </a>
           </p>
-          <p className="text-[10px] uppercase text-muted tracking-widest">Official Archive & Curation Hub</p>
+          <p className="text-[10px] uppercase text-muted tracking-widest">Available Mon–Sat, 10am–8pm IST</p>
         </div>
       </div>
 
