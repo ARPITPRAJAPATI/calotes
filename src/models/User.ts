@@ -57,6 +57,30 @@ const UserSchema = new Schema(
         ref: 'Product', // Links relationship to Product collection
       },
     ],
+
+    // Cross-device synced Cart items
+    cart: [
+      {
+        productId: String,
+        name: String,
+        price: Number,
+        image: String,
+        size: String,
+        quantity: Number,
+      },
+    ],
+
+    // Cross-device synced Wishlist items
+    savedWishlist: [
+      {
+        productId: String,
+        name: String,
+        price: Number,
+        image: String,
+        slug: String,
+        category: String,
+      },
+    ],
     
     // NextAuth integration property tracking email verification timestamps (required by adapter specs)
     emailVerified: {

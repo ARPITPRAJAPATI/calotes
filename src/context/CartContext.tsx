@@ -26,11 +26,14 @@ interface CartContextType {
   cartCount: number;    // Computed count of all item quantities in cart
 }
 
+import { useSession } from "next-auth/react";
+
 // Create the Context object with undefined fallback default
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 // Context Provider wrapper component containing the state management logic
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { data: session } = useSession();
   const [items, setItems] = useState<CartItem[]>([]); // Initialize state array for cart items
   const [isCartOpen, setIsCartOpen] = useState(false); // Initialize cart drawer open state as closed
   const [isMounted, setIsMounted] = useState(false);   // Mount flag tracking to prevent React 18 hydration mismatches
@@ -55,13 +58,55 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Run whenever the items state or isMounted flag updates to persist cart state to localStorage
+  // Sync with Cloud MongoDB database when user logs in with Google/Email
   useEffect(() => {
-    // Only perform write operations if the component has successfully completed its mount phase
+    if (!isMounted || !session?.user?.email) return;
+
+    const syncCloudCart = async () => {
+      try {
+        const res = await fetch("/api/user/sync");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.cart) && data.cart.length > 0) {
+            setItems((localItems) => {
+              // Merge local & cloud items, deduplicating matching productId + size
+              const merged = [...localItems];
+              data.cart.forEach((cloudItem: CartItem) => {
+                const idx = merged.findIndex(
+                  (i) => i.productId === cloudItem.productId && i.size === cloudItem.size
+                );
+                if (idx > -1) {
+                  merged[idx] = { ...merged[idx], quantity: Math.max(merged[idx].quantity, cloudItem.quantity) };
+                } else {
+                  merged.push(cloudItem);
+                }
+              });
+              return merged;
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to sync cloud cart:", err);
+      }
+    };
+
+    syncCloudCart();
+  }, [session?.user?.email, isMounted]);
+
+  // Save changes back to localStorage and Cloud MongoDB when cart items update
+  useEffect(() => {
     if (isMounted) {
       localStorage.setItem("calotes_cart", JSON.stringify(items));
+
+      if (session?.user?.email) {
+        fetch("/api/user/sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cart: items }),
+        }).catch((err) => console.error("Cloud cart push error:", err));
+      }
     }
-  }, [items, isMounted]);
+  }, [items, isMounted, session?.user?.email]);
 
   // Action method to append a new item or increment its count if it already exists
   const addToCart = (newItem: CartItem) => {

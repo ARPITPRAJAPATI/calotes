@@ -26,6 +26,8 @@ interface WishlistContextType {
   setIsOpen: (open: boolean) => void; // Action toggle wishlist drawer open/close
 }
 
+import { useSession } from "next-auth/react";
+
 // Create the Context with null fallback value
 const WishlistContext = createContext<WishlistContextType | null>(null);
 // LocalStorage key constant for consistent namespace reads/writes
@@ -33,6 +35,7 @@ const STORAGE_KEY = "calotes_wishlist";
 
 // Provider wrapper component housing the wishlist state manager
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
+  const { data: session } = useSession();
   const [items, setItems] = useState<WishlistItem[]>([]); // Initialize state array for wishlist items
   const [isOpen, setIsOpen] = useState(false); // Track drawer visibility state (defaults to closed)
   const [isMounted, setIsMounted] = useState(false); // Mount flag tracking to prevent overwriting saved items
@@ -49,14 +52,52 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Run whenever items state updates to sync changes back to localStorage
+  // Sync with Cloud MongoDB database when user logs in with Google/Email
+  useEffect(() => {
+    if (!isMounted || !session?.user?.email) return;
+
+    const syncCloudWishlist = async () => {
+      try {
+        const res = await fetch("/api/user/sync");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.wishlist) && data.wishlist.length > 0) {
+            setItems((localItems) => {
+              // Merge local & cloud items, deduplicating matching productId
+              const merged = [...localItems];
+              data.wishlist.forEach((cloudItem: WishlistItem) => {
+                if (!merged.some((i) => i.productId === cloudItem.productId)) {
+                  merged.push(cloudItem);
+                }
+              });
+              return merged;
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to sync cloud wishlist:", err);
+      }
+    };
+
+    syncCloudWishlist();
+  }, [session?.user?.email, isMounted]);
+
+  // Run whenever items state updates to sync changes back to localStorage & MongoDB
   useEffect(() => {
     if (isMounted) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); // Write stringified array
       } catch {}
+
+      if (session?.user?.email) {
+        fetch("/api/user/sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ wishlist: items }),
+        }).catch((err) => console.error("Cloud wishlist push error:", err));
+      }
     }
-  }, [items, isMounted]);
+  }, [items, isMounted, session?.user?.email]);
 
   // Evaluator function returning boolean value checking if an item exists in wishlist
   // Wrapped in useCallback to prevent child components re-rendering on parent updates
