@@ -10,22 +10,6 @@ interface RouteParams {
   params: Promise<{ id: string }>; // App Router asynchronous URL parameters
 }
 
-// Allowed order status transitions (state machine — cannot go backwards)
-const VALID_ORDER_STATUS_TRANSITIONS: Record<string, string[]> = {
-  Processing: ['Shipped', 'Cancelled'],
-  Shipped:    ['Delivered', 'Cancelled'],
-  Delivered:  [], // Terminal state
-  Cancelled:  [], // Terminal state
-};
-
-// Allowed payment status transitions
-const VALID_PAYMENT_STATUS_TRANSITIONS: Record<string, string[]> = {
-  Pending:  ['Paid', 'Failed'],
-  Paid:     ['Refunded'],
-  Failed:   ['Pending'],  // Retry only
-  Refunded: [],           // Terminal state
-};
-
 // PUT order detailed API route: updates order status (Admin protected, with audit logging)
 export async function PUT(req: Request, { params }: RouteParams) {
   try {
@@ -50,27 +34,13 @@ export async function PUT(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    // ── State machine validation ────────────────────────────────────────────────
-    // Enforce legal transitions — prevents illegal status manipulations like
-    // setting a Delivered order back to Processing, or a Paid order to Pending.
-    if (orderStatus && orderStatus !== order.orderStatus) {
-      const allowed = VALID_ORDER_STATUS_TRANSITIONS[order.orderStatus] || [];
-      if (!allowed.includes(orderStatus)) {
-        return NextResponse.json(
-          { error: `Invalid status transition: ${order.orderStatus} → ${orderStatus}` },
-          { status: 409 }
-        );
-      }
+    // Validate status values to ensure they are valid schema enums
+    if (orderStatus && !['Processing', 'Shipped', 'Delivered', 'Cancelled'].includes(orderStatus)) {
+      return NextResponse.json({ error: 'Invalid order status' }, { status: 400 });
     }
 
-    if (paymentStatus && paymentStatus !== order.paymentStatus) {
-      const allowed = VALID_PAYMENT_STATUS_TRANSITIONS[order.paymentStatus] || [];
-      if (!allowed.includes(paymentStatus)) {
-        return NextResponse.json(
-          { error: `Invalid payment status transition: ${order.paymentStatus} → ${paymentStatus}` },
-          { status: 409 }
-        );
-      }
+    if (paymentStatus && !['Pending', 'Paid', 'Failed', 'Refunded'].includes(paymentStatus)) {
+      return NextResponse.json({ error: 'Invalid payment status' }, { status: 400 });
     }
 
     // Snapshot the before-state for the audit log
