@@ -120,7 +120,7 @@ export default function CheckoutPage() {
             alert("Payment verification failed.");
           }
         },
-        prefill: { name: address.fullName },
+        prefill: { name: address.fullName, email: session?.user?.email || "", contact: address.phone || "" },
         theme: { color: "#0F0F0F" },
         config: {
           display: {
