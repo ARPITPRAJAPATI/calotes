@@ -43,6 +43,14 @@ export async function PUT(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    // Limit maximum administrators to 3
+    if (role === 'admin' && existingUser.role !== 'admin') {
+      const adminCount = await User.countDocuments({ role: 'admin' });
+      if (adminCount >= 3) {
+        return NextResponse.json({ error: 'Maximum limit of 3 admin users reached!' }, { status: 400 });
+      }
+    }
+
     const previousRole = existingUser.role;
 
     existingUser.role = role;

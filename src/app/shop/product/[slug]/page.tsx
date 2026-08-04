@@ -2,6 +2,7 @@ import connectDB from "@/lib/db";
 import Product from "@/models/Product";
 import ProductClient from "@/components/ProductClient";
 import { notFound } from "next/navigation";
+import { isValidObjectId } from "@/lib/sanitize";
 
 export const dynamic = 'force-dynamic';
 
@@ -18,8 +19,9 @@ export default async function ProductDetailsPage({ params }: PageProps) {
   try {
     await connectDB();
     
-    // Fetch target product by slug
-    const productDoc = await Product.findOne({ slug })
+    // Fetch target product by slug or ID fallback
+    const query = isValidObjectId(slug) ? { _id: slug } : { slug };
+    const productDoc = await Product.findOne(query)
       .populate('category')
       .lean();
 

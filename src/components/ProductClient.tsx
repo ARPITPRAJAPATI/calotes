@@ -9,6 +9,7 @@ import { ArrowLeft, ShieldCheck, Ruler, MessageCircle, Star, Sparkles, Heart, Ch
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import PatinaInspector from "@/components/PatinaInspector";
+import toast from "react-hot-toast";
 
 interface ProductClientProps {
   product: any;
@@ -37,7 +38,7 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
 
   const handleAddToCart = () => {
     if (product.sizes?.length > 0 && !selectedSize) {
-      alert("Select a size first.");
+      toast.error("Please select a size.");
       return;
     }
     addToCart({

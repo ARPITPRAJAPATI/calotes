@@ -173,18 +173,22 @@ export default function ProfilePage() {
                     {/* Purchased garments list */}
                     <div className="divide-y divide-border/20">
                       {order.items.map((item) => (
-                        <div key={item._id} className="flex gap-4 py-4 first:pt-0 last:pb-0 items-center">
-                          <div className="w-10 h-12 bg-bg border border-border/30 shrink-0">
-                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                        <Link
+                          key={item._id}
+                          href={`/shop/product/${item.product}`}
+                          className="flex gap-4 py-4 first:pt-0 last:pb-0 items-center hover:opacity-80 transition-opacity cursor-pointer group"
+                        >
+                          <div className="w-10 h-12 bg-bg border border-border/30 shrink-0 overflow-hidden">
+                            <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-text font-black truncate text-[10px]">{item.name}</h4>
+                            <h4 className="text-text font-black truncate text-[10px] group-hover:text-terracotta transition-colors">{item.name}</h4>
                             <p className="text-[8px] text-muted mt-0.5">SIZE: {item.size} · QTY: {item.quantity}</p>
                           </div>
-                          <div className="text-text font-black text-[10px]">
+                          <div className="text-text font-black text-[10px] shrink-0 font-mono">
                             ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                           </div>
-                        </div>
+                        </Link>
                       ))}
                     </div>
                   </div>
