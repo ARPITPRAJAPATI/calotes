@@ -102,7 +102,7 @@ export async function GET() {
 
   const memoryUsage = process.memoryUsage();
 
-  return NextResponse.json(
+  const response = NextResponse.json(
     {
       status: overallStatus,
       timestamp: new Date().toISOString(),
@@ -120,4 +120,24 @@ export async function GET() {
     },
     { status: overallStatus === 'down' ? 503 : 200 }
   );
+
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  return response;
+}
+
+export async function OPTIONS() {
+  const response = new NextResponse(null, { status: 200 });
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  return response;
+}
+
+export async function HEAD() {
+  const response = new NextResponse(null, { status: 200 });
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+  return response;
 }
