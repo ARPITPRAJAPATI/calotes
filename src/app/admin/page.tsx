@@ -5,6 +5,8 @@ import Product from "@/models/Product"; // Import Product schema model
 import User from "@/models/User"; // Import User schema model
 import { IndianRupee, Package, ShoppingBag, Users } from "lucide-react"; // Import vector graphics icons
 
+import AdminHealthMonitor from "@/components/AdminHealthMonitor";
+
 export default async function AdminDashboard() {
   await connectDB(); // Establish connection to database
 
@@ -41,6 +43,9 @@ export default async function AdminDashboard() {
           </div>
         ))}
       </div>
+
+      {/* Live System Health Monitor */}
+      <AdminHealthMonitor />
 
       {/* Info panel grid boxes */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
