@@ -121,6 +121,25 @@ export async function POST(req: Request) {
       console.error('[WARN] Stock decrement failed for order', order_id, stockErr);
     }
 
+    // 8b. ── Coupon usage increment (non-fatal, best-effort) ───────────────────────
+    // Atomically increment usageCount and record the user so per-user limits work correctly.
+    // This MUST run after payment confirmation — never before.
+    try {
+      if (order.appliedCoupon) {
+        const PromoCode = (await import('@/models/PromoCode')).default;
+        await PromoCode.findOneAndUpdate(
+          { code: order.appliedCoupon },
+          {
+            $inc: { usageCount: 1 },
+            $push: { usedBy: order.user },
+          }
+        );
+      }
+    } catch (couponErr) {
+      // Non-fatal — payment is already confirmed, just log it
+      console.error('[WARN] Coupon usage update failed for order', order_id, couponErr);
+    }
+
     // 9. ── Trigger order confirmation email (non-blocking, best-effort) ─────────
     try {
       const populatedOrder = await Order.findById(order_id).populate('user', 'email').lean() as any;

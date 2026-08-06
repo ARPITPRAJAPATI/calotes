@@ -170,9 +170,9 @@ export default function CheckoutPage() {
   );
 
   const finalOrderTotal = Math.max(0, cartTotal - discountAmount);
-  const codTokenAmount = 0; // Testing mode: ₹0 token
-  const codFee = 1;         // Temporary ₹1 COD fee for testing
-  const codOnlineNow = codTokenAmount + codFee; // Pay ₹1 online NOW
+  const codTokenAmount = Math.round(finalOrderTotal * 0.20);
+  const codFee = 59;
+  const codOnlineNow = codTokenAmount + codFee;
   const codRemaining = finalOrderTotal - codTokenAmount;
 
   return (
@@ -304,11 +304,11 @@ export default function CheckoutPage() {
               {/* Cost breakdown list */}
               <div className="border-t border-border pt-6 space-y-4">
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-text">
-                  <span className="text-muted">Subtotal</span><span>₹{cartTotal}</span>
+                  <span className="text-muted">Subtotal</span><span>₹{cartTotal.toLocaleString("en-IN")}</span>
                 </div>
                 {discountAmount > 0 && (
                   <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-accent">
-                    <span>Discount</span><span>-₹{discountAmount}</span>
+                    <span>Discount</span><span>-₹{discountAmount.toLocaleString("en-IN")}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-text">
@@ -331,7 +331,8 @@ export default function CheckoutPage() {
                   {loading ? <Loader2 className="animate-spin" size={16} /> : <><Lock size={13} /> Secure Payment (Pay ₹{finalOrderTotal.toLocaleString("en-IN")} Full Online)</>}
                 </button>
 
-                {/* 2. Partial Cash on Delivery Card (Collapsible Details Accordion) */}
+                {/* 2. Partial Cash on Delivery Card (Collapsible Details Accordion) — only shown when cart has items */}
+                {items.length > 0 && <>
                 <div className="border border-border/80 p-5 bg-card/60 space-y-4 transition-all duration-300">
                   <div
                     onClick={() => setShowCodDetails(!showCodDetails)}
@@ -382,6 +383,7 @@ export default function CheckoutPage() {
                     {loading ? <Loader2 className="animate-spin" size={14} /> : <span>Pay Advance ₹{codOnlineNow.toLocaleString("en-IN")} &amp; Place COD Order</span>}
                   </button>
                 </div>
+                </>}
 
                 {/* Save complete order list to wishlist */}
                 <button

@@ -98,9 +98,10 @@ export async function POST(req: Request) {
         return NextResponse.json({ received: true }, { status: 200 });
       }
 
-      // ── Mark order as Paid ──────────────────────────────────────────────────
+      // ── Mark order as Paid / Partial Paid (based on payment method) ────────────
+      const targetStatus = order.paymentMethod === 'Partial COD' ? 'Partial Paid' : 'Paid';
       await Order.findByIdAndUpdate(order._id, {
-        paymentStatus: 'Paid',
+        paymentStatus: targetStatus,
         razorpayPaymentId,
       });
 

@@ -324,6 +324,8 @@ export default function AdminOrdersPage() {
                   className={`w-full border text-[10px] font-black uppercase tracking-widest p-3 outline-none cursor-pointer transition-all duration-200 ${
                     selectedOrder.paymentStatus === 'Paid'
                       ? 'bg-accent/5 border-accent/30 text-accent hover:border-accent/60'
+                      : selectedOrder.paymentStatus === 'Partial Paid'
+                      ? 'bg-emerald-500/5 border-emerald-500/30 text-emerald-600 hover:border-emerald-500/60'
                       : selectedOrder.paymentStatus === 'Failed'
                       ? 'bg-accent-red/5 border-accent-red/30 text-accent-red hover:border-accent-red/60'
                       : 'bg-yellow-500/5 border-yellow-500/20 text-yellow-600 hover:border-yellow-500/55'

@@ -90,6 +90,16 @@ const OrderSchema = new Schema(
     razorpaySignature: {
       type: String, // HMAC-SHA256 signature validating source authenticity of payment completion
     },
+    // Applied coupon code (snapshot at time of order — for records and analytics)
+    appliedCoupon: {
+      type: String,
+      default: null,
+    },
+    // Discount deducted from cart total in INR (snapshot at time of order)
+    discountAmount: {
+      type: Number,
+      default: 0,
+    },
   },
   // Automatically track createdAt and updatedAt timestamps for order management
   { timestamps: true }

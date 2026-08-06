@@ -39,7 +39,7 @@ export async function PUT(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: 'Invalid order status' }, { status: 400 });
     }
 
-    if (paymentStatus && !['Pending', 'Paid', 'Failed', 'Refunded'].includes(paymentStatus)) {
+    if (paymentStatus && !['Pending', 'Paid', 'Partial Paid', 'Failed', 'Refunded'].includes(paymentStatus)) {
       return NextResponse.json({ error: 'Invalid payment status' }, { status: 400 });
     }
 
