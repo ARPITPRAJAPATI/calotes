@@ -48,11 +48,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    // 5. ── State-machine guard — only Pending orders can be marked Paid ───────────
+    // 5. ── State-machine guard — only Pending orders can be marked Paid/Partial Paid ──
     // This prevents replay attacks where an old payment ID is reused to re-confirm an order.
     if (order.paymentStatus !== 'Pending') {
-      // If already Paid, return success (idempotent) — don't error
-      if (order.paymentStatus === 'Paid') {
+      // If already Paid or Partial Paid, return success (idempotent) — don't error
+      if (order.paymentStatus === 'Paid' || order.paymentStatus === 'Partial Paid') {
         return NextResponse.json({ success: true, alreadyProcessed: true }, { status: 200 });
       }
       return NextResponse.json(
@@ -91,9 +91,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'Invalid payment signature' }, { status: 400 });
     }
 
-    // 7. ── Mark order as Paid (state transition) ──────────────────────────────────
+    // 7. ── Mark order as Paid / Partial Paid (state transition) ───────────────────
+    const targetStatus = order.paymentMethod === 'Partial COD' ? 'Partial Paid' : 'Paid';
+
     await Order.findByIdAndUpdate(order_id, {
-      paymentStatus: 'Paid',
+      paymentStatus: targetStatus,
       razorpayPaymentId: razorpay_payment_id,
       razorpaySignature: razorpay_signature,
     });

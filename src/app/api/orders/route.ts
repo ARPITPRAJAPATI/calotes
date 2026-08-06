@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: firstError }, { status: 400 });
     }
 
-    const { items, shippingAddress, couponCode } = parsed.data;
+    const { items, shippingAddress, couponCode, paymentMethod = 'Full Online' } = parsed.data;
 
     await connectDB();
 
@@ -125,7 +125,7 @@ export async function POST(req: Request) {
 
         if (!isExpired && !isOverGlobalLimit && !isOverUserLimit && meetsMinOrder) {
           if (promo.discountType === 'percentage') {
-            discountAmount = Math.floor((serverComputedTotal * promo.discountValue) / 100);
+            discountAmount = Math.round((serverComputedTotal * promo.discountValue) / 100);
           } else {
             discountAmount = promo.discountValue;
           }
@@ -143,45 +143,65 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid order total' }, { status: 400 });
     }
 
-    // 6. Instantiate Razorpay SDK client using environment secrets
+    // 6. Calculate payment breakdown based on payment method
+    let razorpayChargeAmount = finalAmount; // Default full online (INR)
+    let paidAmount = finalAmount;
+    let codAmountDue = 0;
+    let codFee = 0;
+
+    if (paymentMethod === 'Partial COD') {
+      const tokenAmount = Math.round(finalAmount * 0.20); // 20% advance token
+      codFee = 59; // ₹59 flat COD handling fee
+      razorpayChargeAmount = tokenAmount + codFee; // Amount to pay online NOW
+      paidAmount = razorpayChargeAmount;
+      codAmountDue = finalAmount - tokenAmount; // Balance due to courier on delivery
+    }
+
+    // 7. Instantiate Razorpay SDK client using environment secrets
     const razorpay = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID || '',
       key_secret: process.env.RAZORPAY_KEY_SECRET || '',
     });
 
-    // 7. Create order log record in MongoDB database with Pending status
+    // 8. Create order log record in MongoDB database with Pending status
     const newOrder = await Order.create({
       user: session.user.id,
       items: validatedItems,         // Server-validated items with DB prices
       totalAmount: finalAmount,      // Server-computed total — NOT from client
       shippingAddress,
       paymentStatus: 'Pending',
+      paymentMethod,
+      paidAmount,
+      codAmountDue,
+      codFee,
       appliedCoupon: appliedCouponCode,
       discountAmount,
     });
 
-    // 8. Initialize Razorpay transaction using server-computed amount
+    // 9. Initialize Razorpay transaction using server-computed amount
     const razorpayOrder = await razorpay.orders.create({
-      amount: finalAmount * 100, // Razorpay expects paise (smallest currency unit)
+      amount: razorpayChargeAmount * 100, // Razorpay expects paise (smallest currency unit)
       currency: 'INR',
       receipt: newOrder._id.toString(),
     });
 
-    // 9. Store Razorpay order ID on our order record for later verification
+    // 10. Store Razorpay order ID on our order record for later verification
     newOrder.razorpayOrderId = razorpayOrder.id;
     await newOrder.save();
 
     // Return only what the client needs to open the Razorpay checkout
-    // NOTE: We return `razorpayOrder.amount` (the server-authoritative amount) not `finalAmount`
     return NextResponse.json({
       orderId: newOrder._id,
       razorpayOrderId: razorpayOrder.id,
       amount: razorpayOrder.amount,   // Paise — Razorpay echoes back the server amount
       currency: razorpayOrder.currency,
       keyId: process.env.RAZORPAY_KEY_ID,
-      // Return the server-computed total for display — client must use this, not its own calculation
       serverTotal: finalAmount,
       discountApplied: discountAmount,
+      paymentMethod,
+      paidAmount,
+      codAmountDue,
+      codFee,
     });
   } catch (error: any) {
     console.error('Order creation failed:', error);

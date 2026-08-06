@@ -105,6 +105,7 @@ export const OrderCreateSchema = z.object({
     .max(20, 'Cart exceeds maximum item limit'),
   shippingAddress: CheckoutAddressSchema,
   couponCode: z.string().max(50).optional(),  // optional promo code to apply server-side
+  paymentMethod: z.enum(['Full Online', 'Partial COD']).default('Full Online'),
 });
 
 // ─── Store Settings Schema ────────────────────────────────────────────────────

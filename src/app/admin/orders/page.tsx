@@ -33,6 +33,10 @@ interface Order {
   items: OrderItem[];
   totalAmount: number;
   paymentStatus: string;
+  paymentMethod?: string;
+  paidAmount?: number;
+  codAmountDue?: number;
+  codFee?: number;
   orderStatus: string;
   createdAt: string;
   shippingAddress: {

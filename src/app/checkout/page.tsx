@@ -11,7 +11,7 @@ import { useSession } from "next-auth/react";
 // Import Next.js routing hook
 import { useRouter } from "next/navigation";
 // Import vector icons
-import { ArrowLeft, Lock, ShieldCheck, Loader2, Tag, Heart } from "lucide-react";
+import { ArrowLeft, Lock, ShieldCheck, Loader2, Tag, Heart, ChevronDown, ChevronUp } from "lucide-react";
 // Import Link for page transitions
 import Link from "next/link";
 // Import toast component alerts
@@ -36,6 +36,9 @@ export default function CheckoutPage() {
   const [discountAmount, setDiscountAmount] = useState(0); // Deducted monetary value
   const [appliedCoupon, setAppliedCoupon] = useState("");   // Checked, valid promo label
   const [validatingCoupon, setValidatingCoupon] = useState(false); // Tracks promo verification spinner
+
+  // Collapsible accordion for Partial COD details (hidden by default)
+  const [showCodDetails, setShowCodDetails] = useState(false);
 
   // Redirect users to Login panel if session authentication checks fail
   useEffect(() => {
@@ -82,7 +85,7 @@ export default function CheckoutPage() {
   };
 
   // Triggers order creation API routes and launches Razorpay checkout panel overlay
-  const handlePayment = async (e: React.FormEvent) => {
+  const handlePayment = async (e: React.FormEvent, paymentMethod: "Full Online" | "Partial COD" = "Full Online") => {
     e.preventDefault();
     if (!items.length) return;
     setLoading(true);
@@ -95,7 +98,13 @@ export default function CheckoutPage() {
       const orderData = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, totalAmount: finalAmount, shippingAddress: address }),
+        body: JSON.stringify({
+          items,
+          totalAmount: finalAmount,
+          shippingAddress: address,
+          couponCode: appliedCoupon || undefined,
+          paymentMethod,
+        }),
       }).then((t) => t.json());
       if (orderData.error) throw new Error(orderData.error);
       
@@ -105,7 +114,7 @@ export default function CheckoutPage() {
         amount: orderData.amount,
         currency: orderData.currency,
         name: "Calotes Vintage",
-        description: "Archive Collection Purchase",
+        description: paymentMethod === "Partial COD" ? "Partial COD Advance Payment" : "Archive Collection Purchase",
         order_id: orderData.razorpayOrderId,
         // On successful payment collection: send transaction token to verification endpoints
         handler: async (response: any) => {
@@ -159,6 +168,12 @@ export default function CheckoutPage() {
       <Loader2 className="animate-spin text-terracotta" />
     </div>
   );
+
+  const finalOrderTotal = Math.max(0, cartTotal - discountAmount);
+  const codTokenAmount = Math.round(finalOrderTotal * 0.20);
+  const codFee = 59;
+  const codOnlineNow = codTokenAmount + codFee;
+  const codRemaining = finalOrderTotal - codTokenAmount;
 
   return (
     <div className="w-full pt-32 pb-24 flex-1">
@@ -306,11 +321,68 @@ export default function CheckoutPage() {
 
               {/* Submit Buttons */}
               <div className="pt-6 space-y-4">
-                <button type="submit" form="checkout-form" disabled={loading || !items.length}
-                  className="btn-primary w-full justify-center py-5 flex items-center gap-3 disabled:opacity-40"
+                {/* 1. Full Online Payment */}
+                <button
+                  type="button"
+                  onClick={(e) => handlePayment(e, "Full Online")}
+                  disabled={loading || !items.length}
+                  className="btn-primary w-full justify-center py-5 flex items-center gap-3 disabled:opacity-40 shadow-lg"
                 >
-                  {loading ? <Loader2 className="animate-spin" size={16} /> : <><Lock size={13} /> Secure Payment</>}
+                  {loading ? <Loader2 className="animate-spin" size={16} /> : <><Lock size={13} /> Secure Payment (Pay ₹{finalOrderTotal.toLocaleString("en-IN")} Full Online)</>}
                 </button>
+
+                {/* 2. Partial Cash on Delivery Card (Collapsible Details Accordion) */}
+                <div className="border border-border/80 p-5 bg-card/60 space-y-4 transition-all duration-300">
+                  <div
+                    onClick={() => setShowCodDetails(!showCodDetails)}
+                    className="flex items-center justify-between cursor-pointer select-none group"
+                  >
+                    <span className="text-[10px] font-black uppercase tracking-widest text-text flex items-center gap-2 group-hover:text-terracotta transition-colors">
+                      <ShieldCheck size={14} className="text-terracotta" /> Cash on Delivery (Partial COD)
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                        20% Token + ₹59 Fee
+                      </span>
+                      <div className="p-1 text-muted group-hover:text-text transition-colors">
+                        {showCodDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Collapsible Details Breakdown */}
+                  {showCodDetails && (
+                    <div className="text-[10px] text-muted space-y-1.5 font-mono border-t border-border/40 pt-3 transition-all animate-in fade-in duration-300">
+                      <div className="flex justify-between">
+                        <span>20% Advance Token:</span>
+                        <span className="font-bold text-text">₹{codTokenAmount.toLocaleString("en-IN")}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>COD Handling Charge:</span>
+                        <span className="font-bold text-text">₹59</span>
+                      </div>
+                      <div className="flex justify-between border-t border-border/40 pt-1 text-terracotta font-bold">
+                        <span>Pay Online Now:</span>
+                        <span>₹{codOnlineNow.toLocaleString("en-IN")}</span>
+                      </div>
+                      <div className="flex justify-between text-emerald-400 font-bold">
+                        <span>Payable to Courier on Delivery:</span>
+                        <span>₹{codRemaining.toLocaleString("en-IN")}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Main Action Button (Always Visible) */}
+                  <button
+                    type="button"
+                    onClick={(e) => handlePayment(e, "Partial COD")}
+                    disabled={loading || !items.length}
+                    className="w-full py-4 bg-bg border border-terracotta text-terracotta hover:bg-terracotta hover:text-bg text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40"
+                  >
+                    {loading ? <Loader2 className="animate-spin" size={14} /> : <span>Pay Advance ₹{codOnlineNow.toLocaleString("en-IN")} &amp; Place COD Order</span>}
+                  </button>
+                </div>
+
                 {/* Save complete order list to wishlist */}
                 <button
                   type="button"

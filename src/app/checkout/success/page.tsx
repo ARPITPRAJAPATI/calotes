@@ -27,6 +27,10 @@ interface OrderDetails {
   _id: string;
   items: OrderItem[];
   totalAmount: number;
+  paymentMethod?: string;
+  paidAmount?: number;
+  codAmountDue?: number;
+  codFee?: number;
   shippingAddress: {
     fullName: string;
     street: string;
@@ -111,9 +115,13 @@ function SuccessContent() {
                 <span className="text-text font-black text-sm">{order._id.toUpperCase()}</span>
               </div>
               <div>
-                <span className="text-muted block text-[9px] mb-1">STATUS</span>
+                <span className="text-muted block text-[9px] mb-1 font-mono">STATUS</span>
                 <span className="px-2 py-1 bg-accent/15 border border-accent text-accent font-black text-[9px]">
-                  {order.paymentStatus === 'Paid' ? 'PAID & PROCESSING' : 'PENDING'}
+                  {order.paymentStatus === 'Partial Paid'
+                    ? 'PARTIAL COD (ADVANCE PAID)'
+                    : order.paymentStatus === 'Paid'
+                    ? 'PAID & PROCESSING'
+                    : 'PENDING'}
                 </span>
               </div>
             </div>
@@ -160,11 +168,29 @@ function SuccessContent() {
                 <p className="text-text font-bold flex items-center gap-2">
                   {order.shippingAddress.phone || "No phone listed"}
                 </p>
-                <div className="pt-2">
-                  <span className="text-muted block">TOTAL CHARGED</span>
-                  <span className="text-terracotta text-sm font-black mt-1 block">
-                    ₹{order.totalAmount.toLocaleString("en-IN")}
-                  </span>
+                <div className="pt-2 space-y-1">
+                  <div className="flex justify-between text-muted">
+                    <span>ORDER TOTAL:</span>
+                    <span className="text-text font-black">₹{order.totalAmount.toLocaleString("en-IN")}</span>
+                  </div>
+
+                  {order.paymentMethod === "Partial COD" ? (
+                    <>
+                      <div className="flex justify-between text-emerald-400 font-black">
+                        <span>PAID ONLINE NOW:</span>
+                        <span>₹{(order.paidAmount || 0).toLocaleString("en-IN")}</span>
+                      </div>
+                      <div className="flex justify-between text-terracotta border-t border-border/40 pt-1 font-black">
+                        <span>DUE ON DELIVERY (COD):</span>
+                        <span>₹{(order.codAmountDue || 0).toLocaleString("en-IN")}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex justify-between text-terracotta font-black border-t border-border/40 pt-1">
+                      <span>TOTAL CHARGED ONLINE:</span>
+                      <span>₹{order.totalAmount.toLocaleString("en-IN")}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

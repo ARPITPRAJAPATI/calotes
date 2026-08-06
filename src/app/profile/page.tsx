@@ -27,9 +27,13 @@ interface UserOrder {
   _id: string;
   items: OrderItem[];
   totalAmount: number;
-  paymentStatus: 'Pending' | 'Paid' | 'Failed' | 'Refunded';
-  orderStatus: 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+  paymentStatus: string;
+  orderStatus: string;
   createdAt: string;
+  paymentMethod?: string;
+  paidAmount?: number;
+  codAmountDue?: number;
+  codFee?: number;
 }
 
 export default function ProfilePage() {
@@ -156,9 +160,13 @@ export default function ProfilePage() {
                         <div className="space-y-1">
                           <span className="text-[8px] text-muted block">PAYMENT</span>
                           <span className={`px-2 py-0.5 border text-[8px] font-black tracking-widest ${
-                            order.paymentStatus === 'Paid' ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-500'
+                            order.paymentStatus === 'Paid'
+                              ? 'bg-green-500/10 border-green-500/30 text-green-500'
+                              : order.paymentStatus === 'Partial Paid'
+                              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500'
+                              : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-500'
                           }`}>
-                            {order.paymentStatus}
+                            {order.paymentStatus === 'Partial Paid' ? `PARTIAL COD (DUE: ₹${((order as any).codAmountDue || 0).toLocaleString("en-IN")})` : order.paymentStatus}
                           </span>
                         </div>
                         <div className="space-y-1">

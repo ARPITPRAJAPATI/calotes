@@ -50,8 +50,29 @@ const OrderSchema = new Schema(
     // Status tracking phase of payment resolution
     paymentStatus: {
       type: String,
-      enum: ['Pending', 'Paid', 'Failed', 'Refunded'], // Enforce status values
+      enum: ['Pending', 'Paid', 'Partial Paid', 'Failed', 'Refunded'], // Enforce status values
       default: 'Pending', // Defaults to Pending until Razorpay webhook/signature verification resolves
+    },
+    // Payment mode chosen (Full Online vs Partial COD)
+    paymentMethod: {
+      type: String,
+      enum: ['Full Online', 'Partial COD'],
+      default: 'Full Online',
+    },
+    // Actual amount paid online via Razorpay (INR)
+    paidAmount: {
+      type: Number,
+      default: 0,
+    },
+    // Remaining balance due on delivery (Cash/UPI to courier)
+    codAmountDue: {
+      type: Number,
+      default: 0,
+    },
+    // COD handling fee charged (INR)
+    codFee: {
+      type: Number,
+      default: 0,
     },
     // Logistics fulfillment tracking phase
     orderStatus: {
