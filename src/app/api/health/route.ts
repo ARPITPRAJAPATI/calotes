@@ -52,6 +52,15 @@ export async function GET() {
   const dbStartTime = Date.now();
   try {
     await connectDB();
+
+    // If readyState is connecting (2) or disconnected (0), await connection resolution
+    if (mongoose.connection.readyState !== 1) {
+      await mongoose.connect(process.env.MONGODB_URI!, {
+        bufferCommands: true,
+        serverSelectionTimeoutMS: 5000,
+      });
+    }
+
     if (mongoose.connection.readyState === 1) {
       // Perform a lightweight admin ping query
       if (mongoose.connection.db) {
@@ -61,7 +70,7 @@ export async function GET() {
       services.database.latencyMs = Date.now() - dbStartTime;
     } else {
       services.database.status = 'down';
-      services.database.error = 'Mongoose not connected';
+      services.database.error = `Mongoose state: ${mongoose.connection.readyState}`;
     }
   } catch (err: any) {
     services.database.status = 'down';

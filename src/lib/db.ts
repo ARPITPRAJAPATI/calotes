@@ -23,19 +23,27 @@ async function connectDB() {
   if (!MONGODB_URI) {
     throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
   }
-  
-  // If a connection is already established and cached, return it directly (0ms latency, reused connection)
-  if (cached.conn) {
+
+  // If a connection is active AND readyState is 1 (connected), return it directly
+  if (cached.conn && mongoose.connection.readyState === 1) {
     return cached.conn;
+  }
+
+  // If connection is disconnected (0) or missing, reset stale cache
+  if (!cached.conn || mongoose.connection.readyState === 0) {
+    cached.conn = null;
+    cached.promise = null;
   }
 
   // If there is no connection request currently in progress
   if (!cached.promise) {
     const opts = {
-      bufferCommands: false, // Disable Mongoose buffering. Queries fail immediately if connection is down instead of hanging.
+      bufferCommands: true, // Enable Mongoose command buffering during serverless connection handshakes
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
     };
 
-    // Trigger mongoose.connect and save the returned Promise in cache to prevent duplicate concurrent connection requests
+    // Trigger mongoose.connect and save the returned Promise in cache
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
       return mongooseInstance;
     });
@@ -45,9 +53,10 @@ async function connectDB() {
     // Await the connection promise to resolve and store the established connection instance in cache
     cached.conn = await cached.promise;
   } catch (e) {
-    // If connection establishment fails, reset the promise cache to null so subsequent attempts can retry
+    // If connection establishment fails, reset the cache to null so subsequent attempts can retry
     cached.promise = null;
-    throw e; // Re-throw connection error
+    cached.conn = null;
+    throw e;
   }
 
   // Return the active connection instance
