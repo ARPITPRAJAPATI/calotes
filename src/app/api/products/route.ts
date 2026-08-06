@@ -88,7 +88,7 @@ export async function GET(req: Request) {
       Product.countDocuments(filter),
     ]);
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       products,
       pagination: {
         page,
@@ -98,6 +98,10 @@ export async function GET(req: Request) {
         hasMore: page * limit < total,
       },
     });
+
+    // Edge CDN caching: 10s fresh, 59s stale-while-revalidate background refresh
+    response.headers.set('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=59');
+    return response;
   } catch (error: any) {
     console.error('Products fetch failed:', error);
     return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
