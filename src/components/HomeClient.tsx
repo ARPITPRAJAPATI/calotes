@@ -74,6 +74,7 @@ interface HomeClientProps {
   lookbookList?: any[];
   storyImageUrl?: string;
   communityPostsList?: any[];
+  instagramUrl?: string;
 }
 
 export default function HomeClient({
@@ -86,6 +87,7 @@ export default function HomeClient({
   lookbookList,
   storyImageUrl,
   communityPostsList,
+  instagramUrl = "https://www.instagram.com/calotes.live/",
 }: HomeClientProps) {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [mounted, setMounted] = useState(false);
@@ -363,7 +365,7 @@ export default function HomeClient({
             <h2 className="font-display font-black text-4xl md:text-6xl uppercase tracking-tighter leading-none">Wear It. Tag It.</h2>
           </div>
           <a
-            href="https://www.instagram.com/calotes.live/"
+            href={instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex items-center gap-3 section-label text-muted hover:text-terracotta transition-colors group"

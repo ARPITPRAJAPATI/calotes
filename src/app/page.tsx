@@ -120,6 +120,11 @@ export default async function Home() {
       }))
     : [];
 
+  // Instagram URL from settings (falling back to official handle if stale DB value)
+  const instagramUrl = settings?.instagramUrl && !settings.instagramUrl.includes('calotes.vintage')
+    ? settings.instagramUrl
+    : "https://www.instagram.com/calotes.live/";
+
   return (
     <HomeClient
       arrivalsList={arrivalsList}
@@ -131,6 +136,7 @@ export default async function Home() {
       lookbookList={lookbookList}
       storyImageUrl={storyImageUrl}
       communityPostsList={communityPostsList}
+      instagramUrl={instagramUrl}
     />
   );
 }
