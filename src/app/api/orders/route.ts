@@ -150,9 +150,9 @@ export async function POST(req: Request) {
     let codFee = 0;
 
     if (paymentMethod === 'Partial COD') {
-      const tokenAmount = 0; // Testing mode: ₹0 token
-      codFee = 1; // Temporary ₹1 COD fee for testing
-      razorpayChargeAmount = tokenAmount + codFee; // Pay ₹1 online NOW
+      const tokenAmount = Math.round(finalAmount * 0.20); // 20% advance token
+      codFee = 59; // ₹59 flat COD handling fee
+      razorpayChargeAmount = tokenAmount + codFee; // Amount to pay online NOW
       paidAmount = razorpayChargeAmount;
       codAmountDue = finalAmount - tokenAmount; // Balance due to courier on delivery
     }

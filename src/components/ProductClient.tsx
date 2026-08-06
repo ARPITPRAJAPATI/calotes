@@ -48,6 +48,7 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
       image: product.images?.[0] || '/images/hero-pc.jpg',
       size: selectedSize || "OS",
       quantity: 1,
+      stock: product.stock !== undefined ? product.stock : 1,
     });
     setAdded(true);
     setTimeout(() => {

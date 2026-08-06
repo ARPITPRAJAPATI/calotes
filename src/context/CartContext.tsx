@@ -11,6 +11,7 @@ export interface CartItem {
   image: string;     // Thumbnail image URL
   size: string;      // User-selected size string (e.g. S, M, L, OS)
   quantity: number;  // Current quantity of this specific size
+  stock?: number;    // Available inventory stock quantity (defaults to 1 for vintage pieces)
 }
 
 // Interface outlining the values and action methods exposed by the CartContext
@@ -27,6 +28,7 @@ interface CartContextType {
 }
 
 import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
 
 // Create the Context object with undefined fallback default
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -97,7 +99,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isMounted) {
       localStorage.setItem("calotes_cart", JSON.stringify(items));
-
       if (session?.user?.email) {
         fetch("/api/user/sync", {
           method: "POST",
@@ -110,6 +111,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Action method to append a new item or increment its count if it already exists
   const addToCart = (newItem: CartItem) => {
+    const maxStock = newItem.stock !== undefined ? newItem.stock : 1; // Default 1 for 1-of-1 vintage items
+    let stockReached = false;
+
     setItems((prev) => {
       // Look for an existing item in the cart matching both the Product ID and selected Size
       const existingItem = prev.find(
@@ -117,17 +121,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       );
       // If a matching item is found
       if (existingItem) {
-        // Map over previous items and increment the matching item's quantity
+        if (existingItem.quantity >= maxStock) {
+          stockReached = true;
+          return prev;
+        }
+        const nextQty = Math.min(existingItem.quantity + newItem.quantity, maxStock);
         return prev.map((item) =>
           item.productId === newItem.productId && item.size === newItem.size
-            ? { ...item, quantity: item.quantity + newItem.quantity }
+            ? { ...item, quantity: nextQty }
             : item
         );
       }
       // If the item does not exist in the cart, append the new item payload to the array
-      return [...prev, newItem];
+      return [...prev, { ...newItem, quantity: Math.min(newItem.quantity, maxStock) }];
     });
-    setIsCartOpen(true); // Automatically slide open the cart drawer for a premium feedback experience
+
+    if (stockReached) {
+      toast.error(`Only ${maxStock} unique piece available in the vault!`);
+    } else {
+      setIsCartOpen(true); // Automatically slide open the cart drawer for a premium feedback experience
+    }
   };
 
   // Action method to remove a product item from the cart matching both ID and size constraints
@@ -142,11 +155,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const updateQuantity = (productId: string, size: string, quantity: number) => {
     if (quantity < 1) return; // Prevent setting quantities below 1 (user must use remove action instead)
     setItems((prev) =>
-      prev.map((item) =>
-        item.productId === productId && item.size === size
-          ? { ...item, quantity }
-          : item
-      )
+      prev.map((item) => {
+        if (item.productId === productId && item.size === size) {
+          const maxStock = item.stock !== undefined ? item.stock : 1;
+          if (quantity > maxStock) {
+            toast.error(`Only ${maxStock} unique piece available in the vault!`);
+            return { ...item, quantity: maxStock };
+          }
+          return { ...item, quantity };
+        }
+        return item;
+      })
     );
   };
   

@@ -89,8 +89,15 @@ export default function CartDrawer() {
                           {/* Decrement quantity */}
                           <button onClick={() => updateQuantity(item.productId, item.size, item.quantity - 1)} className="p-2 hover:bg-card transition-colors"><Minus size={12} /></button>
                           <span className="text-[10px] font-bold w-8 text-center">{item.quantity}</span>
-                          {/* Increment quantity */}
-                          <button onClick={() => updateQuantity(item.productId, item.size, item.quantity + 1)} className="p-2 hover:bg-card transition-colors"><Plus size={12} /></button>
+                          {/* Increment quantity with stock limit check */}
+                          <button
+                            onClick={() => updateQuantity(item.productId, item.size, item.quantity + 1)}
+                            disabled={item.quantity >= (item.stock !== undefined ? item.stock : 1)}
+                            className="p-2 hover:bg-card transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            title={item.quantity >= (item.stock !== undefined ? item.stock : 1) ? `Only ${item.stock !== undefined ? item.stock : 1} available in vault` : "Increase quantity"}
+                          >
+                            <Plus size={12} />
+                          </button>
                         </div>
                         {/* Row item cost (price multiplied by quantity) */}
                         <span className="text-xs font-bold">₹{item.price * item.quantity}</span>
