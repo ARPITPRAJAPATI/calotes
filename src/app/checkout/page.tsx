@@ -114,7 +114,7 @@ export default function CheckoutPage() {
         amount: orderData.amount,
         currency: orderData.currency,
         name: "Calotes Vintage",
-        description: paymentMethod === "Partial COD" ? "Partial COD Advance Payment" : "Archive Collection Purchase",
+        description: "Archive Collection Purchase",
         order_id: orderData.razorpayOrderId,
         // On successful payment collection: send transaction token to verification endpoints
         handler: async (response: any) => {
@@ -170,9 +170,9 @@ export default function CheckoutPage() {
   );
 
   const finalOrderTotal = Math.max(0, cartTotal - discountAmount);
-  const codTokenAmount = Math.round(finalOrderTotal * 0.20);
-  const codFee = 59;
-  const codOnlineNow = codTokenAmount + codFee;
+  const codTokenAmount = 0; // Testing mode: ₹0 token
+  const codFee = 1;         // Temporary ₹1 COD fee for testing
+  const codOnlineNow = codTokenAmount + codFee; // Pay ₹1 online NOW
   const codRemaining = finalOrderTotal - codTokenAmount;
 
   return (

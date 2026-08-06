@@ -211,6 +211,12 @@ export default function AdminOrdersPage() {
                 {/* Totals */}
                 <td className="p-4 text-text font-black">
                   ₹{order.totalAmount.toLocaleString('en-IN')}
+                  {order.paymentMethod === 'Partial COD' && (
+                    <div className="mt-1 space-y-0.5 text-[8px] font-mono">
+                      <span className="block text-emerald-600 font-bold">Paid: ₹{(order.paidAmount || 0).toLocaleString('en-IN')}</span>
+                      <span className="block text-terracotta font-bold">Due: ₹{(order.codAmountDue || 0).toLocaleString('en-IN')} (COD)</span>
+                    </div>
+                  )}
                 </td>
                 
                 {/* Payment Status Dropdown select */}
@@ -221,6 +227,8 @@ export default function AdminOrdersPage() {
                     className={`border text-[10px] font-black uppercase tracking-widest p-2 outline-none cursor-pointer transition-colors ${
                       order.paymentStatus === 'Paid'
                         ? 'bg-accent/10 border-accent/40 text-text'
+                        : order.paymentStatus === 'Partial Paid'
+                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600'
                         : order.paymentStatus === 'Failed'
                         ? 'bg-accent-red/10 border-accent-red/40 text-accent-red'
                         : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-600'
@@ -228,6 +236,7 @@ export default function AdminOrdersPage() {
                   >
                     <option value="Pending">Pending</option>
                     <option value="Paid">Paid</option>
+                    <option value="Partial Paid">Partial Paid</option>
                     <option value="Failed">Failed</option>
                   </select>
                 </td>
@@ -322,6 +331,7 @@ export default function AdminOrdersPage() {
                 >
                   <option value="Pending" className="bg-card text-text">Pending</option>
                   <option value="Paid" className="bg-card text-text">Paid</option>
+                  <option value="Partial Paid" className="bg-card text-text">Partial Paid</option>
                   <option value="Failed" className="bg-card text-text">Failed</option>
                 </select>
               </div>
