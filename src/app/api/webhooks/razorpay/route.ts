@@ -92,9 +92,9 @@ export async function POST(req: Request) {
         return NextResponse.json({ received: true }, { status: 200 });
       }
 
-      // ── Idempotency check — skip if already Paid ────────────────────────────
-      if (order.paymentStatus === 'Paid') {
-        console.log(`[WEBHOOK] Order ${order._id} already marked Paid — skipping`);
+      // ── Idempotency check — skip if already Paid or Partial Paid ────────────
+      if (order.paymentStatus === 'Paid' || order.paymentStatus === 'Partial Paid') {
+        console.log(`[WEBHOOK] Order ${order._id} already marked ${order.paymentStatus} — skipping`);
         return NextResponse.json({ received: true }, { status: 200 });
       }
 
