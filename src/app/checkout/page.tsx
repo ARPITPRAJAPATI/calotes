@@ -20,7 +20,7 @@ import toast from "react-hot-toast";
 import { useWishlist } from "@/context/WishlistContext";
 
 export default function CheckoutPage() {
-  const { items, cartTotal, clearCart } = useCart(); // Extract cart state parameters
+  const { items, cartTotal, clearCart, removeFromCart } = useCart(); // Extract cart state parameters
   const { data: session, status } = useSession(); // Access user profile session credentials
   const { toggleWishlist, isInWishlist } = useWishlist(); // Extract wishlist toggle controls
   const router = useRouter(); // Initialize page router redirects
@@ -95,7 +95,7 @@ export default function CheckoutPage() {
       const finalAmount = cartTotal - discountAmount;
       
       // 1. Create order record on MongoDB and secure Razorpay order token ID
-      const orderData = await fetch("/api/orders", {
+      const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -105,8 +105,20 @@ export default function CheckoutPage() {
           couponCode: appliedCoupon || undefined,
           paymentMethod,
         }),
-      }).then((t) => t.json());
-      if (orderData.error) throw new Error(orderData.error);
+      });
+      const orderData = await res.json();
+      
+      if (!res.ok) {
+        // If an item in cart was deleted by Admin or sold out to another collector, auto-remove it from user's cart
+        if (orderData.deletedProductId || (orderData.outOfStockProductId && orderData.availableStock === 0)) {
+          const targetId = orderData.deletedProductId || orderData.outOfStockProductId;
+          const targetSize = orderData.deletedSize || orderData.outOfStockSize || "";
+          removeFromCart(targetId, targetSize);
+          toast.error(orderData.error || "An item in your cart is no longer available.");
+          return;
+        }
+        throw new Error(orderData.error || "Order creation failed.");
+      }
       
       // 2. Configure payment gateway parameters mapping Razorpay expectations
       const options = {

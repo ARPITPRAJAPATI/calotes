@@ -68,7 +68,11 @@ export async function POST(req: Request) {
 
       if (!product) {
         return NextResponse.json(
-          { error: `Product not found: ${productId}` },
+          {
+            error: `The piece "${item.name || 'selected item'}" is no longer available in the vault.`,
+            deletedProductId: productId,
+            deletedSize: item.size,
+          },
           { status: 404 }
         );
       }
@@ -78,8 +82,16 @@ export async function POST(req: Request) {
       // the payment verify route AFTER payment is confirmed. This prevents
       // users from placing orders on out-of-stock items before paying.
       if (product.stock !== undefined && product.stock < item.quantity) {
+        const msg = product.stock === 0
+          ? `Vault Alert: The piece "${product.name}" was just acquired by another collector.`
+          : `Insufficient stock for "${product.name}". Only ${product.stock} available.`;
         return NextResponse.json(
-          { error: `Insufficient stock for "${product.name}". Only ${product.stock} available.` },
+          {
+            error: msg,
+            outOfStockProductId: productId,
+            outOfStockSize: item.size,
+            availableStock: product.stock,
+          },
           { status: 409 }
         );
       }

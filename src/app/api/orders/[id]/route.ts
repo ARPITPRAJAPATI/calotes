@@ -47,10 +47,31 @@ export async function PUT(req: Request, { params }: RouteParams) {
     const beforeSnapshot = order.toObject();
 
     // Apply status updates
+    const wasPending = beforeSnapshot.paymentStatus === 'Pending' || beforeSnapshot.paymentStatus === 'Failed';
+    const isNowPaid = paymentStatus === 'Paid' || paymentStatus === 'Partial Paid';
+
     if (orderStatus)   order.orderStatus   = orderStatus;
     if (paymentStatus) order.paymentStatus = paymentStatus;
 
     await order.save();
+
+    // If admin manually approved payment from Pending -> Paid / Partial Paid, decrement product stock
+    if (wasPending && isNowPaid && Array.isArray(order.items)) {
+      try {
+        const Product = (await import('@/models/Product')).default;
+        for (const item of order.items) {
+          await Product.findByIdAndUpdate(item.product, {
+            $inc: { stock: -item.quantity },
+          });
+          await Product.findOneAndUpdate(
+            { _id: item.product, stock: { $lt: 0 } },
+            { $set: { stock: 0 } }
+          );
+        }
+      } catch (stockErr) {
+        console.error('[ADMIN-UPDATE] Stock decrement error:', stockErr);
+      }
+    }
 
     // ── Audit log ────────────────────────────────────────────────────────────────
     // Record every admin mutation with attribution, before/after diff, and IP.

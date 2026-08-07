@@ -6,7 +6,7 @@
 
 A production-grade, full-stack e-commerce platform for curated pre-owned vintage clothing and streetwear in India.
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_Store-111111?style=for-the-badge\&logo=vercel\&logoColor=white)](https://calotes-gamma.vercel.app/)
+[![Live](https://img.shields.io/badge/Live_Demo-Visit_Store-111111?style=for-the-badge\&logo=vercel\&logoColor=white)](https://calotes-gamma.vercel.app/)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge\&logo=github)](https://github.com/ARPITPRAJAPATI/calotes)
 
 ![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=flat-square\&logo=nextdotjs)
@@ -44,78 +44,119 @@ The platform also includes a distinctive **Fit Canvas** experience that allows u
 
 ### Customer Experience
 
-* Premium vintage and streetwear storefront
-* Responsive mobile, tablet, and desktop layouts
-* Product browsing by collection and category
-* Detailed product pages
-* Size, condition, brand, price, and measurement information
-* Product filtering and sorting
-* Featured and latest-arrival collections
-* Persistent shopping cart
-* Persistent wishlist
-* Guest and authenticated checkout flows
-* Promotional code support
-* Razorpay payment integration
-* Customer profile and order history
-* Dark and light theme support
-* Toast-based user feedback
-* Lookbook and editorial brand pages
-* Shipping, return, privacy, and terms pages
+* Premium vintage and streetwear storefront with editorial aesthetic
+* Fully responsive layouts for mobile, tablet, and desktop
+* Product browsing by collection, category, brand, and condition
+* Detailed product pages with multi-image slider and zoom
+* Size, condition, brand, price, compare-at price, and physical measurements
+* Full-text product search with filtering (category, brand, price range, condition) and sorting
+* Featured collections and latest-arrivals sections on homepage
+* Persistent shopping cart with localStorage + server sync
+* Per-item stock limit enforcement in cart (prevents adding more than available inventory)
+* Persistent wishlist with toggle support across sessions
+* Collapsible Partial COD payment breakdown accordion on checkout
+* Server-side price recomputation at checkout (no client price manipulation possible)
+* Promotional coupon code support with real-time validation
+* Customer profile page with full order history and status badges
+* `Vault Alert` toast notifications when a 1-of-1 piece is acquired by another collector
+* Auto-removal of sold-out or admin-deleted items from cart at checkout
+* Dark and light theme toggle with persistent preference
+* Announcement bar with configurable text
+* WhatsApp direct contact button
+* Cookie consent banner
+* PWA installable support
+* Skeleton loaders for all async content
+* Lookbook editorial gallery and brand story pages
+* Patina Inspector — detailed item authentication and condition viewer
+* Size guide on product pages
+* Shipping, returns, privacy policy, and terms of service pages
 
 ### Authentication
 
-* Email and password registration
-* Secure password hashing with `bcryptjs`
-* Credentials-based authentication
-* Google OAuth authentication
-* JWT-based sessions
-* Role-based customer and administrator access
-* Protected administration routes
-* Persistent authentication sessions
+* OTP-verified email registration flow (`/api/register/send-otp` + `/api/register/verify-otp`)
+* Email and password login with `bcryptjs` hashing (min 8 chars, uppercase, digit, special char enforced by Zod)
+* Google OAuth authentication via Auth.js
+* JWT-based sessions with role claims
+* Role-based access: `customer` and `admin`
+* All admin routes protected by middleware + server-side session check
+* IDOR protection on order API routes (users can only access their own orders)
 
 ### Administration
 
-* Protected administrator dashboard
-* Product creation and editing
-* Product image management
-* Category management
-* Inventory and stock management
-* Order management
-* Order status updates
-* Payment status visibility
-* Promotional code management
-* Store configuration management
-* Dashboard statistics and summaries
+* Protected administrator dashboard with live revenue, orders, products, and customers metrics
+* Live System Health Monitor — real-time status checks for MongoDB, Cloudinary, and Resend with latency
+* Product creation with Zod server-side validation, slug generation, and image upload
+* Multi-image product management with Cloudinary hosting
+* In-browser image cropping modal for hero, mobile hero, and lookbook images
+* Category management (create, update, delete)
+* Inventory and stock management per product
+* Order management with full customer detail and item breakdown
+* Dual-dropdown status control: Order Status (Processing, Shipped, Delivered, Cancelled) and Payment Status (Pending, Paid, Partial Paid, Failed, Refunded)
+* **Auto stock decrement when admin manually approves payment status** (Pending → Paid / Partial Paid)
+* Customer management and listing
+* Promotional code management — percentage and flat discounts, expiry dates, per-user and global usage limits
+* Immutable Audit Log — every admin action (status change, product delete, promo update, settings change) is permanently recorded with before/after snapshot and admin attribution
+* Store Settings — hero headline, hero subtext, announcement bar text, contact email, Instagram URL, shipping rate, accent colour, desktop and mobile hero images, lookbook images, brand story images, and Instagram community post cards (all configurable from admin, no code changes needed)
 
 ### Commerce and Payments
 
-* Razorpay order creation
-* Razorpay checkout integration
-* Payment signature verification
-* Order persistence in MongoDB
-* Payment and fulfilment status tracking
-* Stock reduction after successful payment
-* Guest checkout support
-* Order-confirmation email delivery
+* **Dual Payment Options:** Full Online payment & Partial Cash on Delivery (20% Advance Token + ₹59 Handling Fee with collapsible breakdown UI)
+* **Razorpay Checkout Integration:** Multi-rail support — UPI, PhonePe, Google Pay, Paytm, Cards, Netbanking, Wallets
+* **Mobile UPI-Resilient Verification:** HMAC-SHA256 signature verification that works even when mobile browsers drop session cookies during PhonePe/GPay app redirects
+* **Automatic Order Reconciliation Engine** (`src/lib/razorpaySync.ts`): Polls Razorpay REST API on order list and order detail fetches — automatically resolves tab-closed payments to Paid/Partial Paid without any manual admin action
+* **Razorpay Server-to-Server Webhook** (`/api/webhooks/razorpay`): `payment.captured`, `payment.failed`, `refund.processed` events with HMAC signature verification and idempotency guards
+* **Vault Inventory Protection:** Real-time stock pre-check at order creation; auto-cart-cleanup and Vault Alert toast for sold-out or admin-deleted items
+* **Server-Side Price Recomputation:** All prices re-fetched from DB at checkout — client cannot manipulate pricing
+* **Coupon Usage Controls:** Server-side coupon validation with global `usageLimit`, per-user `perUserLimit`, expiry, minimum order amount, and atomic `usageCount` + `usedBy` tracking post-payment
+* **Admin Order Lifecycle Management:** Complete order and payment status control with automated stock adjustment on every status mutation
+* **Order Confirmation Emails:** Automated transactional emails via Resend on payment success
+
+### Security
+
+* Zod schema validation on all API route inputs (orders, products, register, coupons)
+* MongoDB operator injection sanitization (`sanitizeMongoOperators`) on all user-submitted data
+* ObjectId validation (`isValidObjectId`) before every DB query to prevent CastError crashes
+* Timing-safe HMAC comparison (`crypto.timingSafeEqual`) for all signature verification
+* Rate limiting on sensitive endpoints (`/api/register`, `/api/auth`) via Upstash Redis (in-memory fallback for local dev)
+* IDOR protection: users can only read/modify their own orders
+* Internal API secret (`X-Internal-Secret` header) protecting internal service-to-service calls
+* Immutable audit log trail for all admin mutations
+* Password complexity enforcement: min 8 chars, uppercase, digit, special character
 
 ### Media and Creative Tools
 
-* Cloudinary image hosting
-* Multiple product images
-* Image upload and transformation workflow
-* Browser-based AI background removal
-* Interactive Fit Canvas
-* Drag-and-drop outfit composition
-* Reusable cutout caching
+* Cloudinary image hosting with secure upload API
+* Multiple product images with full-screen image slider
+* In-browser image cropping modal (aspect ratio control, zoom, pan) powered by `react-image-crop`
+* AI background removal in the browser using `@imgly/background-removal` (no server processing)
+* **Fit Canvas** — interactive drag-and-drop outfit composition tool
+* Cutout caching per product (MongoDB `Cutout` model) to avoid reprocessing
+* Image proxy route (`/api/proxy-image`) to bypass CORS for external image background removal
+* Lookbook gallery and brand story image management from Admin Settings
 
-### Communication
+### SEO and Discoverability
 
-* Transactional email delivery through Resend
-* Welcome emails
-* Order confirmation emails
-* Reusable HTML email templates
-* Customer contact experience
-* Instagram and WhatsApp integration
+* Dynamic `sitemap.xml` auto-generated from live product slugs (`/app/sitemap.ts`)
+* `robots.txt` configuration (`/app/robots.ts`)
+* Per-page `<title>` and `<meta description>` tags
+* Semantic HTML with proper heading hierarchy
+* Open Graph metadata for social sharing
+* MongoDB compound text indexes on product `name`, `brand`, and `description` for fast full-text search
+
+### Communication and Integrations
+
+* Transactional emails via Resend — welcome, order confirmation with item breakdown
+* WhatsApp Business direct contact button (floating)
+* Instagram profile integration in footer and community posts section
+* Contact page with configurable contact email from Admin Settings
+* Configurable announcement bar text from Admin Settings
+
+### Observability and DevOps
+
+* `/api/health` — live health check endpoint covering MongoDB latency, Cloudinary status, Resend status, and environment variable validation (compatible with UptimeRobot / BetterStack monitoring)
+* Admin Health Monitor dashboard widget showing real-time service status
+* Structured server-side console logging with `[WEBHOOK]`, `[RAZORPAY-SYNC]`, `[ADMIN-UPDATE]`, `[SECURITY]` prefixes for log filtering
+* Vercel deployment with automatic CI/CD on `main` branch push
 
 ---
 
