@@ -11,13 +11,8 @@ import { isValidObjectId } from '@/lib/sanitize';
 // Both paths verify the HMAC signature independently.
 export async function POST(req: Request) {
   try {
-    // 1. ── Auth check — only authenticated users can call verify ─────────────────
-    // This was MISSING before. Without it, any unauthenticated attacker could POST
-    // fabricated Razorpay IDs and mark ANY order as Paid.
+    // 1. ── Check session (optional — mobile browsers often drop session cookies after UPI app redirects) ─
     const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     // 2. Parse request body
     let body: unknown;
@@ -35,7 +30,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid order reference' }, { status: 400 });
     }
 
-    // 4. ── Fetch order and verify ownership ───────────────────────────────────────
+    // 4. ── Fetch order ─────────────────────────────────────────────────────────────
     await connectDB();
     const order = await Order.findById(order_id);
 
@@ -43,8 +38,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    // IDOR check: ensure the requesting user owns this order
-    if (order.user.toString() !== session.user.id && (session.user as any).role !== 'admin') {
+    // IDOR check: if session exists, ensure the requesting user owns this order or is admin.
+    // If session was dropped by mobile browser after UPI redirect, cryptographic HMAC signature check below handles security.
+    if (session?.user?.id && order.user.toString() !== session.user.id && (session.user as any).role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
@@ -87,7 +83,7 @@ export async function POST(req: Request) {
 
     if (!isAuthentic) {
       // Log failed verification for fraud monitoring
-      console.warn(`[SECURITY] Payment signature mismatch for order ${order_id} by user ${session.user.id}`);
+      console.warn(`[SECURITY] Payment signature mismatch for order ${order_id} by user ${session?.user?.id ?? 'unknown'}`);
       return NextResponse.json({ success: false, error: 'Invalid payment signature' }, { status: 400 });
     }
 
