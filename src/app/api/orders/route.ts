@@ -226,7 +226,10 @@ export async function GET() {
       .sort('-createdAt')
       .lean();
 
-    return NextResponse.json(orders);
+    const { syncPendingOrdersBatch } = await import('@/lib/razorpaySync');
+    const syncedOrders = await syncPendingOrdersBatch(orders);
+
+    return NextResponse.json(syncedOrders);
   } catch (error: any) {
     console.error('Orders fetch failed:', error);
     return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 });

@@ -98,7 +98,10 @@ export async function GET(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    return NextResponse.json(order);
+    const { syncPendingOrderWithRazorpay } = await import('@/lib/razorpaySync');
+    const syncedOrder = await syncPendingOrderWithRazorpay(order);
+
+    return NextResponse.json(syncedOrder);
   } catch (error: any) {
     console.error('Order fetch failed:', error);
     return NextResponse.json({ error: 'Failed to fetch order' }, { status: 500 });
