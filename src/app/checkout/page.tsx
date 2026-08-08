@@ -390,7 +390,7 @@ export default function CheckoutPage() {
                     type="button"
                     onClick={(e) => handlePayment(e, "Partial COD")}
                     disabled={loading || !items.length}
-                    className="w-full py-4 bg-bg border border-terracotta text-terracotta hover:bg-terracotta hover:text-bg text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40"
+                    className="btn-primary w-full justify-center py-4 flex items-center gap-2 disabled:opacity-40 shadow-lg"
                   >
                     {loading ? <Loader2 className="animate-spin" size={14} /> : <span>Pay Advance ₹{codOnlineNow.toLocaleString("en-IN")} &amp; Place COD Order</span>}
                   </button>
