@@ -139,21 +139,24 @@ export async function POST(req: Request) {
     // 9. ── Trigger order confirmation email (non-blocking, best-effort) ─────────
     try {
       const populatedOrder = await Order.findById(order_id).populate('user', 'email').lean() as any;
-      const baseUrl = process.env.NEXTAUTH_URL || process.env.AUTH_URL?.replace('/api/auth', '') || 'http://localhost:3000';
-      // Use internal secret to authenticate the internal call so /api/send-email rejects public invocations
-      fetch(`${baseUrl}/api/send-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Internal-Secret': process.env.INTERNAL_API_SECRET || '',
-        },
-        body: JSON.stringify({
-          to: populatedOrder?.user?.email,
-          subject: 'Order Confirmed — Calotes Vintage',
-          orderId: order_id,
-          total: order.totalAmount,
-        }),
-      });
+      const recipientEmail = populatedOrder?.user?.email || (session?.user as any)?.email;
+      
+      if (recipientEmail) {
+        const baseUrl = process.env.NEXTAUTH_URL || process.env.AUTH_URL?.replace('/api/auth', '') || 'http://localhost:3000';
+        fetch(`${baseUrl}/api/send-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Internal-Secret': process.env.INTERNAL_API_SECRET || '',
+          },
+          body: JSON.stringify({
+            to: recipientEmail,
+            subject: `Your drip is officially secured! (Order #${String(order_id).slice(-6).toUpperCase()})`,
+            orderId: order_id,
+            total: order.totalAmount,
+          }),
+        });
+      }
     } catch (e) {
       console.error('[WARN] Email trigger failed for order', order_id, e);
     }
