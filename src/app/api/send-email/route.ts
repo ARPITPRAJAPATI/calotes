@@ -226,42 +226,31 @@ export async function POST(req: Request) {
                   <!-- RETENTIONLY STYLE SOCIAL ICONS ROW (FB, IG, X, WA) & FOOTER -->
                   <tr>
                     <td align="center">
-                      <!-- CIRCULAR SOCIAL SVG ICONS ROW -->
+                      <!-- CIRCULAR SOCIAL MEDIA ICONS ROW (FB, IG, X, WA) - GMAIL COMPATIBLE IMG TAGS -->
                       <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="margin: 0 auto 24px auto;">
                         <tr>
                           <!-- Facebook -->
                           <td style="padding: 0 10px;">
                             <a href="https://calotes.in" style="text-decoration: none; display: inline-block;">
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                              </svg>
+                              <img src="https://img.icons8.com/ios-glyphs/48/222222/facebook-new.png" width="22" height="22" alt="Facebook" style="display: block; border: 0;" />
                             </a>
                           </td>
                           <!-- Instagram -->
                           <td style="padding: 0 10px;">
                             <a href="https://www.instagram.com/calotes.live/" style="text-decoration: none; display: inline-block;">
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                              </svg>
+                              <img src="https://img.icons8.com/ios-glyphs/48/222222/instagram-new.png" width="22" height="22" alt="Instagram" style="display: block; border: 0;" />
                             </a>
                           </td>
                           <!-- X (Twitter) -->
                           <td style="padding: 0 10px;">
                             <a href="https://calotes.in" style="text-decoration: none; display: inline-block;">
-                              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 4l11.733 16h4.267l-11.733 -16z"></path>
-                                <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path>
-                              </svg>
+                              <img src="https://img.icons8.com/ios-glyphs/48/222222/twitter--v1.png" width="22" height="22" alt="X" style="display: block; border: 0;" />
                             </a>
                           </td>
                           <!-- WhatsApp -->
                           <td style="padding: 0 10px;">
                             <a href="https://wa.me/919999999999" style="text-decoration: none; display: inline-block;">
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-                              </svg>
+                              <img src="https://img.icons8.com/ios-glyphs/48/222222/whatsapp.png" width="22" height="22" alt="WhatsApp" style="display: block; border: 0;" />
                             </a>
                           </td>
                         </tr>
