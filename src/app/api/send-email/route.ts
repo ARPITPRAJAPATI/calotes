@@ -127,12 +127,8 @@ export async function POST(req: Request) {
                   <!-- TOP BRAND ATELIER HEADER -->
                   <tr>
                     <td align="center" style="padding-bottom: 32px;">
-                      <!-- Minimalist Shopping Bag Icon -->
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: 0 auto 12px auto;">
-                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                        <path d="M16 10a4 4 0 0 1-8 0"></path>
-                      </svg>
+                      <!-- Minimalist Shopping Bag Icon - Gmail Compatible Img Tag -->
+                      <img src="https://img.icons8.com/ios-glyphs/48/222222/shopping-bag.png" width="22" height="22" alt="Calotes Atelier" style="display: block; margin: 0 auto 12px auto; border: 0;" />
                       <!-- DIOR STYLE LIGHT HIGH-FASHION SERIF LOGO -->
                       <div style="font-family: 'Cinzel', 'Didot', 'Bodoni MT', 'Playfair Display', Georgia, serif; font-size: 16px; font-weight: 400; letter-spacing: 0.3em; text-transform: uppercase; color: #222222; line-height: 1;">
                         CALOTES
