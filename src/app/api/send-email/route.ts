@@ -60,51 +60,41 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, mock: true });
     }
 
-    // Build items HTML list with luxury image thumbnails and crisp styling
+    // Build items HTML list matching exact Retentionly Minimalist Atelier layout with Dior Light Typography
     const itemsHtml = items.map((item: any) => `
-      <tr style="border-bottom: 1px solid rgba(26,20,16,0.08);">
-        <td style="padding: 16px 0; width: 65px; vertical-align: middle;">
-          ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width: 56px; height: 64px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(26,20,16,0.12); display: block;" />` : '<div style="width: 56px; height: 64px; background: #E4D4AE; border-radius: 4px;"></div>'}
-        </td>
-        <td style="padding: 16px 12px; vertical-align: middle;">
-          <div style="font-weight: 800; font-size: 13px; text-transform: uppercase; color: #111111; letter-spacing: 0.02em; line-height: 1.3;">${item.name || 'Vintage Archive Piece'}</div>
-          <div style="margin-top: 6px; display: inline-block;">
-            <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; background: #111111; color: #FAF6EE; padding: 2px 7px; border-radius: 3px; letter-spacing: 0.05em;">SIZE: ${item.size || 'OS'}</span>
-            <span style="font-size: 11px; color: #786C5E; margin-left: 8px;">QTY: ${item.quantity || 1}</span>
-          </div>
-        </td>
-        <td style="padding: 16px 0; text-align: right; vertical-align: middle; font-weight: 900; font-size: 14px; color: #111111;">
-          ₹${((item.price || 0) * (item.quantity || 1)).toLocaleString('en-IN')}
-        </td>
-      </tr>
+      <div style="text-align: center; margin-bottom: 30px;">
+        ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width: 210px; height: 230px; object-fit: cover; border-radius: 4px; margin: 0 auto 16px auto; display: block; box-shadow: 0 4px 15px rgba(0,0,0,0.04);" />` : '<div style="width: 210px; height: 230px; background: #F5F5F5; border-radius: 4px; margin: 0 auto 16px auto;"></div>'}
+        <div style="font-family: 'Cinzel', 'Didot', 'Bodoni MT', 'Playfair Display', 'Cormorant Garamond', Georgia, serif; font-size: 15px; font-weight: 400; color: #222222; margin-bottom: 6px; letter-spacing: 0.08em; text-transform: uppercase;">${item.name || 'Vintage Piece'}</div>
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 300; color: #666666; margin-bottom: 6px; letter-spacing: 0.02em;">Size: <strong style="color: #222222; font-weight: 500;">${item.size || 'OS'}</strong> &nbsp;&bull;&nbsp; Quantity: ${item.quantity || 1}</div>
+        <div style="font-family: 'Cinzel', 'Didot', 'Bodoni MT', 'Playfair Display', Georgia, serif; font-size: 15px; font-weight: 500; color: #222222; letter-spacing: 0.05em;">₹${((item.price || 0) * (item.quantity || 1)).toLocaleString('en-IN')}</div>
+      </div>
     `).join('');
 
     // Address formatted string
     const addressHtml = shippingAddress ? `
-      <div style="font-size: 12px; color: #111111; line-height: 1.6;">
-        <strong style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.02em; display: block; margin-bottom: 2px;">${shippingAddress.fullName || customerName}</strong>
-        ${shippingAddress.street || ''}<br />
-        ${shippingAddress.city || ''}${shippingAddress.state ? `, ${shippingAddress.state}` : ''} &bull; ${shippingAddress.postalCode || ''}<br />
-        <span style="color: #786C5E; font-size: 11px;">Phone: ${shippingAddress.phone || 'N/A'}</span>
+      <div style="font-size: 12px; color: #555555; line-height: 1.6; text-align: center; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 300;">
+        <strong style="color: #222222; text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; font-family: 'Cinzel', 'Didot', Georgia, serif; font-weight: 500;">${shippingAddress.fullName || customerName}</strong><br />
+        ${shippingAddress.street || ''}, ${shippingAddress.city || ''}${shippingAddress.state ? `, ${shippingAddress.state}` : ''} - ${shippingAddress.postalCode || ''}<br />
+        <span style="color: #888888; font-size: 11px;">Phone: ${shippingAddress.phone || 'N/A'}</span>
       </div>
-    ` : '<div style="font-size: 12px; color: #786C5E;">Standard Shipping Destination</div>';
+    ` : '<div style="font-size: 12px; color: #888888; text-align: center; font-weight: 300;">Standard Shipping Destination</div>';
 
     // Payment breakdown HTML
     const paymentBreakdownHtml = paymentMethod === 'Partial COD' ? `
-      <div style="background: rgba(200, 90, 50, 0.06); border: 1px solid rgba(200, 90, 50, 0.25); padding: 14px 16px; border-radius: 6px; margin-top: 14px;">
-        <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; color: #C85A32; letter-spacing: 0.1em; margin-bottom: 8px;">Payment Breakdown (Partial COD)</div>
-        <div style="font-size: 12px; margin-top: 4px; color: #111111; display: table; width: 100%;">
-          <span style="display: table-cell; text-align: left;">Advance Paid Online:</span>
-          <strong style="display: table-cell; text-align: right; color: #15803d; font-size: 13px;">₹${paidAmount.toLocaleString('en-IN')}</strong>
+      <div style="border: 1px solid #E5E5E5; padding: 14px; border-radius: 4px; margin-top: 14px; background-color: #FAFAFA;">
+        <div style="font-size: 10px; font-weight: 500; text-transform: uppercase; color: #C85A32; letter-spacing: 0.15em; text-align: center; margin-bottom: 6px; font-family: 'Cinzel', 'Didot', Georgia, serif;">Partial COD Breakdown</div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #444444; margin-top: 4px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 300;">
+          <span>Advance Paid Online:</span>
+          <strong style="color: #15803d; font-weight: 500;">₹${paidAmount.toLocaleString('en-IN')}</strong>
         </div>
-        <div style="font-size: 12px; margin-top: 6px; color: #111111; display: table; width: 100%;">
-          <span style="display: table-cell; text-align: left;">Payable to Courier on Delivery:</span>
-          <strong style="display: table-cell; text-align: right; color: #C85A32; font-size: 13px;">₹${codAmountDue.toLocaleString('en-IN')}</strong>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #444444; margin-top: 4px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 300;">
+          <span>Payable on Delivery:</span>
+          <strong style="color: #C85A32; font-weight: 500;">₹${codAmountDue.toLocaleString('en-IN')}</strong>
         </div>
       </div>
     ` : `
-      <div style="background: rgba(21, 128, 61, 0.06); border: 1px solid rgba(21, 128, 61, 0.2); padding: 12px 16px; border-radius: 6px; margin-top: 14px; font-size: 11px; font-weight: 800; color: #15803d; text-transform: uppercase; letter-spacing: 0.05em;">
-        ✓ PAID FULL ONLINE: ₹${finalTotal.toLocaleString('en-IN')}
+      <div style="border: 1px solid #E5E5E5; padding: 10px 14px; border-radius: 4px; margin-top: 14px; background-color: #FAFAFA; text-align: center; font-size: 10px; font-weight: 500; color: #15803d; text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Cinzel', 'Didot', Georgia, serif;">
+        ✓ Paid Full Online: ₹${finalTotal.toLocaleString('en-IN')}
       </div>
     `;
 
@@ -122,168 +112,172 @@ export async function POST(req: Request) {
         <head>
           <meta charset="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+          <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet" />
         </head>
-        <body style="margin: 0; padding: 0; background-color: #EDE0C4; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;">
+        <body style="margin: 0; padding: 0; background-color: #FAFAFA; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;">
           
           <!-- MAIN CONTAINER -->
-          <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #EDE0C4; padding: 30px 10px;">
+          <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #FAFAFA; padding: 40px 10px;">
             <tr>
               <td align="center">
-                <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #F5EDD8; border: 1px solid rgba(26,20,16,0.15); border-radius: 12px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.12);">
+                <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 560px; background-color: #FFFFFF; border: 1px solid #EBEBEB; border-radius: 4px; padding: 48px 36px; box-shadow: 0 4px 25px rgba(0,0,0,0.03);">
                   
-                  <!-- TOP BRAND ACCENT BAR -->
+                  <!-- TOP BRAND ATELIER HEADER -->
                   <tr>
-                    <td style="height: 4px; background-color: #C85A32;"></td>
-                  </tr>
-
-                  <!-- HIGH-FASHION EDITORIAL BANNER IMAGE -->
-                  <tr>
-                    <td style="background-color: #0F0F0F; text-align: center; line-height: 0;">
-                      <img src="https://calotes.in/images/calotes-email-hero.png" alt="Calotes Vintage Editorial" style="width: 100%; max-width: 600px; height: auto; display: block; border-bottom: 2px solid #C85A32;" />
+                    <td align="center" style="padding-bottom: 32px;">
+                      <!-- Minimalist Shopping Bag Icon -->
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: 0 auto 12px auto;">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                      </svg>
+                      <!-- DIOR STYLE LIGHT HIGH-FASHION SERIF LOGO -->
+                      <div style="font-family: 'Cinzel', 'Didot', 'Bodoni MT', 'Playfair Display', Georgia, serif; font-size: 16px; font-weight: 400; letter-spacing: 0.3em; text-transform: uppercase; color: #222222; line-height: 1;">
+                        CALOTES
+                      </div>
                     </td>
                   </tr>
 
-                  <!-- HERO HUMAN GREETING -->
+                  <!-- DIOR STYLE LIGHT HERO HEADING -->
                   <tr>
-                    <td style="padding: 36px 36px 12px 36px;">
-                      <div style="font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.25em; color: #C85A32; margin-bottom: 8px;">ARCHIVE CONFIRMATION</div>
-                      <h1 style="color: #1A1410; font-size: 24px; font-weight: 900; margin: 0 0 14px 0; letter-spacing: -0.02em;">
-                        Hey ${customerName},
+                    <td align="center" style="padding-bottom: 16px;">
+                      <h1 style="font-family: 'Cinzel', 'Didot', 'Bodoni MT', 'Playfair Display', 'Cormorant Garamond', Georgia, serif; font-size: 28px; font-weight: 400; color: #222222; margin: 0; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1.2;">
+                        YOUR DRIP IS SECURED
                       </h1>
-                      <div style="font-size: 16px; font-weight: 800; color: #1A1410; line-height: 1.5; margin-bottom: 14px;">
-                        Your drip is officially <span style="background: #C85A32; color: #F5EDD8; padding: 3px 10px; border-radius: 4px; font-size: 14px; letter-spacing: 0.05em; display: inline-block;">SECURED 🔒</span>
-                      </div>
-                      <p style="color: #6B6050; font-size: 13px; line-height: 1.6; margin: 0;">
-                        Welcome to <strong>Calotes Vintage</strong> — born from a rebellion against the disposable culture of modern fast fashion. Every piece in our archive is rare, curated, and straight-up different.
+                    </td>
+                  </tr>
+
+                  <!-- SUBTITLE / DESCRIPTION -->
+                  <tr>
+                    <td align="center" style="padding-bottom: 28px;">
+                      <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 15px; font-weight: 400; color: #555555; line-height: 1.6; max-width: 440px; margin: 0 auto; letter-spacing: 0.02em; font-style: italic;">
+                        Hey <strong>${customerName}</strong>, thank you for acquiring from the archive. We saved your piece for you and are carefully preparing your order for shipment.
                       </p>
                     </td>
                   </tr>
 
-                  <!-- BRAND MANIFESTO QUOTE -->
+                  <!-- PILL CODE / ORDER REF BADGE -->
                   <tr>
-                    <td style="padding: 0 36px 20px 36px;">
-                      <div style="background: rgba(200,90,50,0.06); border-left: 3px solid #C85A32; padding: 14px 18px; border-radius: 0 6px 6px 0;">
-                        <p style="color: #1A1410; font-size: 12px; font-style: italic; line-height: 1.5; margin: 0;">
-                          &ldquo;We believe garments are artifacts &mdash; pieces of history that gain character, soul, and value over time.&rdquo;
-                        </p>
+                    <td align="center" style="padding-bottom: 32px;">
+                      <div style="display: inline-block; border: 1px solid #333333; border-radius: 50px; padding: 9px 22px; font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: #222222; font-family: 'Cinzel', 'Didot', Georgia, serif;">
+                        ORDER REF: #${safeOrderId.slice(-8).toUpperCase()}
                       </div>
                     </td>
                   </tr>
 
-                  <!-- PROGRESS TRACKER BAR -->
+                  <!-- THIN DIVIDER LINE 1 -->
                   <tr>
-                    <td style="padding: 0 36px 24px 36px;">
-                      <div style="background: #E4D4AE; padding: 14px 20px; border-radius: 6px; border: 1px solid rgba(26,20,16,0.1);">
-                        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
-                          <tr>
-                            <td align="center" style="font-size: 10px; font-weight: 900; text-transform: uppercase; color: #15803d; letter-spacing: 0.05em;">
-                              ✓ SECURED
-                            </td>
-                            <td align="center" style="font-size: 10px; color: #6B6050;">&mdash;&mdash;</td>
-                            <td align="center" style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: #C85A32; letter-spacing: 0.05em;">
-                              QUALITY CHECK
-                            </td>
-                            <td align="center" style="font-size: 10px; color: #6B6050;">&mdash;&mdash;</td>
-                            <td align="center" style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #6B6050; letter-spacing: 0.05em;">
-                              DISPATCH
-                            </td>
-                          </tr>
-                        </table>
-                      </div>
+                    <td style="padding-bottom: 36px;">
+                      <div style="border-top: 1px solid #E5E5E5; width: 100%;"></div>
                     </td>
                   </tr>
 
-                  <!-- ORDER ARCHIVE SUMMARY CARD -->
+                  <!-- DIOR STYLE LIGHT SECTION TITLE -->
                   <tr>
-                    <td style="padding: 0 36px 20px 36px;">
-                      <div style="background: #E4D4AE; border: 1px solid rgba(26,20,16,0.12); padding: 22px; border-radius: 8px;">
-                        
-                        <div style="display: table; width: 100%; border-bottom: 1px solid rgba(26,20,16,0.12); padding-bottom: 12px; margin-bottom: 8px;">
-                          <div style="display: table-cell; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: #1A1410;">
-                            ORDER REF: #${safeOrderId.slice(-8).toUpperCase()}
-                          </div>
-                          <div style="display: table-cell; text-align: right;">
-                            <span style="font-size: 9px; font-weight: 900; text-transform: uppercase; background: #1A1410; color: #F5EDD8; padding: 3px 8px; border-radius: 3px; letter-spacing: 0.1em;">CONFIRMED</span>
-                          </div>
-                        </div>
-
-                        <!-- ITEMS TABLE -->
-                        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
-                          ${itemsHtml}
-                        </table>
-
-                        <!-- TOTALS BREAKDOWN -->
-                        <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(26,20,16,0.12);">
-                          <div style="display: table; width: 100%; font-size: 13px; font-weight: 900; color: #1A1410;">
-                            <span style="display: table-cell; text-align: left; letter-spacing: 0.05em;">TOTAL ARCHIVE VALUE:</span>
-                            <span style="display: table-cell; text-align: right; color: #C85A32; font-size: 15px;">₹${finalTotal.toLocaleString('en-IN')}</span>
-                          </div>
-                          ${paymentBreakdownHtml}
-                        </div>
-                      </div>
+                    <td align="center" style="padding-bottom: 28px;">
+                      <h2 style="font-family: 'Cinzel', 'Didot', 'Bodoni MT', 'Playfair Display', Georgia, serif; font-size: 15px; font-weight: 400; color: #222222; margin: 0; letter-spacing: 0.15em; text-transform: uppercase;">
+                        HERE'S WHAT YOU ACQUIRED
+                      </h2>
                     </td>
                   </tr>
 
-                  <!-- SHIPPING DESTINATION CARD -->
+                  <!-- CENTERED PRODUCTS LIST -->
                   <tr>
-                    <td style="padding: 0 36px 20px 36px;">
-                      <div style="background: #F5EDD8; border: 1px solid rgba(26,20,16,0.12); padding: 18px; border-radius: 6px;">
-                        <div style="font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; color: #6B6050; margin-bottom: 8px;">SHIPPING DESTINATION</div>
-                        ${addressHtml}
-                      </div>
+                    <td align="center" style="padding-bottom: 12px;">
+                      ${itemsHtml}
                     </td>
                   </tr>
 
-                  <!-- WHAT HAPPENS NEXT SECTION -->
+                  <!-- PILL ACTION BUTTON (LIGHT HIGH-FASHION STYLE) -->
                   <tr>
-                    <td style="padding: 10px 36px 20px 36px;">
-                      <div style="font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; color: #1A1410; margin-bottom: 6px;">
-                        🐍 What happens next?
-                      </div>
-                      <p style="color: #6B6050; font-size: 12px; line-height: 1.6; margin: 0 0 10px 0;">
-                        Your piece is now going through our <strong>selection + quality check phase</strong><br />
-                        <span style="font-style: italic; color: #C85A32;">(because we don’t send mid stuff 🚫)</span>
-                      </p>
-                      <p style="color: #1A1410; font-size: 12px; font-weight: 700; margin: 0;">
-                        📦 Shipping update will hit your inbox as soon as it dispatches.
-                      </p>
-                    </td>
-                  </tr>
-
-                  <!-- VAULT REMINDER CARD -->
-                  <tr>
-                    <td style="padding: 0 36px 24px 36px;">
-                      <div style="background: #1A1410; color: #F5EDD8; padding: 22px 20px; border-radius: 6px; text-align: center; border: 1px solid rgba(200,90,50,0.3);">
-                        <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.25em; color: #C85A32; margin-bottom: 6px;">🔥 VAULT REMINDER</div>
-                        <div style="font-size: 13px; font-weight: 800; line-height: 1.5; letter-spacing: 0.02em;">
-                          You didn’t just buy clothes.<br />You just unlocked a <span style="color: #C85A32; border-bottom: 1px solid #C85A32;">1-of-1 vibe</span>.
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- CALL TO ACTION BUTTON -->
-                  <tr>
-                    <td style="padding: 0 36px 30px 36px; text-align: center;">
-                      <a href="https://calotes.in/profile" style="display: inline-block; background-color: #1A1410; color: #F5EDD8; text-decoration: none; padding: 16px 32px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.25em; border-radius: 4px; border: 1px solid #1A1410; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-                        VIEW ORDER IN ARCHIVE &rarr;
+                    <td align="center" style="padding-bottom: 32px;">
+                      <a href="https://calotes.in/profile" style="display: inline-block; background-color: #222222; color: #FFFFFF; text-decoration: none; padding: 15px 38px; border-radius: 50px; font-size: 10px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; font-family: 'Cinzel', 'Didot', Georgia, serif; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                        VIEW YOUR ORDER IN ARCHIVE
                       </a>
                     </td>
                   </tr>
 
-                  <!-- FOOTER LINKS & SUPPORT -->
+                  <!-- SUMMARY & SHIPPING CARD -->
                   <tr>
-                    <td style="padding: 28px 36px 36px 36px; text-align: center; border-top: 1px solid rgba(26,20,16,0.1); background-color: #EDE0C4;">
-                      <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; color: #1A1410; margin-bottom: 10px;">STAY TAPPED IN</div>
-                      <div style="font-size: 12px; margin-bottom: 16px;">
-                        <a href="https://www.instagram.com/calotes.live/" style="color: #C85A32; font-weight: 800; text-decoration: none; margin: 0 10px;">Instagram @calotes.live</a> &bull;
-                        <a href="https://calotes.in" style="color: #1A1410; font-weight: 800; text-decoration: none; margin: 0 10px;">Website calotes.in</a>
+                    <td style="padding-bottom: 32px;">
+                      <div style="border: 1px solid #EAEAEA; padding: 20px; border-radius: 4px; background-color: #FAFAFA;">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 500; color: #222222; margin-bottom: 8px; font-family: 'Cinzel', 'Didot', Georgia, serif; letter-spacing: 0.05em;">
+                          <span>Total Archive Value:</span>
+                          <span>₹${finalTotal.toLocaleString('en-IN')}</span>
+                        </div>
+                        ${paymentBreakdownHtml}
+                        <div style="border-top: 1px solid #EAEAEA; margin-top: 14px; padding-top: 14px;">
+                          <div style="font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.2em; color: #888888; margin-bottom: 6px; text-align: center; font-family: 'Cinzel', 'Didot', Georgia, serif;">Shipping Destination</div>
+                          ${addressHtml}
+                        </div>
                       </div>
-                      <p style="font-size: 11px; color: #6B6050; line-height: 1.5; margin: 0 0 12px 0;">
-                        If you got any queries, just reply directly to this mail. We got you.
-                      </p>
-                      <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; color: #1A1410;">
-                        &mdash; TEAM CALOTES
+                    </td>
+                  </tr>
+
+                  <!-- THIN DIVIDER LINE 2 -->
+                  <tr>
+                    <td style="padding-bottom: 36px;">
+                      <div style="border-top: 1px solid #E5E5E5; width: 100%;"></div>
+                    </td>
+                  </tr>
+
+                  <!-- RETENTIONLY STYLE SOCIAL ICONS ROW (FB, IG, X, WA) & FOOTER -->
+                  <tr>
+                    <td align="center">
+                      <!-- CIRCULAR SOCIAL SVG ICONS ROW -->
+                      <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="margin: 0 auto 24px auto;">
+                        <tr>
+                          <!-- Facebook -->
+                          <td style="padding: 0 10px;">
+                            <a href="https://calotes.in" style="text-decoration: none; display: inline-block;">
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                              </svg>
+                            </a>
+                          </td>
+                          <!-- Instagram -->
+                          <td style="padding: 0 10px;">
+                            <a href="https://www.instagram.com/calotes.live/" style="text-decoration: none; display: inline-block;">
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                              </svg>
+                            </a>
+                          </td>
+                          <!-- X (Twitter) -->
+                          <td style="padding: 0 10px;">
+                            <a href="https://calotes.in" style="text-decoration: none; display: inline-block;">
+                              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4l11.733 16h4.267l-11.733 -16z"></path>
+                                <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path>
+                              </svg>
+                            </a>
+                          </td>
+                          <!-- WhatsApp -->
+                          <td style="padding: 0 10px;">
+                            <a href="https://wa.me/919999999999" style="text-decoration: none; display: inline-block;">
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                              </svg>
+                            </a>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <!-- BRAND NAME & ADDRESS -->
+                      <div style="font-family: 'Cinzel', 'Didot', 'Bodoni MT', Georgia, serif; font-size: 13px; font-weight: 400; color: #222222; margin-bottom: 6px; letter-spacing: 0.15em; text-transform: uppercase;">
+                        Calotes Vintage
+                      </div>
+                      <div style="font-size: 11px; color: #777777; margin-bottom: 18px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 300;">
+                        New Delhi, India &bull; Hand-picked Vintage Streetwear
+                      </div>
+
+                      <!-- UNSUBSCRIBE / FOOTER NOTE -->
+                      <div style="font-size: 11px; color: #888888; line-height: 1.5; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 300;">
+                        Don't want to receive this email? <a href="https://calotes.in/profile" style="color: #444444; text-decoration: underline;">Unsubscribe here</a>
                       </div>
                     </td>
                   </tr>
