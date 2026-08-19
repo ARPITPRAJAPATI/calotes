@@ -28,7 +28,7 @@ The application combines a premium editorial storefront with essential commerce 
 
 The platform also includes a distinctive **Fit Canvas** experience that allows users to experiment with outfit combinations using draggable clothing elements and browser-based background removal.
 
-> Every garment has a story. Calotes helps you continue it.
+> Every garment has a story. Calotes helps you continue it..
 
 ---
 
