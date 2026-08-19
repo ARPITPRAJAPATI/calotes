@@ -5,10 +5,11 @@ import SafeImage from "@/components/SafeImage";
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ShieldCheck, Ruler, MessageCircle, Star, Sparkles, Heart, ChevronLeft, ChevronRight, ScanLine } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Ruler, MessageCircle, Star, Sparkles, Heart, ChevronLeft, ChevronRight, ScanLine, Maximize2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import PatinaInspector from "@/components/PatinaInspector";
+import FullScreenImageViewer from "@/components/FullScreenImageViewer";
 import toast from "react-hot-toast";
 
 interface ProductClientProps {
@@ -24,6 +25,36 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [added, setAdded] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(false);
+  const [isFullScreenOpen, setIsFullScreenOpen] = useState(false);
+
+  // Touch swipe support for mobile gallery
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchEndX, setTouchEndX] = useState<number | null>(null);
+
+  const minSwipeDistance = 45;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.targetTouches[0].clientX);
+    setTouchEndX(null);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX === null || touchEndX === null) return;
+    const distance = touchStartX - touchEndX;
+    if (distance > minSwipeDistance) {
+      // Swiped Left -> Next Image
+      setSelectedImage((prev) => (prev === product.images.length - 1 ? 0 : prev + 1));
+    } else if (distance < -minSwipeDistance) {
+      // Swiped Right -> Previous Image
+      setSelectedImage((prev) => (prev === 0 ? product.images.length - 1 : prev - 1));
+    }
+    setTouchStartX(null);
+    setTouchEndX(null);
+  };
 
   if (!product) {
     return (
@@ -64,6 +95,7 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
 
   return (
     <div className="w-full pt-28 pb-24 flex-1">
+      {/* Patina Inspector Modal */}
       <AnimatePresence>
         {inspectorOpen && (
           <PatinaInspector
@@ -73,6 +105,18 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
             condition={product.condition}
             category={categoryName}
             onClose={() => setInspectorOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Full-Screen Edge-to-Edge Slidable & Zoomable Lightbox Modal */}
+      <AnimatePresence>
+        {isFullScreenOpen && (
+          <FullScreenImageViewer
+            images={product.images}
+            initialIndex={selectedImage}
+            productName={product.name}
+            onClose={() => setIsFullScreenOpen(false)}
           />
         )}
       </AnimatePresence>
@@ -93,9 +137,16 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
 
       <div className="max-w-[1800px] mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 mb-12">
-          {/* Left Column: Image Gallery */}
+          {/* Left Column: Image Gallery (Flipkart Style Slidable + Tap to Fullscreen) */}
           <div className="lg:col-span-5 flex flex-col gap-4">
-            <div className="relative aspect-[3/4] bg-bg-warm overflow-hidden border border-border/30 group">
+            <div 
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              onClick={() => setIsFullScreenOpen(true)}
+              className="relative aspect-[3/4] bg-bg-warm overflow-hidden border border-border/30 group cursor-zoom-in"
+              title="Click or tap to open fullscreen zoom view"
+            >
               {product.images[selectedImage]?.endsWith(".mp4") ? (
                 <video autoPlay loop muted playsInline className="w-full h-full object-cover">
                   <source src={product.images[selectedImage]} type="video/mp4" />
@@ -104,29 +155,88 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
                 <img 
                   src={product.images[selectedImage]} 
                   alt={`${product.name} - View ${selectedImage + 1}`} 
-                  className="w-full h-full object-cover transition-all duration-700" 
+                  className="w-full h-full object-cover transition-all duration-500 group-hover:scale-[1.02]" 
                 />
               )}
 
+              {/* Tap to Fullscreen Badge */}
+              <div className="absolute top-4 right-4 bg-bg/85 backdrop-blur-md border border-border/60 px-3 py-1.5 rounded-full flex items-center gap-1.5 text-text z-10 transition-all duration-300 opacity-90 group-hover:opacity-100 group-hover:border-terracotta shadow-md">
+                <Maximize2 size={12} className="text-terracotta" />
+                <span className="text-[8px] font-black uppercase tracking-widest">Tap to Zoom</span>
+              </div>
+
+              {/* Chevron Navigation (Discreet on desktop, clean on mobile) */}
               {product.images.length > 1 && (
                 <>
                   <button
-                    onClick={() => setSelectedImage((prev) => (prev === 0 ? product.images.length - 1 : prev - 1))}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 p-2.5 bg-bg/90 border border-border hover:bg-text hover:text-bg transition-colors duration-300 z-10 flex items-center justify-center cursor-pointer shadow-lg"
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedImage((prev) => (prev === 0 ? product.images.length - 1 : prev - 1));
+                    }}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-bg/80 backdrop-blur-sm border border-border/50 text-text hover:bg-text hover:text-bg transition-all duration-200 z-10 flex items-center justify-center cursor-pointer shadow-md opacity-80 hover:opacity-100 active:scale-95"
                     aria-label="Previous image"
                   >
                     <ChevronLeft size={16} />
                   </button>
                   <button
-                    onClick={() => setSelectedImage((prev) => (prev === product.images.length - 1 ? 0 : prev + 1))}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2.5 bg-bg/90 border border-border hover:bg-text hover:text-bg transition-colors duration-300 z-10 flex items-center justify-center cursor-pointer shadow-lg"
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedImage((prev) => (prev === product.images.length - 1 ? 0 : prev + 1));
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-bg/80 backdrop-blur-sm border border-border/50 text-text hover:bg-text hover:text-bg transition-all duration-200 z-10 flex items-center justify-center cursor-pointer shadow-md opacity-80 hover:opacity-100 active:scale-95"
                     aria-label="Next image"
                   >
                     <ChevronRight size={16} />
                   </button>
                 </>
               )}
+
+              {/* Bottom Pagination Dots (Flipkart Style — Tiny & Clean) */}
+              {product.images.length > 1 && (
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10 bg-bg/80 backdrop-blur-md px-2.5 py-1 rounded-full border border-border/30 shadow-sm pointer-events-auto">
+                  {product.images.map((_: any, idx: number) => (
+                    <span
+                      key={idx}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedImage(idx);
+                      }}
+                      className={`block rounded-full cursor-pointer transition-all duration-300 ${
+                        idx === selectedImage
+                          ? "w-4 h-1.5 bg-terracotta"
+                          : "w-1.5 h-1.5 bg-muted/40 hover:bg-muted/70"
+                      }`}
+                      aria-label={`View image ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
+
+            {/* Thumbnail Preview Strip */}
+            {product.images.length > 1 && (
+              <div className="flex items-center gap-2.5 overflow-x-auto py-1 no-scrollbar">
+                {product.images.map((img: string, idx: number) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImage(idx)}
+                    className={`relative w-16 h-20 bg-bg-warm rounded overflow-hidden border-2 transition-all duration-200 shrink-0 cursor-pointer ${
+                      idx === selectedImage
+                        ? "border-terracotta scale-105 shadow-md"
+                        : "border-border/40 opacity-70 hover:opacity-100 hover:border-border"
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
 
             <button
               onClick={() => setInspectorOpen(true)}
