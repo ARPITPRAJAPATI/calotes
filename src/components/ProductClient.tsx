@@ -238,22 +238,51 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
               </div>
             )}
 
+            {/* Google Lens Reverse Image Authentication Button */}
             <button
-              onClick={() => setInspectorOpen(true)}
-              className="group flex items-center justify-between w-full border border-border hover:border-terracotta bg-bg-warm hover:bg-terracotta/5 px-5 py-4 transition-all duration-300"
+              type="button"
+              onClick={() => {
+                const targetImage = product.images?.[selectedImage] || product.images?.[0];
+                if (!targetImage) {
+                  toast.error("No product image found for authentication");
+                  return;
+                }
+                const lensUrl = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(targetImage)}`;
+                window.open(lensUrl, "_blank", "noopener,noreferrer");
+              }}
+              className="group flex items-center justify-between w-full border border-border hover:border-terracotta bg-bg-warm hover:bg-terracotta/5 px-5 py-4 transition-all duration-300 shadow-sm cursor-pointer"
             >
               <div className="flex items-center gap-3">
-                <ScanLine size={12} className="text-terracotta shrink-0" />
+                <div className="w-8 h-8 rounded-full bg-terracotta/10 flex items-center justify-center text-terracotta group-hover:bg-terracotta group-hover:text-bg transition-colors shrink-0">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 8V5a2 2 0 0 1 2-2h3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />
+                  </svg>
+                </div>
                 <div className="text-left">
-                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-text group-hover:text-terracotta transition-colors">
-                    Inspect Patina &amp; Tags
+                  <p className="text-[9px] font-black uppercase tracking-[0.25em] text-text group-hover:text-terracotta transition-colors flex items-center gap-1.5">
+                    Authenticate on Google Lens
+                    <span className="text-[7px] font-bold px-1.5 py-0.5 bg-terracotta/15 text-terracotta rounded uppercase tracking-wider">
+                      Verify
+                    </span>
                   </p>
                   <p className="text-[7px] font-bold uppercase tracking-widest text-muted mt-0.5">
-                    Magnify · Authenticate · Explore
+                    Reverse Image Search · Match Vintage Catalog · Real vs Fake
                   </p>
                 </div>
               </div>
-              <div className="w-6 h-px bg-border group-hover:w-10 group-hover:bg-terracotta transition-all duration-500" />
+              <div className="flex items-center gap-2 text-muted group-hover:text-terracotta transition-colors">
+                <span className="text-[8px] font-bold uppercase tracking-widest hidden sm:inline-block">Open Lens</span>
+                <div className="w-6 h-px bg-border group-hover:w-10 group-hover:bg-terracotta transition-all duration-500" />
+              </div>
             </button>
           </div>
 
@@ -272,9 +301,6 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
                 <span className="text-3xl font-black text-terracotta">
                   ₹{product.price.toLocaleString("en-IN")}
                 </span>
-                {product.compareAtPrice && (
-                  <span className="text-muted line-through text-lg mb-1">₹{product.compareAtPrice.toLocaleString("en-IN")}</span>
-                )}
               </div>
 
               <div className="mt-6">

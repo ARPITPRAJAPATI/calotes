@@ -247,20 +247,9 @@ function ShopContent() {
                   <Link href={`/shop/product/${product.slug}`}>
                     {/* Image Viewport Frame */}
                     <div className="relative aspect-[3/4] overflow-hidden bg-bg-warm">
-                      {product.compareAtPrice ? (
-                        <div className="absolute top-2 left-2 z-20 flex flex-col gap-1.5 items-start">
-                          <span className="text-[7px] font-bold uppercase tracking-widest bg-terracotta/90 text-bg px-2 py-0.5 shadow-sm">
-                            Sale
-                          </span>
-                          <span className="text-[7px] font-bold uppercase tracking-widest bg-bg/95 text-muted px-2 py-0.5 shadow-sm border border-border/20">
-                            {product.condition || "Pre-Loved"}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="absolute top-2 left-2 z-20 text-[7px] font-bold uppercase tracking-widest bg-bg/95 text-muted px-2 py-0.5 shadow-sm border border-border/20">
-                          {product.condition || "Pre-Loved"}
-                        </span>
-                      )}
+                      <span className="absolute top-2 left-2 z-20 text-[7px] font-bold uppercase tracking-widest bg-bg/95 text-muted px-2 py-0.5 shadow-sm border border-border/20">
+                        {product.condition || "Pre-Loved"}
+                      </span>
 
                       {/* Display SOLD OUT overlay on depleted product stocks */}
                       {product.stock !== undefined && product.stock <= 0 && (
