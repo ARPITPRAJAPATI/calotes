@@ -41,9 +41,6 @@ export default function AdminHealthMonitor() {
 
   useEffect(() => {
     fetchHealth();
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchHealth, 30000);
-    return () => clearInterval(interval);
   }, []);
 
   const getStatusBadge = (status: string) => {

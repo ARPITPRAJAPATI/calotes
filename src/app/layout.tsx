@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Barlow, Playfair_Display } from "next/font/google";
+import { unstable_cache } from "next/cache";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import Navbar from "@/components/Navbar";
@@ -76,21 +77,27 @@ export const metadata: Metadata = {
   },
 };
 
+const getCachedThemeAccent = unstable_cache(
+  async () => {
+    try {
+      await connectDB();
+      const settings: any = await Settings.findOne().select('accentColor').lean();
+      return settings?.accentColor || "#C85a32";
+    } catch (err) {
+      console.error("Layout failed to load theme settings", err);
+      return "#C85a32";
+    }
+  },
+  ["root-layout-accent-color"],
+  { revalidate: 300, tags: ["settings"] }
+);
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  let activeAccent = "#C85a32";
-  try {
-    await connectDB();
-    const settings = await Settings.findOne();
-    if (settings && settings.accentColor) {
-      activeAccent = settings.accentColor;
-    }
-  } catch (err) {
-    console.error("Layout failed to load theme settings", err);
-  }
+  const activeAccent = await getCachedThemeAccent();
 
   return (
     <html lang="en" suppressHydrationWarning className={`dark ${inter.variable} ${barlow.variable} ${playfair.variable} antialiased selection:bg-terracotta selection:text-bg`}>
@@ -104,7 +111,6 @@ export default async function RootLayout({
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="manifest" href="/site.webmanifest" />
         <link rel="preload" as="image" href="/images/hero-mobile.jpg" media="(max-width: 767px)" fetchPriority="high" />
         <link rel="preload" as="image" href="/images/hero-pc.jpg" media="(min-width: 768px)" fetchPriority="high" />
         <meta name="theme-color" content="#C85a32" />

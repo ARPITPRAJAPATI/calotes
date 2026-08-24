@@ -4,7 +4,8 @@ import ProductClient from "@/components/ProductClient";
 import { notFound } from "next/navigation";
 import { isValidObjectId } from "@/lib/sanitize";
 
-export const dynamic = 'force-dynamic';
+// Incremental Static Regeneration (ISR): cached at Edge CDN, revalidates every 60s
+export const revalidate = 60;
 
 interface PageProps {
   params: Promise<{ slug: string }>;

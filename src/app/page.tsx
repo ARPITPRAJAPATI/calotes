@@ -1,12 +1,12 @@
-// Server Component — fetches data server-side and sends ready HTML to browser (zero client-side API calls)
+// Server Component — fetches data server-side and caches with ISR (revalidates every 60s)
 import connectDB from "@/lib/db";
 import Product from "@/models/Product";
 import Category from "@/models/Category";
 import Settings from "@/models/Settings";
 import HomeClient from "@/components/HomeClient";
 
-// Force dynamic rendering (fetches fresh data from MongoDB on each request)
-export const dynamic = 'force-dynamic';
+// Incremental Static Regeneration (ISR): serves cached HTML from Edge CDN with 0 CPU load
+export const revalidate = 60;
 
 /* ─────────────────────────────────────────────────────────
    Fallback data (used when DB is empty)

@@ -130,6 +130,7 @@ export async function GET() {
     { status: overallStatus === 'down' ? 503 : 200 }
   );
 
+  response.headers.set('Cache-Control', 'public, s-maxage=15, stale-while-revalidate=60');
   response.headers.set('Access-Control-Allow-Origin', '*');
   response.headers.set('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');

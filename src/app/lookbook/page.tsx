@@ -14,7 +14,8 @@ const DEFAULT_LOOKS = [
   { url: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=900", title: "Look 08", desc: "Military Aesthetic" },
 ];
 
-export const dynamic = "force-dynamic";
+// Incremental Static Regeneration (ISR): cached at Edge CDN, revalidates every 5 minutes
+export const revalidate = 300;
 
 export default async function LookbookPage() {
   await connectDB();

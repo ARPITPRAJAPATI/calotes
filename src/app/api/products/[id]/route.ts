@@ -23,12 +23,15 @@ export async function GET(req: Request, { params }: RouteParams) {
     if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
-    return NextResponse.json(product);
+    const response = NextResponse.json(product);
+    response.headers.set('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=120');
+    return response;
   } catch (error: any) {
     console.error('Product fetch failed:', error);
     return NextResponse.json({ error: 'Failed to fetch product' }, { status: 500 });
   }
 }
+
 
 // PUT product detailed API route: updates details of a single product (Admin protected)
 export async function PUT(req: Request, { params }: RouteParams) {

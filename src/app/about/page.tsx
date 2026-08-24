@@ -2,7 +2,8 @@ import connectDB from "@/lib/db";
 import Settings from "@/models/Settings";
 import AboutClient from "./AboutClient";
 
-export const dynamic = "force-dynamic";
+// Incremental Static Regeneration (ISR): cached at Edge CDN, revalidates every 5 minutes
+export const revalidate = 300;
 
 // Default brand story images used as fallback
 const DEFAULT_BRAND_IMAGES = [
