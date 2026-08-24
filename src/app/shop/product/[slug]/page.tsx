@@ -7,6 +7,25 @@ import { isValidObjectId } from "@/lib/sanitize";
 // Incremental Static Regeneration (ISR): cached at Edge CDN, revalidates every 60s
 export const revalidate = 60;
 
+// Pre-render top 30 active products at build time for instant 0ms edge delivery
+export async function generateStaticParams() {
+  try {
+    await connectDB();
+    const products = await Product.find({ stock: { $gt: 0 } })
+      .select('slug _id')
+      .sort({ isFeatured: -1, createdAt: -1 })
+      .limit(30)
+      .lean();
+
+    return products.map((p: any) => ({
+      slug: String(p.slug || p._id),
+    }));
+  } catch (err) {
+    // Graceful fallback: return empty array so builds never fail if DB is slow
+    return [];
+  }
+}
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }

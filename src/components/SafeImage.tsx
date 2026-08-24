@@ -8,6 +8,17 @@ interface SafeImageProps extends ImgHTMLAttributes<HTMLImageElement> {
 
 const DEFAULT_FALLBACK = "https://images.unsplash.com/photo-1550614000-4b95d4ebfa24?q=80&w=800&auto=format&fit=crop";
 
+function optimizeCloudinaryUrl(url?: any): string {
+  if (typeof url !== 'string' || !url) return typeof url === 'string' ? url : '';
+  if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
+    if (!url.includes('f_auto') && !url.includes('q_auto')) {
+      return url.replace('/upload/', '/upload/f_auto,q_auto/');
+    }
+  }
+  return url;
+}
+
+
 export default function SafeImage({
   src,
   alt = "Calotes Vintage",
@@ -17,7 +28,8 @@ export default function SafeImage({
 }: SafeImageProps) {
   const [imgError, setImgError] = useState(false);
 
-  const effectiveSrc = imgError || !src ? fallbackSrc : src;
+  const rawSrc = imgError || !src ? fallbackSrc : src;
+  const effectiveSrc = optimizeCloudinaryUrl(rawSrc);
 
   return (
     <img
@@ -33,3 +45,4 @@ export default function SafeImage({
     />
   );
 }
+
