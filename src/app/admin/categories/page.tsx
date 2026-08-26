@@ -7,6 +7,7 @@ import { Plus, Trash2, Upload } from 'lucide-react';
 // Import hot toast notification triggers
 import toast from 'react-hot-toast';
 import ImageCropperModal from '@/components/ImageCropperModal';
+import { compressImage } from '@/lib/clientImageCompressor';
 
 // Category interface schema definitions
 interface Category {
@@ -65,11 +66,14 @@ export default function AdminCategoriesPage() {
 
   // Upload single category cover image (cropped or original) to Cloudinary via upload endpoint
   const handleCropComplete = async (fileToUpload: File) => {
+    setIsCropperOpen(false);
+    setCropperFile(null);
     setIsUploading(true);
-    const formData = new FormData();
-    formData.append('file', fileToUpload);
-
     try {
+      const compressed = await compressImage(fileToUpload);
+      const formData = new FormData();
+      formData.append('file', compressed);
+
       const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData,

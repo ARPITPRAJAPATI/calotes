@@ -9,6 +9,7 @@ import { Upload, Trash2, ArrowLeft, Plus } from 'lucide-react';
 // Import hot toast notification helpers
 import toast from 'react-hot-toast';
 import ImageCropperModal from '@/components/ImageCropperModal';
+import { compressImage } from '@/lib/clientImageCompressor';
 // Import Link for page routing transitions
 import Link from 'next/link';
 
@@ -80,8 +81,10 @@ export default function NewProductPage() {
   const uploadSingleFile = async (fileToUpload: File) => {
     setIsUploading(true);
     try {
+      // Fast client-side compression
+      const compressed = await compressImage(fileToUpload);
       const formData = new FormData();
-      formData.append('file', fileToUpload);
+      formData.append('file', compressed);
       
       const res = await fetch('/api/upload', {
         method: 'POST',
@@ -113,17 +116,30 @@ export default function NewProductPage() {
     e.target.value = ''; // Reset file input
   };
 
-  // Handler when user finishes cropping an image in the modal
-  const handleCropComplete = async (croppedFile: File) => {
-    await uploadSingleFile(croppedFile);
+  // Handler when user finishes cropping or skips an individual image (advances instantly)
+  const handleCropComplete = (croppedFile: File) => {
+    // Start upload in background immediately
+    uploadSingleFile(croppedFile);
     
-    // Check if more files are queued for cropping
+    // Advance to next image or close modal in 0ms
     if (currentCropIndex + 1 < pendingFiles.length) {
       setCurrentCropIndex((prev) => prev + 1);
     } else {
       setIsCropperOpen(false);
       setPendingFiles([]);
       setCurrentCropIndex(0);
+    }
+  };
+
+  // Skip all remaining queued images and upload simultaneously
+  const handleSkipAll = () => {
+    const remaining = pendingFiles.slice(currentCropIndex);
+    setIsCropperOpen(false);
+    setPendingFiles([]);
+    setCurrentCropIndex(0);
+    
+    for (const f of remaining) {
+      uploadSingleFile(f);
     }
   };
 
@@ -489,6 +505,8 @@ export default function NewProductPage() {
         }}
         onCropComplete={handleCropComplete}
         onSkipCrop={handleCropComplete}
+        onSkipAll={handleSkipAll}
+        remainingCount={pendingFiles.length - currentCropIndex}
         defaultAspectRatio={3 / 4}
         title={`Crop Product Image (${currentCropIndex + 1}/${pendingFiles.length})`}
       />

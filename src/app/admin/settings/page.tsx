@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 // Import UI vector graphics icons
 import { Loader2, Save, Upload, Plus, Trash2, GripVertical, ImageIcon, Crop } from 'lucide-react';
 import ImageCropperModal from '@/components/ImageCropperModal';
+import { compressImage } from '@/lib/clientImageCompressor';
 
 export default function AdminSettingsPage() {
   // Bind form configurations to individual state hooks
@@ -141,10 +142,12 @@ export default function AdminSettingsPage() {
   const processUploadedFile = async (fileToUpload: File) => {
     setIsUploading(true);
     setIsCropModalOpen(false);
-    const formData = new FormData();
-    formData.append('file', fileToUpload);
 
     try {
+      const compressed = await compressImage(fileToUpload);
+      const formData = new FormData();
+      formData.append('file', compressed);
+
       const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
