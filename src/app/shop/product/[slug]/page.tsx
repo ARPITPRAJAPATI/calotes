@@ -4,8 +4,9 @@ import ProductClient from "@/components/ProductClient";
 import { notFound } from "next/navigation";
 import { isValidObjectId } from "@/lib/sanitize";
 
-// Incremental Static Regeneration (ISR): cached at Edge CDN, revalidates every 60s
-export const revalidate = 60;
+// ISR: 1-hour Edge CDN cache — on-demand revalidation fires instantly when admin
+// edits or deletes a product, keeping the page always fresh without background CPU burn.
+export const revalidate = 3600;
 
 // Pre-render top 30 active products at build time for instant 0ms edge delivery
 export async function generateStaticParams() {

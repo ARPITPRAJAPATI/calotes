@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import connectDB from '@/lib/db';
 import Settings from '@/models/Settings';
 import { auth } from '@/auth';
@@ -70,6 +71,11 @@ export async function POST(req: Request) {
     } else {
       updated = await Settings.findByIdAndUpdate(settings._id, parsed.data, { new: true });
     }
+
+    // Immediately invalidate all pages that display settings-driven content
+    revalidatePath('/', 'layout');       // Hero headline, announcement bar
+    revalidatePath('/about', 'page');   // Brand story images
+    revalidatePath('/lookbook', 'page'); // Lookbook gallery
 
     return NextResponse.json(updated ? updated.toObject() : {});
   } catch (error: any) {

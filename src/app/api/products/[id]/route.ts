@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import connectDB from '@/lib/db';
 import Product from '@/models/Product';
 import AuditLog from '@/models/AuditLog';
@@ -24,7 +25,7 @@ export async function GET(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
     const response = NextResponse.json(product);
-    response.headers.set('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=120');
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
     return response;
   } catch (error: any) {
     console.error('Product fetch failed:', error);
@@ -78,6 +79,12 @@ export async function PUT(req: Request, { params }: RouteParams) {
       after: updatedProduct?.toObject(),
     });
 
+    // Invalidate Edge CDN caches for the affected product and catalog
+    const slug = (updatedProduct as any)?.slug || id;
+    revalidatePath(`/shop/product/${slug}`, 'page');
+    revalidatePath('/shop', 'page');
+    revalidatePath('/', 'layout');
+
     return NextResponse.json(updatedProduct?.toObject());
   } catch (error: any) {
     console.error('Product update failed:', error);
@@ -114,6 +121,12 @@ export async function DELETE(req: Request, { params }: RouteParams) {
       after: null,
     });
     
+    // Invalidate Edge CDN caches so the deleted product disappears instantly
+    const slug = deletedProduct?.slug || id;
+    revalidatePath(`/shop/product/${slug}`, 'page');
+    revalidatePath('/shop', 'page');
+    revalidatePath('/', 'layout');
+
     return NextResponse.json({ success: true, message: 'Product deleted successfully' });
   } catch (error: any) {
     console.error('Product deletion failed:', error);

@@ -2,8 +2,8 @@ import connectDB from "@/lib/db";
 import Settings from "@/models/Settings";
 import AboutClient from "./AboutClient";
 
-// Incremental Static Regeneration (ISR): cached at Edge CDN, revalidates every 5 minutes
-export const revalidate = 300;
+// ISR: 1-hour Edge CDN cache — settings revalidation fires on-demand from admin panel.
+export const revalidate = 3600;
 
 // Default brand story images used as fallback
 const DEFAULT_BRAND_IMAGES = [

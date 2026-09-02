@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import connectDB from '@/lib/db';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
@@ -99,8 +100,9 @@ export async function GET(req: Request) {
       },
     });
 
-    // Edge CDN caching: 10s fresh, 59s stale-while-revalidate background refresh
-    response.headers.set('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=59');
+    // Edge CDN caching: 5-min fresh, 24h stale-while-revalidate.
+    // On-demand revalidation via revalidatePath() handles instant updates from admin panel.
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
     return response;
   } catch (error: any) {
     console.error('Products fetch failed:', error);
@@ -132,6 +134,11 @@ export async function POST(req: Request) {
     }
 
     const product = await Product.create(parsed.data);
+
+    // Invalidate Edge CDN cache so the new product appears instantly on storefront
+    revalidatePath('/', 'layout');
+    revalidatePath('/shop', 'page');
+
     return NextResponse.json(product.toObject(), { status: 201 });
   } catch (error: any) {
     console.error('Product create failed:', error);

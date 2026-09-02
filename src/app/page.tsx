@@ -5,8 +5,9 @@ import Category from "@/models/Category";
 import Settings from "@/models/Settings";
 import HomeClient from "@/components/HomeClient";
 
-// Incremental Static Regeneration (ISR): serves cached HTML from Edge CDN with 0 CPU load
-export const revalidate = 60;
+// ISR: 1-hour Edge CDN cache — on-demand revalidation via revalidatePath() handles
+// instant updates when admin edits a product. No background CPU burn needed.
+export const revalidate = 3600;
 
 /* ─────────────────────────────────────────────────────────
    Fallback data (used when DB is empty)
