@@ -65,11 +65,6 @@ export const metadata: Metadata = {
     icon: [
       { url: "/favicon.ico" },
       { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
@@ -89,7 +84,7 @@ const getCachedThemeAccent = unstable_cache(
     }
   },
   ["root-layout-accent-color"],
-  { revalidate: 300, tags: ["settings"] }
+  { revalidate: 3600, tags: ["settings"] }
 );
 
 export default async function RootLayout({
@@ -107,10 +102,6 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="manifest" href="/manifest.webmanifest" />
-        <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="preload" as="image" href="/images/hero-mobile.jpg" media="(max-width: 767px)" fetchPriority="high" />
         <link rel="preload" as="image" href="/images/hero-pc.jpg" media="(min-width: 768px)" fetchPriority="high" />
         <meta name="theme-color" content="#C85a32" />

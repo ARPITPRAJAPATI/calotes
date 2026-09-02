@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import crypto from 'crypto';
 import connectDB from '@/lib/db';
 import Order from '@/models/Order';
@@ -118,6 +119,10 @@ export async function POST(req: Request) {
             { $set: { stock: 0 } }
           );
         }
+
+        // Invalidate Edge CDN cache so purchased piece immediately reflects on storefront
+        revalidatePath('/', 'layout');
+        revalidatePath('/shop', 'page');
       } catch (stockErr) {
         console.error(`[WEBHOOK] Stock decrement failed for order ${order._id}:`, stockErr);
       }

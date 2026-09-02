@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import crypto from 'crypto';
 import connectDB from '@/lib/db';
 import Order from '@/models/Order';
@@ -112,6 +113,10 @@ export async function POST(req: Request) {
           { $set: { stock: 0 } }
         );
       }
+
+      // Immediately invalidate Edge CDN cache so purchased pieces show as SOLD OUT
+      revalidatePath('/', 'layout');
+      revalidatePath('/shop', 'page');
     } catch (stockErr) {
       // Stock decrement failure is non-fatal (payment already confirmed) — log and continue
       console.error('[WARN] Stock decrement failed for order', order_id, stockErr);
