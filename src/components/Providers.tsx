@@ -10,8 +10,8 @@ import { WishlistProvider } from "@/context/WishlistContext";
 // Root provider composition wrapper mounted in the top-level layout
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    // Inject NextAuth session context at the root level
-    <SessionProvider>
+    // Inject NextAuth session context with window focus refetch disabled to prevent background CPU burn
+    <SessionProvider refetchOnWindowFocus={false}>
       {/* Inject shopping cart state context */}
       <CartProvider>
         {/* Inject user wishlist state context inside the cart provider */}
