@@ -324,7 +324,7 @@ export default function AdminSettingsPage() {
                     {isUploading && cropTarget === 'desktop' ? 'Uploading...' : 'Upload PC Image'}
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif,image/*"
                       onChange={(e) => handleFileSelect('desktop', e)}
                       className="hidden"
                       disabled={isUploading}
@@ -370,7 +370,7 @@ export default function AdminSettingsPage() {
                     {isUploading && cropTarget === 'mobile' ? 'Uploading...' : 'Upload Mobile Image'}
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif,image/*"
                       onChange={(e) => handleFileSelect('mobile', e)}
                       className="hidden"
                       disabled={isUploading}
@@ -532,7 +532,7 @@ export default function AdminSettingsPage() {
           <input
             ref={lookbookFileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif,image/*"
             className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0];
@@ -642,7 +642,7 @@ export default function AdminSettingsPage() {
           <input
             ref={brandFileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif,image/*"
             className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0];

@@ -9,7 +9,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Allowed MIME types for upload — only raster images accepted
+// Allowed MIME types for upload — raster images and modern formats including iPhone HEIC/HEIF
 // SVG is intentionally excluded as it can contain embedded JavaScript (XSS vector)
 const ALLOWED_MIME_TYPES = new Set([
   'image/jpeg',
@@ -17,10 +17,14 @@ const ALLOWED_MIME_TYPES = new Set([
   'image/png',
   'image/webp',
   'image/avif',
+  'image/heic',
+  'image/heif',
+  'image/heic-sequence',
+  'image/heif-sequence',
 ]);
 
-// Maximum file size: 5MB
-const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+// Maximum file size: 10MB (Cloudinary handles up to 10MB easily)
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 
 // POST upload API route: validates and uploads images to Cloudinary (Admin protected only)
 export async function POST(req: Request) {
@@ -41,11 +45,13 @@ export async function POST(req: Request) {
 
     // 3. ── MIME type validation ──────────────────────────────────────────────────
     // Check both the reported type and sniff the magic bytes as a second layer.
-    // Never rely on file extension alone — attackers rename .exe files to .jpg.
+    // On iOS Safari, file.type can occasionally be empty for HEIC files picked from Camera Roll.
     const reportedType = file.type.toLowerCase();
-    if (!ALLOWED_MIME_TYPES.has(reportedType)) {
+    const isKnownExtension = /\.(jpe?g|png|webp|avif|heic|heif)$/i.test(file.name || '');
+    
+    if (!ALLOWED_MIME_TYPES.has(reportedType) && !(reportedType === '' && isKnownExtension)) {
       return NextResponse.json(
-        { error: `File type "${reportedType}" is not allowed. Only JPEG, PNG, WebP, and AVIF images are accepted.` },
+        { error: `File type "${reportedType || 'unknown'}" is not allowed. Only JPEG, PNG, WebP, AVIF, and HEIC images are accepted.` },
         { status: 415 }
       );
     }

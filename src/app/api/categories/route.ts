@@ -10,7 +10,7 @@ export async function GET() {
     const categories = await Category.find().populate('parent').sort('name').lean();
     return NextResponse.json(categories, {
       headers: {
-        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=600',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
       },
     });
   } catch (error: any) {
@@ -41,6 +41,14 @@ export async function POST(req: Request) {
       image,
       parent: parent || null,
     });
+
+    // Instant on-demand revalidation
+    try {
+      const { revalidatePath } = await import('next/cache');
+      revalidatePath('/shop');
+      revalidatePath('/');
+      revalidatePath('/api/categories');
+    } catch {}
 
     return NextResponse.json(category.toObject(), { status: 201 });
   } catch (error: any) {

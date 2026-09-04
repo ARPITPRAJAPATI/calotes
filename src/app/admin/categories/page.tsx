@@ -215,7 +215,7 @@ export default function AdminCategoriesPage() {
                 <label className="border border-dashed border-border aspect-square w-full flex flex-col items-center justify-center cursor-pointer hover:border-text transition-colors group">
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif,image/*"
                     onChange={handleFileSelect}
                     className="hidden"
                   />

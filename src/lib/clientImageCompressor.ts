@@ -19,8 +19,11 @@ export async function compressImage(
   file: File,
   options: CompressionOptions = {}
 ): Promise<File> {
-  // If not in browser, not an image, or already a small WebP/JPEG, return immediately
-  if (typeof window === 'undefined' || !file || !file.type.startsWith('image/')) {
+  // Recognize valid images by MIME or common file extensions (crucial for iOS Safari Camera Roll)
+  const isImg = Boolean(
+    file && (file.type?.startsWith('image/') || /\.(jpe?g|png|webp|avif|heic|heif)$/i.test(file.name || ''))
+  );
+  if (typeof window === 'undefined' || !isImg) {
     return file;
   }
 

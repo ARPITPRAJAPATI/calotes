@@ -114,31 +114,54 @@ export default function EditProductPage({ params }: PageProps) {
   const [currentCropIndex, setCurrentCropIndex] = useState<number>(0);
   const [isCropperOpen, setIsCropperOpen] = useState<boolean>(false);
 
-  // Helper to upload a single file (original or cropped) to Cloudinary
-  const uploadSingleFile = async (fileToUpload: File) => {
+  const [uploadProgressText, setUploadProgressText] = useState('');
+
+  // Robust sequential batch upload queue: prevents mobile browser crashes and network connection drops
+  const uploadBatch = async (filesToUpload: File[]) => {
+    if (!filesToUpload.length) return;
     setIsUploading(true);
-    try {
-      // Fast client-side compression
-      const compressed = await compressImage(fileToUpload);
-      const formData = new FormData();
-      formData.append('file', compressed);
-      
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      if (res.ok && data.url) {
-        setImages((prev) => [...prev, data.url]);
-        toast.success('Image uploaded successfully!');
-      } else {
-        toast.error(`Upload failed: ${data.error || 'Unknown error'}`);
+    let successCount = 0;
+
+    for (let i = 0; i < filesToUpload.length; i++) {
+      const file = filesToUpload[i];
+      const progressLabel = filesToUpload.length > 1 ? ` (${i + 1}/${filesToUpload.length})` : '';
+      setUploadProgressText(`Uploading${progressLabel}...`);
+
+      try {
+        const compressed = await compressImage(file);
+        const formData = new FormData();
+        formData.append('file', compressed);
+
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await res.json();
+        if (res.ok && data.url) {
+          setImages((prev) => [...prev, data.url]);
+          successCount++;
+        } else {
+          toast.error(`Image ${i + 1} failed: ${data.error || 'Upload rejected'}`);
+        }
+      } catch (err) {
+        console.error('Upload error:', err);
+        toast.error(`Image ${i + 1} upload failed`);
       }
-    } catch {
-      toast.error('Image upload failed');
-    } finally {
-      setIsUploading(false);
     }
+
+    if (successCount === filesToUpload.length) {
+      toast.success(filesToUpload.length > 1 ? `All ${successCount} images uploaded!` : 'Image uploaded successfully!');
+    } else if (successCount > 0) {
+      toast.success(`${successCount} of ${filesToUpload.length} images uploaded.`);
+    }
+
+    setIsUploading(false);
+    setUploadProgressText('');
+  };
+
+  // Helper to upload a single file (original or cropped) to Cloudinary
+  const uploadSingleFile = (fileToUpload: File) => {
+    uploadBatch([fileToUpload]);
   };
 
   // Intercept file selection and open Cropper Modal
@@ -168,16 +191,13 @@ export default function EditProductPage({ params }: PageProps) {
     }
   };
 
-  // Skip all remaining queued images and upload simultaneously
+  // Skip all remaining queued images and upload sequentially in queue
   const handleSkipAll = () => {
     const remaining = pendingFiles.slice(currentCropIndex);
     setIsCropperOpen(false);
     setPendingFiles([]);
     setCurrentCropIndex(0);
-    
-    for (const f of remaining) {
-      uploadSingleFile(f);
-    }
+    uploadBatch(remaining);
   };
 
   // Delete image from state array
@@ -517,13 +537,13 @@ export default function EditProductPage({ params }: PageProps) {
                   <input
                     type="file"
                     multiple
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif,image/*"
                     onChange={handleImageUpload}
                     className="hidden"
                   />
                   <Upload size={18} className="text-muted group-hover:text-text mb-1 transition-colors animate-bounce" />
                   <span className="text-[8px] font-black uppercase tracking-widest text-center text-muted group-hover:text-text transition-colors px-1">
-                    {isUploading ? 'Uploading...' : 'Add Images'}
+                    {isUploading ? (uploadProgressText || 'Uploading...') : 'Add Images'}
                   </span>
                 </label>
               </div>
